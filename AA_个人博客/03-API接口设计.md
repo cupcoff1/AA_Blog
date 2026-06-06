@@ -344,6 +344,15 @@
   "note_count": 25,
   "project_count": 6,
   "comment_count": 15,
+  "tags": [
+    {
+      "name": "Java",
+      "slug": "java",
+      "blog_count": 3,
+      "note_count": 2,
+      "project_count": 1
+    }
+  ],
   "recent_comments": [
     {
       "id": 1,
