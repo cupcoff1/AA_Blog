@@ -237,7 +237,7 @@
 
 ```json
 {
-  "url": "https://github.com/login/oauth/authorize?client_id=xxx&..."
+  "url": "https://github.com/login/oauth/authorize?client_id=xxx&redirect_uri=xxx&scope=user:email"
 }
 ```
 
@@ -245,17 +245,25 @@
 
 **GET** `/api/auth/github/callback?code={code}`
 
-后端用 code 换取 access_token，获取用户信息，签发评论者 token。
+后端用 code 换取 GitHub access_token，调 GitHub API 获取用户名和头像，签发评论者 JWT。
 
 ```json
 {
-  "token": "github_xxx...",
+  "token": "eyJ...",
   "user": {
     "name": "cupcoff1",
-    "avatar": "https://avatars.githubusercontent.com/..."
+    "avatar": "https://avatars.githubusercontent.com/u/xxx"
   }
 }
 ```
+
+### 3.3 评论者认证方式
+
+发表/删除评论时携带：
+
+> Header: `Authorization: Bearer <commenter_token>`
+
+后端从 JWT 解析出 `username` 和 `avatar`，无需额外传参。
 
 ---
 

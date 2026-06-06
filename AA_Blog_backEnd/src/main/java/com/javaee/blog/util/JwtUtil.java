@@ -32,6 +32,18 @@ public class JwtUtil {
                 .compact();
     }
 
+    /** 生成评论者 Token，含 avatar 信息 */
+    public String generateCommenterToken(String username, String avatar) {
+        Date now = new Date();
+        return Jwts.builder()
+                .subject(username)
+                .claim("avatar", avatar)
+                .issuedAt(now)
+                .expiration(new Date(now.getTime() + ttl * 1000))
+                .signWith(key)
+                .compact();
+    }
+
     public Claims parseToken(String token) {
         return Jwts.parser()
                 .verifyWith(key)
