@@ -200,20 +200,6 @@
 }
 ```
 
-**GET** `/api/projects/{slug}`
-
-```json
-{
-  "id": 1,
-  "name": "...",
-  "slug": "...",
-  "description": "...",
-  "content": "# Full markdown...",
-  "demo_url": "...",
-  "github_url": "...",
-  "tags": [{"id": 1, "name": "Vue", "slug": "vue"}]
-}
-```
 
 ### 2.6 About Me
 
@@ -315,22 +301,28 @@
 
 ```json
 {
-  "token": "eyJ...",
-  "refresh_token": "eyJ..."
+  "token": "eyJ..."
 }
 ```
 
 **POST** `/api/admin/refresh`
 
-```json
-{
-  "refresh_token": "eyJ..."
-}
-```
+> Header: `Authorization: Bearer <old_token>`
 
 ```json
 {
   "token": "eyJ..."
+}
+```
+
+**PUT** `/api/admin/password`
+
+> Header: `Authorization: Bearer <token>`
+
+```json
+{
+  "old_password": "123456",
+  "new_password": "new_password"
 }
 ```
 
@@ -502,7 +494,6 @@ slug 后端自动生成，published_at 自动取当前时间。
 {
   "name": "...",
   "description": "...",
-  "content": "# Markdown...",
   "demo_url": "...",
   "github_url": "...",
   "tag_ids": [],
@@ -527,38 +518,13 @@ slug 后端自动生成，published_at 自动取当前时间。
   "id": 1,
   "name": "...",
   "description": "...",
-  "content": "# Markdown...",
   "demo_url": "...",
   "github_url": "...",
   "tags": [{"id": 1, "name": "Vue"}]
 }
 ```
 
-### 5.6 标签管理
-
-**GET** `/api/admin/tags`
-
-**POST** `/api/admin/tags`
-
-```json
-{
-  "name": "..."
-}
-```
-
-**PUT** `/api/admin/tags/{id}`
-
-```json
-{
-  "name": "..."
-}
-```
-
-**DELETE** `/api/admin/tags/{id}`
-
-> 删除前校验：如果标签有关联内容，拒绝删除，返回 400。
-
-### 5.7 评论管理
+### 5.6 评论管理
 
 **GET** `/api/admin/comments`
 
@@ -582,7 +548,7 @@ slug 后端自动生成，published_at 自动取当前时间。
 
 > 级联删除所有子回复。
 
-### 5.8 About Me 管理
+### 5.7 About Me 管理
 
 **PUT** `/api/admin/about`
 
@@ -596,7 +562,7 @@ slug 后端自动生成，published_at 自动取当前时间。
 }
 ```
 
-### 5.9 文件上传
+### 5.8 文件上传
 
 **POST** `/api/admin/upload`
 
@@ -624,7 +590,6 @@ slug 后端自动生成，published_at 自动取当前时间。
 | GET | `/api/blog/{slug}/comments` | 无 | 文章评论列表 |
 | GET | `/api/notes` | 无 | Notes 列表 + 搜索 |
 | GET | `/api/projects` | 无 | 项目列表 |
-| GET | `/api/projects/{slug}` | 无 | 项目详情 |
 | GET | `/api/about` | 无 | 个人资料 |
 | GET | `/api/tags` | 无 | 标签列表 |
 | GET | `/api/auth/github/url` | 无 | GitHub 授权 URL |
@@ -633,6 +598,7 @@ slug 后端自动生成，published_at 自动取当前时间。
 | DELETE | `/api/comments/{id}` | 评论者 | 删除自己的评论 |
 | POST | `/api/admin/login` | 无 | 管理员登录 |
 | POST | `/api/admin/refresh` | 无 | 刷新 Token |
+| PUT | `/api/admin/password` | 管理员 | 修改密码 |
 | GET | `/api/admin/dashboard` | 管理员 | 仪表盘统计 |
 | GET | `/api/admin/blog` | 管理员 | Blog 管理列表 |
 | POST | `/api/admin/blog` | 管理员 | 创建文章 |
@@ -649,10 +615,6 @@ slug 后端自动生成，published_at 自动取当前时间。
 | PUT | `/api/admin/projects/{id}` | 管理员 | 编辑项目 |
 | DELETE | `/api/admin/projects/{id}` | 管理员 | 删除项目 |
 | GET | `/api/admin/projects/{id}` | 管理员 | 获取单个项目 |
-| GET | `/api/admin/tags` | 管理员 | 标签管理列表 |
-| POST | `/api/admin/tags` | 管理员 | 创建标签 |
-| PUT | `/api/admin/tags/{id}` | 管理员 | 编辑标签 |
-| DELETE | `/api/admin/tags/{id}` | 管理员 | 删除标签 |
 | GET | `/api/admin/comments` | 管理员 | 评论管理列表 |
 | DELETE | `/api/admin/comments/{id}` | 管理员 | 删除评论 |
 | PUT | `/api/admin/about` | 管理员 | 编辑个人资料 |
