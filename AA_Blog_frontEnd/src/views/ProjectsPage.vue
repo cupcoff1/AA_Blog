@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { FolderOpen } from '@lucide/vue'
+import { FolderOpen, Pencil, Trash2 } from '@lucide/vue'
 import api from '@/api/client'
 import type { ProjectsVO } from '@/models/types'
 
 const projects = ref<ProjectsVO[]>([])
 const loading = ref(true)
 const error = ref(false)
+const isAdmin = !!localStorage.getItem('admin_token')
+
+const deleteProject = async (id: number, name: string) => {
+  if (!confirm(`删除「${name}」？`)) return
+  await api.delete(`/admin/projects/${id}`)
+  projects.value = projects.value.filter(p => p.id !== id)
+}
 
 onMounted(async () => {
   try {
@@ -36,7 +43,14 @@ onMounted(async () => {
         <span v-else class="project-name">{{ proj.name }}</span>
         <p>{{ proj.description }}</p>
         <div class="tags" v-if="proj.tags?.length">
-          <span v-for="tag in proj.tags" :key="tag.id" class="tag-btn">{{ tag.name }}</span>
+        </div>
+        <div v-if="isAdmin" class="card-actions">
+          <RouterLink :to="`/projects/${proj.id}/edit`" class="icon-btn" title="编辑">
+            <Pencil :size="14" />
+          </RouterLink>
+          <button @click="deleteProject(proj.id, proj.name)" class="icon-btn icon-del" title="删除">
+            <Trash2 :size="14" />
+          </button>
         </div>
       </div>
     </div>
@@ -62,4 +76,8 @@ onMounted(async () => {
   font-size: 0.78em; color: var(--text-secondary);
   background: var(--bg-secondary);
 }
+.card-actions { display: flex; gap: 4px; margin-top: 0.5rem; justify-content: flex-end; }
+.icon-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; color: var(--text-secondary); background: none; border: none; cursor: pointer; }
+.icon-btn:hover { background: rgba(147, 197, 253, 0.25); color: rgba(147, 197, 253, 1); }
+.icon-del:hover { background: rgba(229, 62, 62, 0.15); color: #e53e3e; }
 </style>

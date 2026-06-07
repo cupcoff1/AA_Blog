@@ -7,18 +7,20 @@ const about = ref<AboutVO | null>(null)
 const loading = ref(true)
 const error = ref(false)
 
-const parseSkills = (s: string) => {
+const parseList = (s: string) => {
   try { return JSON.parse(s) as string[] } catch { return [] }
 }
 
 const stickyNotes = computed(() => {
-  const skills = about.value?.skills ? parseSkills(about.value.skills) : []
+  const a = about.value
+  const skills = a?.skills ? parseList(a.skills) : []
+  const hobbies = a?.hobbies ? parseList(a.hobbies) : []
   return [
-    { title: '👋', content: `I'm ${about.value?.nickname || 'AA_'}`, color: '#fff3cd', rotate: -3 },
+    { title: '👋', content: `I'm ${a?.nickname || 'AA_'}`, color: '#fff3cd', rotate: -3 },
     { title: '💻', content: skills.join(' · ') || 'Loading...', color: '#d4edda', rotate: 2 },
-    { title: '📍', content: '中国 · 学生', color: '#cce5ff', rotate: -1 },
-    { title: '📚', content: about.value?.bio?.substring(0, 60) || '...', color: '#f8d7da', rotate: 4 },
-    { title: '🎵', content: '喜欢音乐、编程、开源', color: '#e8daef', rotate: -2 },
+    { title: '📍', content: a?.location || '地球某处', color: '#cce5ff', rotate: -1 },
+    { title: '📚', content: a?.bio?.substring(0, 60) || '...', color: '#f8d7da', rotate: 4 },
+    { title: '🎵', content: hobbies.join(' · ') || '探索中', color: '#e8daef', rotate: -2 },
     { title: '🔗', content: 'github.com/cupcoff1', color: '#d1ecf1', rotate: 1 },
   ]
 })
@@ -79,6 +81,6 @@ onMounted(async () => {
 }
 .sticky:hover { transform: scale(1.05) !important; z-index: 10; }
 .sticky-title { font-size: 1.5em; margin-bottom: 0.5em; }
-.sticky-body { font-size: 0.9em; color: var(--text-secondary); line-height: 1.6; }
+.sticky-body { font-family: 'Ma Shan Zheng', cursive; font-size: 1.05em; color: rgba(0,0,0,0.65); line-height: 1.6; }
 .center-note { width: 220px; min-height: 140px; }
 </style>

@@ -16,6 +16,8 @@ public class About {
     private String avatar;
     private String bio;
     private String skills;
+    private String hobbies;
+    private String location;
     private String socialLinks;
     private LocalDateTime updatedAt;
 }

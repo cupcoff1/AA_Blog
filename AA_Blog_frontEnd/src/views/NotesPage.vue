@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Pencil, Search } from '@lucide/vue'
+import { Pencil, Search, Trash2 } from '@lucide/vue'
 import api from '@/api/client'
 import type { NotesVO } from '@/models/types'
 import { marked } from 'marked'
@@ -11,7 +11,14 @@ const router = useRouter()
 const notes = ref<NotesVO[]>([])
 const loading = ref(true)
 const error = ref(false)
+const isAdmin = !!localStorage.getItem('admin_token')
 const keyword = ref((route.query.q as string) || '')
+
+const deleteNote = async (id: number, title: string) => {
+  if (!confirm(`删除「${title}」？`)) return
+  await api.delete(`/admin/notes/${id}`)
+  notes.value = notes.value.filter(n => n.id !== id)
+}
 
 const fetchNotes = async () => {
   loading.value = true
@@ -67,6 +74,14 @@ watch(() => route.query.q, (val) => { keyword.value = (val as string) || '' })
             :to="`/notes?tag=${tag.slug}`" class="tag-btn">{{ tag.name }}</RouterLink>
         </div>
         <div class="note-body" v-html="marked(note.content || '')" />
+        <div v-if="isAdmin" class="note-actions">
+          <RouterLink :to="`/notes/${note.id}/edit`" class="icon-btn" title="编辑">
+            <Pencil :size="14" />
+          </RouterLink>
+          <button @click="deleteNote(note.id, note.title)" class="icon-btn icon-del" title="删除">
+            <Trash2 :size="14" />
+          </button>
+        </div>
       </article>
     </div>
   </div>
@@ -98,4 +113,8 @@ watch(() => route.query.q, (val) => { keyword.value = (val as string) || '' })
 .tag-btn:hover { border-color: var(--link); color: var(--link); text-decoration: none; }
 .note-body { line-height: 1.9; font-size: 1.02em; margin-top: 0.8em; background: rgba(0,0,0,0.08); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
 .note-body :deep(a) { text-decoration: underline; text-decoration-thickness: 2px; text-decoration-style: dotted; text-underline-offset: 6px; }
+.note-actions { display: flex; gap: 4px; margin-top: 0.5rem; justify-content: flex-end; }
+.icon-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; color: var(--text-secondary); background: none; border: none; cursor: pointer; }
+.icon-btn:hover { background: rgba(147, 197, 253, 0.25); color: rgba(147, 197, 253, 1); }
+.icon-del:hover { background: rgba(229, 62, 62, 0.15); color: #e53e3e; }
 </style>

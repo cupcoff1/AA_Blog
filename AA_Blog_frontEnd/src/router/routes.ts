@@ -36,29 +36,18 @@ const router = createRouter({
     },
 
     // ==================== 后台 ====================
-    {
-      path: '/admin/login',
-      name: 'admin-login',
-      component: () => import('@/views/admin/LoginPage.vue')
-    },
-    {
-      path: '/admin',
-      component: () => import('@/views/admin/AdminLayout.vue'),
-      children: [
-        { path: '', name: 'admin-dashboard', component: () => import('@/views/admin/DashboardPage.vue') },
-        { path: 'blog', name: 'admin-blog-list', component: () => import('@/views/admin/BlogListPage.vue') },
-        { path: 'blog/new', name: 'admin-blog-new', component: () => import('@/views/admin/BlogEditPage.vue') },
-        { path: 'blog/:id/edit', name: 'admin-blog-edit', component: () => import('@/views/admin/BlogEditPage.vue') },
-        { path: 'notes', name: 'admin-notes-list', component: () => import('@/views/admin/NotesListPage.vue') },
-        { path: 'notes/new', name: 'admin-notes-new', component: () => import('@/views/admin/NotesEditPage.vue') },
-        { path: 'notes/:id/edit', name: 'admin-notes-edit', component: () => import('@/views/admin/NotesEditPage.vue') },
-        { path: 'projects', name: 'admin-projects-list', component: () => import('@/views/admin/ProjectsListPage.vue') },
-        { path: 'projects/new', name: 'admin-projects-new', component: () => import('@/views/admin/ProjectsEditPage.vue') },
-        { path: 'projects/:id/edit', name: 'admin-projects-edit', component: () => import('@/views/admin/ProjectsEditPage.vue') },
-        { path: 'comments', name: 'admin-comments', component: () => import('@/views/admin/CommentsPage.vue') },
-        { path: 'about', name: 'admin-about', component: () => import('@/views/admin/AboutPage.vue') }
-      ]
-    },
+    { path: '/admin/login', name: 'admin-login', component: () => import('@/views/admin/LoginPage.vue') },
+    { path: '/admin', name: 'admin-dashboard', component: () => import('@/views/admin/DashboardPage.vue') },
+    { path: '/admin/comments', name: 'admin-comments', component: () => import('@/views/admin/CommentsPage.vue') },
+    { path: '/admin/about', name: 'admin-about', component: () => import('@/views/admin/AboutPage.vue') },
+
+    // 编辑页（管理员专用）
+    { path: '/blog/new', name: 'blog-new', component: () => import('@/views/admin/BlogEditPage.vue') },
+    { path: '/blog/:id/edit', name: 'blog-edit', component: () => import('@/views/admin/BlogEditPage.vue') },
+    { path: '/notes/new', name: 'notes-new', component: () => import('@/views/admin/NotesEditPage.vue') },
+    { path: '/notes/:id/edit', name: 'notes-edit', component: () => import('@/views/admin/NotesEditPage.vue') },
+    { path: '/projects/new', name: 'projects-new', component: () => import('@/views/admin/ProjectsEditPage.vue') },
+    { path: '/projects/:id/edit', name: 'projects-edit', component: () => import('@/views/admin/ProjectsEditPage.vue') },
 
     // ==================== 404 ====================
     {

@@ -4,14 +4,13 @@ import { useRoute } from 'vue-router'
 import Sidebar from '@/components/Sidebar.vue'
 
 const route = useRoute()
-const isAdmin = computed(() => route.path.startsWith('/admin'))
+const isLogin = computed(() => route.path === '/admin/login')
 </script>
 
 <template>
-  <div v-if="isAdmin" class="layout-full">
+  <div v-if="isLogin" class="layout-full">
     <router-view />
   </div>
-
   <div v-else class="layout">
     <Sidebar />
     <main class="main-content">

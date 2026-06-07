@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { BookOpen, Search } from '@lucide/vue'
+import { BookOpen, Search, Pencil, Trash2 } from '@lucide/vue'
 import api from '@/api/client'
 import type { BlogListVO } from '@/models/types'
 
@@ -10,6 +10,13 @@ const router = useRouter()
 const blogs = ref<BlogListVO[]>([])
 const loading = ref(true)
 const error = ref(false)
+const isAdmin = !!localStorage.getItem('admin_token')
+
+const deleteBlog = async (id: number, title: string) => {
+  if (!confirm(`删除「${title}」？`)) return
+  await api.delete(`/admin/blog/${id}`)
+  blogs.value = blogs.value.filter(b => b.id !== id)
+}
 const keyword = ref((route.query.q as string) || '')
 
 const fetchBlogs = async () => {
@@ -56,11 +63,20 @@ watch(() => route.query.q, (val) => { keyword.value = (val as string) || '' })
     <div v-else-if="!blogs.length" class="state">暂无文章</div>
 
     <div v-else class="post-list">
-      <RouterLink v-for="blog in blogs" :key="blog.id"
-        :to="`/blog/${blog.slug}`" class="post-item">
-        <time>{{ blog.publishedAt?.split('T')[0] }}</time>
-        <div class="post-title">{{ blog.title }}</div>
-      </RouterLink>
+      <div v-for="blog in blogs" :key="blog.id" class="post-row">
+        <RouterLink :to="`/blog/${blog.slug}`" class="post-item">
+          <time>{{ blog.publishedAt?.split('T')[0] }}</time>
+          <div class="post-title">{{ blog.title }}</div>
+        </RouterLink>
+        <div v-if="isAdmin" class="post-actions">
+          <RouterLink :to="`/blog/${blog.id}/edit`" class="icon-btn" title="编辑">
+            <Pencil :size="14" />
+          </RouterLink>
+          <button @click="deleteBlog(blog.id, blog.title)" class="icon-btn icon-del" title="删除">
+            <Trash2 :size="14" />
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -98,4 +114,10 @@ watch(() => route.query.q, (val) => { keyword.value = (val as string) || '' })
   text-decoration-style: dotted; text-decoration-color: var(--text); text-underline-offset: 6px;
 }
 .post-item:hover .post-title { text-decoration-color: var(--link); color: var(--link); }
+.post-row { display: flex; align-items: center; gap: 0.5rem; }
+.post-row .post-item { flex: 1; }
+.post-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.icon-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; color: var(--text-secondary); background: none; border: none; cursor: pointer; }
+.icon-btn:hover { background: rgba(147, 197, 253, 0.25); color: rgba(147, 197, 253, 1); }
+.icon-del:hover { background: rgba(229, 62, 62, 0.15); color: #e53e3e; }
 </style>

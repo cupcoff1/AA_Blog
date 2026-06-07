@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import api from '@/api/client'
 
 const nickname = ref(''); const avatar = ref(''); const bio = ref('')
-const skills = ref(''); const socialLinks = ref('')
+const skills = ref(''); const hobbies = ref(''); const location = ref(''); const socialLinks = ref('')
 const loading = ref(false); const message = ref('')
 
 const submit = async () => {
@@ -11,7 +11,8 @@ const submit = async () => {
   try {
     await api.put('/admin/about', {
       nickname: nickname.value, avatar: avatar.value, bio: bio.value,
-      skills: skills.value, socialLinks: socialLinks.value
+      skills: skills.value, hobbies: hobbies.value, location: location.value,
+      socialLinks: socialLinks.value
     })
     message.value = '保存成功'
   } catch (e: any) { message.value = e.message || '保存失败' }
@@ -21,7 +22,8 @@ onMounted(async () => {
   try {
     const a = await api.get('/about')
     nickname.value = a.nickname; avatar.value = a.avatar; bio.value = a.bio
-    skills.value = a.skills || ''; socialLinks.value = a.socialLinks || ''
+    skills.value = a.skills || ''; hobbies.value = a.hobbies || ''
+    location.value = a.location || ''; socialLinks.value = a.socialLinks || ''
   } catch {}
 })
 </script>
@@ -32,8 +34,10 @@ onMounted(async () => {
     <form @submit.prevent="submit">
       <label>昵称</label><input v-model="nickname" type="text" />
       <label>头像 URL</label><input v-model="avatar" type="text" placeholder="/uploads/avatars/xxx.jpg" />
-      <label>个人简介（Markdown）</label><textarea v-model="bio" rows="6" placeholder="Markdown 内容" />
-      <label>技能（JSON）</label><input v-model="skills" type="text" placeholder='["Java", "Spring Boot"]' />
+      <label>位置</label><input v-model="location" type="text" placeholder="中国 · 学生" />
+      <label>个人简介</label><textarea v-model="bio" rows="4" placeholder="简短介绍" />
+      <label>技能（JSON 数组）</label><input v-model="skills" type="text" placeholder='["Java", "Spring Boot"]' />
+      <label>爱好（JSON 数组）</label><input v-model="hobbies" type="text" placeholder='["coding", "music"]' />
       <label>社交链接（JSON）</label><input v-model="socialLinks" type="text" placeholder='{"github": "..."}' />
       <button type="submit" class="btn-submit" :disabled="loading">{{ loading ? '保存中...' : '保存' }}</button>
     </form>

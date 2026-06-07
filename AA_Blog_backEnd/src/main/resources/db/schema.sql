@@ -100,6 +100,8 @@ CREATE TABLE IF NOT EXISTS about (
     avatar VARCHAR(500) NOT NULL,
     bio TEXT NOT NULL,
     skills JSON,
+    hobbies JSON,
+    location VARCHAR(200),
     social_links JSON,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)

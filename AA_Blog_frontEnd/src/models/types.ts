@@ -100,6 +100,8 @@ export interface AboutVO {
   avatar: string
   bio: string
   skills: string
+  hobbies: string
+  location: string
   socialLinks: string
 }
 

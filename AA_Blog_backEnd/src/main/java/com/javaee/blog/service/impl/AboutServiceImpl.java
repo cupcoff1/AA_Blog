@@ -29,6 +29,8 @@ public class AboutServiceImpl implements AboutService {
         about.setAvatar(request.getAvatar());
         about.setBio(request.getBio());
         about.setSkills(request.getSkills());
+        about.setHobbies(request.getHobbies());
+        about.setLocation(request.getLocation());
         about.setSocialLinks(request.getSocialLinks());
         aboutMapper.updateById(about);
     }
@@ -39,6 +41,8 @@ public class AboutServiceImpl implements AboutService {
         vo.setAvatar(about.getAvatar());
         vo.setBio(about.getBio());
         vo.setSkills(about.getSkills());
+        vo.setHobbies(about.getHobbies());
+        vo.setLocation(about.getLocation());
         vo.setSocialLinks(about.getSocialLinks());
         return vo;
     }

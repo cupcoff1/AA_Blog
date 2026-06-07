@@ -5,7 +5,8 @@
       "Bash(npx vue-tsc *)",
       "Bash(npm install *)",
       "Read(//tmp/**)",
-      "Bash(npx vite *)"
+      "Bash(npx vite *)",
+      "Bash(mysql *)"
     ]
   }
 }
