@@ -16,60 +16,62 @@ const newTags = ref<string[]>([])
 const loading = ref(false)
 const error = ref('')
 
+const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const uploading = ref(false)
+
 const addNewTag = () => {
   const name = newTagInput.value.trim()
-  if (name && !newTags.value.includes(name)) {
-    newTags.value.push(name)
-    newTagInput.value = ''
-  }
+  if (name && !newTags.value.includes(name)) { newTags.value.push(name); newTagInput.value = '' }
 }
 
-const removeNewTag = (name: string) => {
-  newTags.value = newTags.value.filter(t => t !== name)
+const uploadImage = async (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  uploading.value = true
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    const res = await api.post('/admin/upload?type=image', form, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    const url = res.url
+    const ta = textareaRef.value
+    if (ta) {
+      const pos = ta.selectionStart
+      const md = `![](${url})`
+      content.value = content.value.slice(0, pos) + md + content.value.slice(pos)
+    }
+  } catch { error.value = '图片上传失败' }
+  finally { uploading.value = false; (e.target as HTMLInputElement).value = '' }
 }
+const removeNewTag = (name: string) => { newTags.value = newTags.value.filter(t => t !== name) }
 
 const submit = async () => {
   if (!title.value || !summary.value || !content.value) {
-    error.value = '标题、摘要、正文不能为空'
-    return
+    error.value = '标题、摘要、正文不能为空'; return
   }
-  loading.value = true
-  error.value = ''
+  loading.value = true; error.value = ''
   try {
-    const body = {
-      title: title.value,
-      summary: summary.value,
-      content: content.value,
-      tagIds: tagIds.value,
-      newTags: newTags.value
-    }
-    if (editId) {
-      await api.put(`/admin/blog/${editId}`, body)
-    } else {
-      await api.post('/admin/blog', body)
-    }
-    router.push('/admin/blog')
-  } catch (e: any) {
-    error.value = e.message || '保存失败'
-  } finally {
-    loading.value = false
-  }
+    const body = { title: title.value, summary: summary.value, content: content.value, tagIds: tagIds.value, newTags: newTags.value }
+    if (editId) await api.put(`/admin/blog/${editId}`, body)
+    else await api.post('/admin/blog', body)
+    router.push('/blog')
+  } catch (e: any) { error.value = e.message || '保存失败' }
+  finally { loading.value = false }
 }
 
 onMounted(async () => {
   if (editId) {
     const blog = await api.get(`/admin/blog/${editId}`)
-    title.value = blog.title
-    summary.value = blog.summary
-    content.value = blog.content
+    title.value = blog.title; summary.value = blog.summary; content.value = blog.content
     tagIds.value = blog.tags?.map((t: any) => t.id) || []
   }
 })
 </script>
 
 <template>
-  <div class="blog-edit">
-    <h1>{{ editId ? '编辑文章' : '新建文章' }}</h1>
+  <div class="edit-page">
+    <h1 class="page-title">{{ editId ? '编辑文章' : '新建文章' }}</h1>
 
     <div class="error" v-if="error">{{ error }}</div>
 
@@ -80,19 +82,23 @@ onMounted(async () => {
       <label>摘要</label>
       <input v-model="summary" type="text" placeholder="简短描述" />
 
-      <label>正文（Markdown）</label>
-      <textarea v-model="content" rows="16" placeholder="Markdown 内容" />
+      <div class="label-row">
+        <label>正文（Markdown）</label>
+        <label class="upload-label">
+          <input type="file" accept="image/*" @change="uploadImage" hidden />
+          {{ uploading ? '上传中...' : '📷 插入图片' }}
+        </label>
+      </div>
+      <textarea ref="textareaRef" v-model="content" rows="16" placeholder="Markdown 内容" />
 
-      <label>标签</label>
-      <div class="tag-mgr">
-        <div class="new-tags" v-if="newTags.length">
-          <span v-for="t in newTags" :key="t" class="new-tag">
-            {{ t }} <button type="button" @click="removeNewTag(t)">&times;</button>
-          </span>
-        </div>
+      <label>新标签</label>
+      <div class="tag-area">
+        <span v-for="t in newTags" :key="t" class="tag-pill">
+          {{ t }} <button type="button" @click="removeNewTag(t)">&times;</button>
+        </span>
         <div class="tag-input">
-          <input v-model="newTagInput" @keyup.enter.prevent="addNewTag" placeholder="输入新标签名，回车添加" />
-          <button type="button" @click="addNewTag">+</button>
+          <input v-model="newTagInput" @keyup.enter.prevent="addNewTag" placeholder="输入标签，回车添加" />
+          <button type="button" @click="addNewTag" class="tag-add">+</button>
         </div>
       </div>
 
@@ -104,53 +110,26 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.blog-edit { max-width: 800px; padding: 1rem 0; }
-
-.error {
-  background: #fed7d7; color: #c53030; padding: 0.6rem 1rem;
-  border-radius: 6px; margin-bottom: 1rem; font-size: 0.9em;
-}
-
+.edit-page { max-width: 800px; padding: 2rem 0; }
+.page-title { font-size: 2rem; margin-bottom: 1.5rem; }
+.error { background: #fed7d7; color: #c53030; padding: 0.6rem 1rem; border-radius: var(--radius); margin-bottom: 1rem; font-size: 0.9em; }
 form { display: flex; flex-direction: column; gap: 0.8rem; }
-
-label { font-weight: 600; font-size: 0.95em; margin-top: 0.5rem; }
-
+.label-row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.3rem; }
+.upload-label { font-weight: 500; font-size: 0.85em; color: var(--link); cursor: pointer; }
+.upload-label:hover { color: var(--link-hover); }
+label { font-weight: 600; font-size: 0.9em; color: var(--text-secondary); }
 input, textarea {
-  padding: 0.6rem 1rem; border: 1px solid var(--border);
-  border-radius: 6px; font-size: 1em; font-family: inherit;
-  background: var(--bg); color: var(--text); outline: none;
+  padding: 0.65rem 0.8rem; border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 0.95em; font-family: inherit; background: var(--bg); color: var(--text); outline: none;
 }
-
-input:focus, textarea:focus { border-color: var(--link); }
-
-.tag-mgr { display: flex; flex-direction: column; gap: 0.5rem; }
-
-.new-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-
-.new-tag {
-  background: var(--bg-secondary); padding: 4px 10px;
-  border-radius: 4px; font-size: 0.9em; display: flex; align-items: center; gap: 4px;
-}
-
-.new-tag button {
-  background: none; border: none; cursor: pointer;
-  color: var(--text-secondary); font-size: 1.1em;
-}
-
-.tag-input { display: flex; gap: 0.5rem; }
-
-.tag-input input { flex: 1; }
-
-.tag-input button {
-  padding: 0.5rem 1rem; background: var(--bg-secondary);
-  border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
-}
-
-.submit-btn {
-  margin-top: 1rem; padding: 0.7rem; background: var(--link);
-  color: #fff; border: none; border-radius: 6px; font-size: 1em; cursor: pointer;
-}
-
-.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+input:focus, textarea:focus { border-color: var(--link); box-shadow: 0 0 0 2px rgba(177,45,108,0.08); }
+.tag-area { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.tag-pill { display: flex; align-items: center; gap: 4px; background: var(--bg-secondary); padding: 3px 10px; border-radius: 20px; font-size: 0.85em; }
+.tag-pill button { background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 1em; padding: 0; line-height: 1; }
+.tag-input { display: flex; gap: 0; }
+.tag-input input { flex: 1; border-top-right-radius: 0; border-bottom-right-radius: 0; font-size: 0.85em; padding: 5px 8px; }
+.tag-add { padding: 5px 12px; border: 1px solid var(--border); border-left: none; border-radius: 0 var(--radius) var(--radius) 0; background: var(--bg-secondary); cursor: pointer; color: var(--text-secondary); }
+.submit-btn { margin-top: 1rem; padding: 0.5rem 1.5rem; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius); font-size: 0.9em; font-weight: 500; cursor: pointer; transition: opacity 0.2s; width: fit-content; }
+.submit-btn:hover { opacity: 0.85; }
+.submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
-

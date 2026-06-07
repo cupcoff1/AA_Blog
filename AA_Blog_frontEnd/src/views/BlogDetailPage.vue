@@ -85,10 +85,6 @@ const scrollToComments = () => {
               {{ comments.length ? `${comments.length} 条评论` : '暂无评论' }}
             </a>
           </div>
-          <div class="tags" v-if="blog.tags?.length">
-            <RouterLink v-for="tag in blog.tags" :key="tag.id"
-              :to="`/blog?tag=${tag.slug}`" class="tag-btn">{{ tag.name }}</RouterLink>
-          </div>
         </header>
 
         <div class="blog-content" v-html="marked(blog.content || '')" />
@@ -178,14 +174,6 @@ const scrollToComments = () => {
 
 /* Tags as buttons */
 .tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-.tag-btn {
-  display: inline-block; padding: 4px 12px;
-  border: 1px solid var(--border); border-radius: var(--radius);
-  font-size: 0.82em; color: var(--text-secondary);
-  background: var(--bg-secondary);
-}
-.tag-btn:hover { border-color: var(--link); color: var(--link); text-decoration: none; }
-
 /* Content */
 .blog-content { line-height: 1.8; font-size: 1.05em; margin-bottom: 2.5rem; }
 .blog-content :deep(a) { text-decoration: underline; text-decoration-thickness: 2px; text-decoration-style: dotted; text-underline-offset: 6px; }

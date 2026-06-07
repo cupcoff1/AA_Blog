@@ -17,7 +17,7 @@ const submit = async () => {
   try {
     const body = { name: name.value, description: description.value, demoUrl: demoUrl.value, githubUrl: githubUrl.value, tagIds: tagIds.value, newTags: newTags.value }
     editId ? await api.put(`/admin/projects/${editId}`, body) : await api.post('/admin/projects', body)
-    router.push('/admin/projects')
+    router.push('/projects')
   } catch (e: any) { error.value = e.message || '保存失败' } finally { loading.value = false }
 }
 onMounted(async () => {
@@ -26,7 +26,7 @@ onMounted(async () => {
 </script>
 <template>
   <div class="edit-page">
-    <h1>{{ editId ? '编辑项目' : '新建项目' }}</h1>
+    <h1 class="page-title">{{ editId ? '编辑项目' : '新建项目' }}</h1>
     <div class="error" v-if="error">{{ error }}</div>
     <form @submit.prevent="submit">
       <label>名称</label><input v-model="name" type="text" placeholder="项目名称" />
@@ -34,27 +34,32 @@ onMounted(async () => {
       <label>Demo 链接</label><input v-model="demoUrl" type="text" placeholder="https://..." />
       <label>GitHub 链接</label><input v-model="githubUrl" type="text" placeholder="https://github.com/..." />
       <label>标签</label>
-      <div class="tag-mgr">
-        <div class="tag-row" v-if="newTags.length"><span v-for="t in newTags" :key="t" class="tag">{{ t }} <button type="button" @click="removeNewTag(t)">&times;</button></span></div>
-        <div class="tag-row"><input v-model="newTagInput" @keyup.enter.prevent="addNewTag" placeholder="新标签，回车添加" /><button type="button" @click="addNewTag">+</button></div>
+      <div class="tag-area">
+        <span v-for="t in newTags" :key="t" class="tag-pill">{{ t }} <button type="button" @click="removeNewTag(t)">&times;</button></span>
+        <div class="tag-input">
+          <input v-model="newTagInput" @keyup.enter.prevent="addNewTag" placeholder="输入标签，回车添加" />
+          <button type="button" @click="addNewTag" class="tag-add">+</button>
+        </div>
       </div>
-      <button type="submit" class="btn-submit" :disabled="loading">{{ loading ? '保存中...' : '保存' }}</button>
+      <button type="submit" class="submit-btn" :disabled="loading">{{ loading ? '保存中...' : '保存' }}</button>
     </form>
   </div>
 </template>
 <style scoped>
-.edit-page { max-width: 800px; padding: 1rem 0; }
-.error { background: #fed7d7; color: #c53030; padding: 0.6rem 1rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9em; }
+.edit-page { max-width: 800px; padding: 2rem 0; }
+.page-title { font-size: 2rem; margin-bottom: 1.5rem; }
+.error { background: #fed7d7; color: #c53030; padding: 0.6rem 1rem; border-radius: var(--radius); margin-bottom: 1rem; font-size: 0.9em; }
 form { display: flex; flex-direction: column; gap: 0.8rem; }
-label { font-weight: 600; font-size: 0.95em; margin-top: 0.5rem; }
-input { padding: 0.6rem 1rem; border: 1px solid var(--border); border-radius: 6px; font-size: 1em; background: var(--bg); color: var(--text); outline: none; }
-input:focus { border-color: var(--link); }
-.tag-mgr { display: flex; flex-direction: column; gap: 0.5rem; }
-.tag-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.tag { background: var(--bg-secondary); padding: 4px 10px; border-radius: 4px; font-size: 0.9em; display: flex; align-items: center; gap: 4px; }
-.tag button { background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 1.1em; }
-.tag-row input { flex: 1; }
-.tag-row button { padding: 0.5rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
-.btn-submit { margin-top: 1rem; padding: 0.7rem; background: var(--link); color: #fff; border: none; border-radius: 6px; font-size: 1em; cursor: pointer; }
-.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+label { font-weight: 600; font-size: 0.9em; margin-top: 0.3rem; color: var(--text-secondary); }
+input { padding: 0.65rem 0.8rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.95em; background: var(--bg); color: var(--text); outline: none; }
+input:focus { border-color: var(--link); box-shadow: 0 0 0 2px rgba(177,45,108,0.08); }
+.tag-area { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.tag-pill { display: flex; align-items: center; gap: 4px; background: var(--bg-secondary); padding: 3px 10px; border-radius: 20px; font-size: 0.85em; }
+.tag-pill button { background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 1em; padding: 0; line-height: 1; }
+.tag-input { display: flex; }
+.tag-input input { flex: 1; border-top-right-radius: 0; border-bottom-right-radius: 0; font-size: 0.85em; padding: 5px 8px; }
+.tag-add { padding: 5px 12px; border: 1px solid var(--border); border-left: none; border-radius: 0 var(--radius) var(--radius) 0; background: var(--bg-secondary); cursor: pointer; color: var(--text-secondary); }
+.submit-btn { margin-top: 1rem; padding: 0.5rem 1.5rem; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius); font-size: 0.9em; font-weight: 500; cursor: pointer; transition: opacity 0.2s; width: fit-content; }
+.submit-btn:hover { opacity: 0.85; }
+.submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
