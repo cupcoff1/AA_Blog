@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:tania.dev)"
+      "WebFetch(domain:tania.dev)",
+      "Bash(npx vue-tsc *)"
     ]
   }
 }
