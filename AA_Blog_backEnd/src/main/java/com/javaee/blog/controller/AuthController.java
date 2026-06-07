@@ -1,7 +1,6 @@
 package com.javaee.blog.controller;
 
 import com.javaee.blog.common.Result;
-import com.javaee.blog.common.ResultCode;
 import com.javaee.blog.service.GitHubAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +22,7 @@ public class AuthController {
 
     @GetMapping("/github/callback")
     public Result<?> callback(@RequestParam String code) {
-        try {
-            Map<String, Object> result = gitHubAuthService.handleCallback(code);
-            return Result.ok(result);
-        } catch (Exception e) {
-            return Result.fail(ResultCode.SERVER_ERROR, "GitHub 授权失败");
-        }
+        Map<String, Object> result = gitHubAuthService.handleCallback(code);
+        return Result.ok(result);
     }
 }

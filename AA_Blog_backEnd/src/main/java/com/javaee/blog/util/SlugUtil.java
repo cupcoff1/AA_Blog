@@ -1,11 +1,19 @@
 package com.javaee.blog.util;
 
-import com.github.promeg.pinyinhelper.Pinyin;
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 
 /**
  * 标题转 slug 工具，中文转拼音，空格和符号转连字符
  */
 public class SlugUtil {
+
+    private static final HanyuPinyinOutputFormat FORMAT = new HanyuPinyinOutputFormat();
+
+    static {
+        FORMAT.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+    }
 
     public static String toSlug(String input) {
         StringBuilder sb = new StringBuilder();
@@ -15,10 +23,12 @@ public class SlugUtil {
             } else if (Character.isLetterOrDigit(c)) {
                 sb.append(c);
             } else if (c > 127) {
-                // 转拼音
-                String py = Pinyin.toPinyin(c);
-                if (py != null) {
-                    sb.append(py.toLowerCase().replace(" ", "-"));
+                try {
+                    String[] pinyin = PinyinHelper.toHanyuPinyinStringArray(c, FORMAT);
+                    if (pinyin != null && pinyin.length > 0) {
+                        sb.append(pinyin[0]);
+                    }
+                } catch (Exception ignored) {
                 }
             }
         }

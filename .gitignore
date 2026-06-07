@@ -35,6 +35,9 @@ build/
 ### Secrets ###
 .env
 
+### Uploads ###
+uploads/
+
 ### Mac OS ###
 .DS_Store
 

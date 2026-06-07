@@ -45,11 +45,7 @@ public class LoginController {
     public Result<?> changePassword(@Valid @RequestBody ChangePasswordRequest request,
                                      HttpServletRequest req) {
         String username = (String) req.getAttribute("username");
-        try {
-            authService.changePassword(username, request.getOldPassword(), request.getNewPassword());
-            return Result.ok();
-        } catch (IllegalArgumentException e) {
-            return Result.fail(ResultCode.BAD_REQUEST, e.getMessage());
-        }
+        authService.changePassword(username, request.getOldPassword(), request.getNewPassword());
+        return Result.ok();
     }
 }

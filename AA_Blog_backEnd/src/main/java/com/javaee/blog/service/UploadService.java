@@ -32,6 +32,8 @@ public class UploadService {
         }
 
         String subDir = "image".equals(type) ? "images" : "avatars";
+
+        // 创建子目录
         Path dir = Paths.get(baseDir, subDir);
         Files.createDirectories(dir);
 
