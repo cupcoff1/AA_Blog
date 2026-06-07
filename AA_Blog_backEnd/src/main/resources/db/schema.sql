@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS projects (
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL,
     description VARCHAR(500) NOT NULL,
-    content LONGTEXT NOT NULL,
+    content LONGTEXT NULL,
     demo_url VARCHAR(500),
     github_url VARCHAR(500),
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -1,10 +1,35 @@
 <script setup lang="ts">
-import NavBar from '@/components/NavBar.vue'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import Sidebar from '@/components/Sidebar.vue'
+
+const route = useRoute()
+const isAdmin = computed(() => route.path.startsWith('/admin'))
 </script>
 
 <template>
-  <NavBar />
-  <main class="container">
+  <div v-if="isAdmin" class="layout-full">
     <router-view />
-  </main>
+  </div>
+
+  <div v-else class="layout">
+    <Sidebar />
+    <main class="main-content">
+      <router-view />
+    </main>
+  </div>
 </template>
+
+<style scoped>
+.layout-full { min-height: 100vh; }
+.layout { min-height: 100vh; }
+@media screen and (min-width: 900px) {
+  .layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    gap: 5rem;
+    padding-left: 10rem;
+  }
+}
+.main-content { padding: 2rem 2rem 0; max-width: var(--max-width); }
+</style>

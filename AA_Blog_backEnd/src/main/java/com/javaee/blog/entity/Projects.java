@@ -16,7 +16,6 @@ public class Projects {
     private String name;
     private String slug;
     private String description;
-    private String content;
     private String demoUrl;
     private String githubUrl;
     private LocalDateTime createdAt;

@@ -105,111 +105,23 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.blog-detail {
-  padding: 2rem 0;
-}
-
-.blog-header {
-  margin-bottom: 2rem;
-}
-
-.blog-header h1 {
-  margin-bottom: 0.5rem;
-}
-
-.blog-meta {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  color: var(--text-secondary);
-  font-size: 0.95em;
-}
-
-.tags {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.tag {
-  font-size: 0.8em;
-  color: var(--text-secondary);
-  background: var(--bg-secondary);
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.blog-content {
-  line-height: 1.9;
-  margin-bottom: 2rem;
-}
-
-.post-nav {
-  display: flex;
-  justify-content: space-between;
-  padding: 1.5rem 0;
-  border-top: 1px solid var(--border);
-  margin-bottom: 2rem;
-}
-
-.state {
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 3rem 0;
-}
-
-.state.error {
-  color: #e53e3e;
-}
-
-/* 评论 */
-.comments {
-  border-top: 1px solid var(--border);
-  padding-top: 1.5rem;
-}
-
-.comment {
-  display: flex;
-  gap: 0.8rem;
-  margin-bottom: 1.2rem;
-}
-
-.comment-avatar img {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-}
-
-.comment-body {
-  flex: 1;
-}
-
-.comment-header {
-  display: flex;
-  gap: 0.8rem;
-  align-items: center;
-  margin-bottom: 0.3rem;
-}
-
-.comment-header time {
-  font-size: 0.85em;
-  color: var(--text-secondary);
-}
-
-.comment-content {
-  font-size: 0.95em;
-}
-
-.replies {
-  margin-top: 0.8rem;
-  margin-left: 1rem;
-  padding-left: 1rem;
-  border-left: 2px solid var(--border);
-}
-
-.no-comments {
-  color: var(--text-secondary);
-  font-size: 0.95em;
-  margin-top: 0.5rem;
-}
+.blog-detail { padding: 2.5rem 0; }
+.blog-header { margin-bottom: 2.5rem; }
+.blog-header h1 { font-size: 2.2em; margin-bottom: 0.4em; letter-spacing: -0.02em; }
+.blog-meta { display: flex; gap: 1rem; align-items: center; color: var(--text-secondary); font-size: 0.9em; }
+.tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.tag { font-size: 0.78em; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; }
+.blog-content { line-height: 1.9; font-size: 1.05em; margin-bottom: 2.5rem; }
+.post-nav { display: flex; justify-content: space-between; padding: 1.5rem 0; border-top: 1px solid var(--border); margin-bottom: 2rem; font-size: 0.95em; }
+.state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
+.state.error { color: #e53e3e; }
+.comments { border-top: 1px solid var(--border); padding-top: 1.5rem; }
+.comment { display: flex; gap: 0.8rem; margin-bottom: 1.2rem; }
+.comment-avatar img { width: 38px; height: 38px; border-radius: 50%; }
+.comment-body { flex: 1; }
+.comment-header { display: flex; gap: 0.8rem; align-items: center; margin-bottom: 0.2em; font-size: 0.92em; }
+.comment-header time { font-size: 0.85em; color: var(--text-secondary); }
+.comment-content { font-size: 0.95em; line-height: 1.7; }
+.replies { margin-top: 0.8rem; margin-left: 1rem; padding-left: 1rem; border-left: 2px solid var(--border); }
+.no-comments { color: var(--text-secondary); font-size: 0.95em; margin-top: 0.5rem; }
 </style>

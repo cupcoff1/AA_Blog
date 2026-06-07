@@ -45,7 +45,7 @@ const logout = () => {
 <style scoped>
 .admin-layout {
   display: flex;
-  min-height: calc(100vh - 60px);
+  min-height: 100vh;
 }
 
 .sidebar {

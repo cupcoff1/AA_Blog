@@ -43,6 +43,7 @@ watch(() => route.query.q, (val) => {
 
 <template>
   <div class="blog-page">
+    <h1 class="page-title">Blog</h1>
     <div class="search-bar">
       <input v-model="keyword" @keyup.enter="search" placeholder="搜索文章..." />
     </div>
@@ -67,76 +68,21 @@ watch(() => route.query.q, (val) => {
 </template>
 
 <style scoped>
-.blog-page {
-  padding: 2rem 0;
-}
-
-.search-bar {
-  margin-bottom: 2rem;
-}
-
+.blog-page { padding: 2.5rem 0; }
+.page-title { font-size: 1.8em; margin-bottom: 1rem; }
+.search-bar { margin-bottom: 1.5rem; }
 .search-bar input {
-  width: 100%;
-  padding: 0.6rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 1em;
-  background: var(--bg);
-  color: var(--text);
-  outline: none;
+  width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--border);
+  border-radius: var(--radius); font-size: 1em; background: var(--bg-secondary);
+  color: var(--text); outline: none; transition: border-color 0.2s;
 }
-
-.search-bar input:focus {
-  border-color: var(--link);
-}
-
-.state {
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 3rem 0;
-}
-
-.post-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.post-item {
-  padding-bottom: 1.2rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.post-title {
-  font-family: var(--serif);
-  font-size: 1.25em;
-  font-weight: 600;
-}
-
-.post-meta {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.3rem;
-  color: var(--text-secondary);
-  font-size: 0.9em;
-}
-
-.post-summary {
-  flex: 1;
-}
-
-.tags {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.tag {
-  font-size: 0.8em;
-  color: var(--text-secondary);
-  background: var(--bg-secondary);
-  padding: 2px 8px;
-  border-radius: 4px;
-}
+.search-bar input:focus { border-color: var(--link); background: var(--bg); }
+.state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
+.post-list { display: flex; flex-direction: column; gap: 1.8rem; }
+.post-item { padding-bottom: 1.6rem; border-bottom: 1px solid var(--border); }
+.post-title { font-family: var(--serif); font-size: 1.25em; font-weight: 600; }
+.post-meta { display: flex; gap: 1rem; margin-top: 0.25em; color: var(--text-secondary); font-size: 0.88em; }
+.post-summary { flex: 1; }
+.tags { display: flex; gap: 0.4rem; margin-top: 0.4rem; flex-wrap: wrap; }
+.tag { font-size: 0.78em; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; }
 </style>

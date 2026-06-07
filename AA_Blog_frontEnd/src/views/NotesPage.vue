@@ -66,83 +66,22 @@ watch(() => route.query.q, (val) => { keyword.value = (val as string) || '' })
 </template>
 
 <style scoped>
-.notes-page {
-  padding: 2rem 0;
-}
-
-.search-bar {
-  margin-bottom: 2rem;
-}
-
+.notes-page { padding: 2.5rem 0; }
+.search-bar { margin-bottom: 1.5rem; }
 .search-bar input {
-  width: 100%;
-  padding: 0.6rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 1em;
-  background: var(--bg);
-  color: var(--text);
-  outline: none;
+  width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--border);
+  border-radius: var(--radius); font-size: 1em; background: var(--bg-secondary);
+  color: var(--text); outline: none;
 }
-
-.search-bar input:focus {
-  border-color: var(--link);
-}
-
-.state {
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 3rem 0;
-}
-
-.state.error {
-  color: #e53e3e;
-}
-
-.note-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.note-item {
-  padding-bottom: 2rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.note-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 0.5rem;
-}
-
-.note-header h2 {
-  margin: 0;
-  font-size: 1.25em;
-}
-
-.note-header time {
-  color: var(--text-secondary);
-  font-size: 0.9em;
-}
-
-.tags {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.8rem;
-  flex-wrap: wrap;
-}
-
-.tag {
-  font-size: 0.8em;
-  color: var(--text-secondary);
-  background: var(--bg-secondary);
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.note-body {
-  line-height: 1.9;
-}
+.search-bar input:focus { border-color: var(--link); background: var(--bg); }
+.state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
+.state.error { color: #e53e3e; }
+.note-list { display: flex; flex-direction: column; gap: 2.5rem; }
+.note-item { padding-bottom: 2.2rem; border-bottom: 1px solid var(--border); }
+.note-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem; }
+.note-header h2 { margin: 0; font-size: 1.35em; font-family: var(--serif); }
+.note-header time { color: var(--text-secondary); font-size: 0.88em; }
+.tags { display: flex; gap: 0.4rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
+.tag { font-size: 0.78em; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; }
+.note-body { line-height: 1.9; font-size: 1.02em; }
 </style>

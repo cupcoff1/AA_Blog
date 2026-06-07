@@ -43,64 +43,17 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.projects-page {
-  padding: 2rem 0;
-}
-
-.projects-page h1 {
-  margin-bottom: 1.5rem;
-}
-
-.state {
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 3rem 0;
-}
-
-.state.error {
-  color: #e53e3e;
-}
-
-.project-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.project-card {
-  padding: 1.2rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-
-.project-card h2 {
-  margin: 0 0 0.5rem;
-}
-
-.project-card p {
-  color: var(--text-secondary);
-  font-size: 0.95em;
-  margin-bottom: 0.8rem;
-}
-
-.tags {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.8rem;
-  flex-wrap: wrap;
-}
-
-.tag {
-  font-size: 0.8em;
-  color: var(--text-secondary);
-  background: var(--bg-secondary);
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.project-links {
-  display: flex;
-  gap: 1rem;
-}
+.projects-page { padding: 2.5rem 0; }
+.projects-page h1 { font-size: 1.8em; margin-bottom: 1.5rem; }
+.state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
+.state.error { color: #e53e3e; }
+.project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; }
+.project-card { padding: 1.2rem 1.4rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); transition: border-color 0.2s; }
+.project-card:hover { border-color: var(--link); }
+.project-card h2 { margin: 0 0 0.4em; font-size: 1.2em; font-family: var(--serif); }
+.project-card p { color: var(--text-secondary); font-size: 0.92em; margin-bottom: 0.6em; }
+.tags { display: flex; gap: 0.4rem; margin-bottom: 0.6em; flex-wrap: wrap; }
+.tag { font-size: 0.78em; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; }
+.project-links { display: flex; gap: 1rem; font-size: 0.9em; }
 </style>
 
