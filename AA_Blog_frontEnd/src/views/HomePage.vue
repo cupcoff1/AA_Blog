@@ -1,119 +1,137 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { BookOpen, Pencil, FolderOpen } from '@lucide/vue'
 import api from '@/api/client'
 import type { HomeVO } from '@/models/types'
+
+const quotes = [
+  '请给我画只绵羊吧',
+  '真正重要的东西，眼睛是看不见的',
+  '是你为你的玫瑰花费的时间，才使你的玫瑰变得如此重要',
+  '如果一个人爱上了这亿万颗星星中独一无二的一朵花',
+  '只有用心才能看清',
+  '"真怪',
+]
+const currentQuote = ref(0)
+const quoteVisible = ref(true)
+let timer: ReturnType<typeof setInterval>
 
 const data = ref<HomeVO | null>(null)
 const error = ref(false)
 
 onMounted(async () => {
-  try {
-    data.value = await api.get('/home')
-  } catch {
-    error.value = true
-  }
+  try { data.value = await api.get('/home') }
+  catch { error.value = true }
+  timer = setInterval(() => {
+    quoteVisible.value = false
+    setTimeout(() => {
+      currentQuote.value = (currentQuote.value + 1) % quotes.length
+      quoteVisible.value = true
+    }, 400)
+  }, 5000)
 })
+onUnmounted(() => clearInterval(timer))
 </script>
 
 <template>
   <div v-if="data" class="home">
-    <!-- 个人简介 -->
-    <section class="intro">
-      <div class="avatar" v-if="data.about.avatar">
-        <img :src="data.about.avatar" :alt="data.about.nickname" />
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Hey, I'm AA_!</h1>
+        <p class="hero-desc" :class="{ quote: true, visible: quoteVisible }">{{ quotes[currentQuote] }}</p>
+
       </div>
-      <h1>{{ data.about.nickname }}</h1>
-      <p class="bio">{{ data.about.bio }}</p>
+      <div class="hero-image">
+        <img src="/hero.jpg" alt="Hero" />
+      </div>
     </section>
 
-    <!-- 最新文章 -->
+    <!-- Blog -->
     <section class="section">
-      <h2>
-        <RouterLink to="/blog">Blog</RouterLink>
-      </h2>
+      <div class="section-head">
+        <h2 class="section-title"><BookOpen :size="22" /> Blog</h2>
+        <p class="section-desc">指南、参考与教程</p>
+      </div>
       <div v-if="data.latestBlogs.length" class="post-list">
         <article v-for="blog in data.latestBlogs" :key="blog.id" class="post-item">
-          <RouterLink :to="`/blog/${blog.slug}`" class="post-title">{{ blog.title }}</RouterLink>
-          <div class="post-meta">
-            <time>{{ blog.publishedAt?.split('T')[0] }}</time>
-            <span class="post-summary">{{ blog.summary }}</span>
-          </div>
-          <div class="tags" v-if="blog.tags?.length">
-            <RouterLink v-for="tag in blog.tags" :key="tag.id"
-              :to="`/blog?tag=${tag.slug}`" class="tag">{{ tag.name }}</RouterLink>
+          <time>{{ blog.publishedAt?.split('T')[0] }}</time>
+          <div>
+            <RouterLink :to="`/blog/${blog.slug}`" class="post-title">{{ blog.title }}</RouterLink>
           </div>
         </article>
       </div>
       <p v-else class="empty">暂无文章</p>
     </section>
 
-    <!-- 最新笔记 -->
+    <!-- Notes -->
     <section class="section">
-      <h2>
-        <RouterLink to="/notes">Notes</RouterLink>
-      </h2>
+      <div class="section-head">
+        <h2 class="section-title"><Pencil :size="22" /> Notes</h2>
+        <p class="section-desc">生活、项目以及一切</p>
+      </div>
       <div v-if="data.latestNotes.length" class="post-list">
         <article v-for="note in data.latestNotes" :key="note.id" class="post-item">
+          <time>{{ note.publishedAt?.split('T')[0] }}</time>
           <span class="post-title no-link">{{ note.title }}</span>
-          <div class="post-meta">
-            <time>{{ note.publishedAt?.split('T')[0] }}</time>
-            <span class="tags" v-if="note.tags?.length">
-              <RouterLink v-for="tag in note.tags" :key="tag.id"
-                :to="`/notes?tag=${tag.slug}`" class="tag">{{ tag.name }}</RouterLink>
-            </span>
-          </div>
         </article>
       </div>
       <p v-else class="empty">暂无笔记</p>
     </section>
 
-    <!-- 最新项目 -->
+    <!-- Projects -->
     <section class="section">
-      <h2>
-        <RouterLink to="/projects">Projects</RouterLink>
-      </h2>
+      <div class="section-head">
+        <h2 class="section-title"><FolderOpen :size="22" /> Projects</h2>
+        <p class="section-desc">我做过的开源项目</p>
+      </div>
       <div v-if="data.latestProjects.length" class="project-list">
-        <div v-for="proj in data.latestProjects" :key="proj.id" class="project-item">
-          <span class="project-name">{{ proj.name }}</span>
-          <span class="project-desc">{{ proj.description }}</span>
-          <div class="project-links">
-            <a v-if="proj.demoUrl" :href="proj.demoUrl" target="_blank">Demo</a>
-            <a v-if="proj.githubUrl" :href="proj.githubUrl" target="_blank">GitHub</a>
-          </div>
-          <div class="tags" v-if="proj.tags?.length">
-            <span v-for="tag in proj.tags" :key="tag.id" class="tag">{{ tag.name }}</span>
-          </div>
+        <div v-for="proj in data.latestProjects" :key="proj.id" class="project-card">
+          <a v-if="proj.githubUrl" :href="proj.githubUrl" target="_blank" class="project-name">{{ proj.name }}</a>
+          <span v-else class="project-name">{{ proj.name }}</span>
+          <p>{{ proj.description }}</p>
         </div>
       </div>
       <p v-else class="empty">暂无项目</p>
     </section>
   </div>
-  <p v-else-if="error" class="error">加载失败，请检查后端服务</p>
-  <p v-else class="loading">加载中...</p>
+  <p v-else-if="error" class="state error">加载失败，请检查后端服务</p>
+  <p v-else class="state">加载中...</p>
 </template>
 
 <style scoped>
-.home { padding: 4rem 0; }
-.intro { text-align: center; margin-bottom: 4rem; }
-.avatar { width: 90px; height: 90px; border-radius: 50%; overflow: hidden; margin: 0 auto 1.2rem; }
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
-.bio { color: var(--text-secondary); max-width: 480px; margin: 0.5rem auto 0; font-size: 0.95em; }
-.section { margin-bottom: 3rem; }
-.section h2 { font-size: 1.4em; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
-.section h2 a { color: var(--text); }
-.post-list { display: flex; flex-direction: column; gap: 1.4rem; }
-.post-item { padding-bottom: 1.4rem; border-bottom: 1px solid var(--border); }
-.post-title { font-family: var(--serif); font-weight: 600; font-size: 1.15em; }
+.home { padding: 1.5rem 0 3rem; }
+
+/* Hero */
+.hero { display: flex; gap: 2rem; align-items: center; margin-bottom: 4rem; }
+.hero-text { flex: 1; }
+.hero h1 { font-size: 3em; margin-bottom: 0.2em; }
+.hero-desc { color: rgba(147, 197, 253, 0.9); font-family: 'Space Mono', monospace; font-size: 0.95em; max-width: 560px; margin-bottom: 1em; min-height: 1.6em; }
+.quote { opacity: 1; transform: translateY(0); transition: opacity 0.4s ease, transform 0.4s ease; }
+.quote:not(.visible) { opacity: 0; transform: translateY(8px); }
+.hero-image { width: 260px; height: 260px; border-radius: 50%; overflow: hidden; flex-shrink: 0; margin-top: 1.5rem; }
+.hero-image img { width: 200%; height: 100%; object-fit: cover; object-position: left; }
+/* Sections */
+.section { margin-bottom: 3.5rem; }
+.section-head { margin-bottom: 1.2rem; }
+.section-title { font-size: 1.8em; margin: 0 0 0.2em; display: flex; align-items: center; gap: 8px; }
+.section-title a { color: var(--text); }
+.section-desc { color: var(--text-secondary); font-size: 0.95em; margin: 0; }
+
+/* Post list */
+.post-list { display: flex; flex-direction: column; gap: 1.5rem; }
+.post-item { display: flex; flex-direction: column; gap: 0.2rem; }
+.post-item time { color: var(--text-secondary); font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; }
+.post-title { font-weight: 600; font-size: 1.1em; }
 .no-link { color: var(--text); }
-.post-meta { display: flex; gap: 1rem; margin-top: 0.25em; color: var(--text-secondary); font-size: 0.88em; }
-.post-summary { flex: 1; }
-.tags { display: flex; gap: 0.4rem; margin-top: 0.4rem; flex-wrap: wrap; }
-.tag { font-size: 0.78em; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; letter-spacing: 0.02em; }
-.project-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; }
-.project-item { padding: 1.2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
-.project-name { font-weight: 600; display: block; font-family: var(--serif); }
-.project-desc { color: var(--text-secondary); font-size: 0.88em; margin-top: 0.25em; display: block; }
-.project-links { margin-top: 0.6rem; display: flex; gap: 1rem; font-size: 0.9em; }
-.error, .empty, .loading { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
+.tags { display: flex; gap: 0.4rem; margin-left: auto; flex-wrap: wrap; }
+/* Projects */
+.project-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.8rem; }
+.project-card { padding: 0.8rem 1rem; background: var(--bg-card); backdrop-filter: blur(10px); border: 2px solid var(--border); border-radius: var(--radius); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.project-name { font-weight: 600; display: block; margin-bottom: 0.2em; }
+.project-name:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+.project-card p { color: var(--text-secondary); font-size: 0.9em; margin-bottom: 0.4em; }
+.state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
 .error { color: #e53e3e; }
+.empty { color: var(--text-secondary); font-size: 0.95em; }
 </style>

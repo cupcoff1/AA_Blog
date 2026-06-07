@@ -53,7 +53,6 @@ onMounted(async () => {
 .project-card h2 { margin: 0 0 0.4em; font-size: 1.2em; font-family: var(--serif); }
 .project-card p { color: var(--text-secondary); font-size: 0.92em; margin-bottom: 0.6em; }
 .tags { display: flex; gap: 0.4rem; margin-bottom: 0.6em; flex-wrap: wrap; }
-.tag { font-size: 0.78em; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; }
 .project-links { display: flex; gap: 1rem; font-size: 0.9em; }
 </style>
 

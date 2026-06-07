@@ -55,11 +55,11 @@ if (dark.value) document.body.classList.add('dark')
   display: none;
   position: sticky; top: 0; height: 100vh; overflow-y: auto;
   flex-direction: column;
-  border-right: 1px solid var(--border); background: var(--bg);
+  border-right: 1px solid rgba(128,128,128,0.15); background: var(--bg);
   min-width: var(--sidebar-width); width: var(--sidebar-width);
 }
 @media screen and (min-width: 900px) { .sidebar { display: flex; } }
-.sidebar-section { margin: 0 1.25rem; padding: 1.25rem 0; border-bottom: 1px solid var(--border); }
+.sidebar-section { margin: 0 1.25rem; padding: 1.25rem 0; border-bottom: 1px solid rgba(128,128,128,0.15); }
 .sidebar-section:first-child { margin-top: 1.5rem; }
 .sidebar-section:last-child { border-bottom: none; }
 .sidebar-title-row { display: flex; align-items: center; justify-content: space-between; }

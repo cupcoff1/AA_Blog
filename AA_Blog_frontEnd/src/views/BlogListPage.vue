@@ -53,9 +53,9 @@ watch(() => route.query.q, (val) => {
 
     <div v-else class="post-list">
       <article v-for="blog in blogs" :key="blog.id" class="post-item">
+        <time>{{ blog.publishedAt?.split('T')[0] }}</time>
         <RouterLink :to="`/blog/${blog.slug}`" class="post-title">{{ blog.title }}</RouterLink>
         <div class="post-meta">
-          <time>{{ blog.publishedAt?.split('T')[0] }}</time>
           <span class="post-summary">{{ blog.summary }}</span>
         </div>
         <div class="tags" v-if="blog.tags?.length">
@@ -79,10 +79,10 @@ watch(() => route.query.q, (val) => {
 .search-bar input:focus { border-color: var(--link); background: var(--bg); }
 .state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
 .post-list { display: flex; flex-direction: column; gap: 1.8rem; }
-.post-item { padding-bottom: 1.6rem; border-bottom: 1px solid var(--border); }
-.post-title { font-family: var(--serif); font-size: 1.25em; font-weight: 600; }
-.post-meta { display: flex; gap: 1rem; margin-top: 0.25em; color: var(--text-secondary); font-size: 0.88em; }
+.post-item { display: flex; flex-direction: column; gap: 0.2rem; }
+.post-item time { color: var(--text-secondary); font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; }
+.post-title { font-family: var(--heading); font-size: 1.15em; font-weight: 600; }
+.post-meta { color: var(--text-secondary); font-size: 0.88em; margin-top: 0.1em; }
 .post-summary { flex: 1; }
 .tags { display: flex; gap: 0.4rem; margin-top: 0.4rem; flex-wrap: wrap; }
-.tag { font-size: 0.78em; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; }
 </style>

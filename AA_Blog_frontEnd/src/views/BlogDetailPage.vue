@@ -110,7 +110,6 @@ onMounted(async () => {
 .blog-header h1 { font-size: 2.2em; margin-bottom: 0.4em; letter-spacing: -0.02em; }
 .blog-meta { display: flex; gap: 1rem; align-items: center; color: var(--text-secondary); font-size: 0.9em; }
 .tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-.tag { font-size: 0.78em; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; }
 .blog-content { line-height: 1.9; font-size: 1.05em; margin-bottom: 2.5rem; }
 .post-nav { display: flex; justify-content: space-between; padding: 1.5rem 0; border-top: 1px solid var(--border); margin-bottom: 2rem; font-size: 0.95em; }
 .state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }

@@ -31,5 +31,5 @@ const isAdmin = computed(() => route.path.startsWith('/admin'))
     padding-left: 10rem;
   }
 }
-.main-content { padding: 2rem 2rem 0; max-width: var(--max-width); }
+.main-content { padding: 1rem 2rem 0; max-width: var(--max-width); }
 </style>

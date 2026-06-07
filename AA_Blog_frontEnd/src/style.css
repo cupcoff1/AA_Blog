@@ -1,18 +1,18 @@
 :root {
   --bg: #fdf9ee;
   --bg-secondary: #f6f0df;
-  --bg-card: #fdf9ee;
+  --bg-card: rgba(246, 240, 223, 0.6);
   --text: #25252b;
   --text-secondary: #4e4e55;
   --link: #b12d6c;
   --link-hover: #8d1f52;
   --border: #ded4b2;
   --code-bg: #eee8d5;
-  --max-width: 760px;
+  --max-width: 900px;
   --sidebar-width: 220px;
   --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, -apple-system, sans-serif;
-  --mono: 'Cascadia Code', Consolas, monospace;
+  --mono: 'Space Mono', Consolas, monospace;
   --radius: 6px;
   --h1: 2.8rem;
   --h2: 2.3rem;
@@ -21,7 +21,7 @@
 body.dark {
   --bg: #1c1c20;
   --bg-secondary: #25252b;
-  --bg-card: #323239;
+  --bg-card: rgba(50, 50, 57, 0.5);
   --text: #f3f4f6;
   --text-secondary: #c8c8cf;
   --link: #c892e7;
@@ -52,3 +52,5 @@ blockquote { border-left: 3px solid var(--link); padding: 0.3em 1em; color: var(
 img { max-width: 100%; border-radius: var(--radius); }
 ul, ol { margin-bottom: 0.75rem; padding-left: 1.5em; }
 li { margin-bottom: 0.2em; }
+.tag { font-size: 0.82em; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+.tag:hover { color: var(--link); }

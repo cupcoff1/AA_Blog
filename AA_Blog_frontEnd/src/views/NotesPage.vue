@@ -82,6 +82,5 @@ watch(() => route.query.q, (val) => { keyword.value = (val as string) || '' })
 .note-header h2 { margin: 0; font-size: 1.35em; font-family: var(--serif); }
 .note-header time { color: var(--text-secondary); font-size: 0.88em; }
 .tags { display: flex; gap: 0.4rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
-.tag { font-size: 0.78em; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; }
 .note-body { line-height: 1.9; font-size: 1.02em; }
 </style>
