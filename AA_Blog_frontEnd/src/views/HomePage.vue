@@ -44,7 +44,8 @@ onUnmounted(() => clearInterval(timer))
 
       </div>
       <div class="hero-image">
-        <img src="/hero.jpg" alt="Hero" />
+        <img src="/hero-light.png" alt="Hero" class="hero-light" />
+        <img src="/hero.jpg" alt="Hero" class="hero-dark" />
       </div>
     </section>
 
@@ -107,11 +108,16 @@ onUnmounted(() => clearInterval(timer))
 .hero { display: flex; gap: 2rem; align-items: center; margin-bottom: 4rem; }
 .hero-text { flex: 1; }
 .hero h1 { font-size: 3em; margin-bottom: 0.2em; }
-.hero-desc { color: rgba(147, 197, 253, 0.9); font-family: 'Space Mono', monospace; font-size: 1.2em; max-width: 560px; margin-top: 2em; margin-bottom: 1em; height: 3.6em; overflow: hidden; }
+.hero-desc { font-family: 'Space Mono', monospace; font-size: 1.2em; max-width: 560px; margin-top: 2em; margin-bottom: 1em; height: 3.6em; overflow: hidden; color: rgba(34, 139, 34, 0.8); }
+body.dark .hero-desc { color: rgba(147, 197, 253, 0.9); }
 .quote { opacity: 1; transform: translateY(0); transition: opacity 0.4s ease, transform 0.4s ease; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .quote:not(.visible) { opacity: 0; transform: translateY(8px); }
-.hero-image { width: 260px; height: 260px; border-radius: 50%; overflow: hidden; flex-shrink: 0; margin-top: 1.5rem; }
-.hero-image img { width: 200%; height: 100%; object-fit: cover; object-position: left; }
+.hero-image { width: 260px; height: 260px; border-radius: 50%; overflow: hidden; flex-shrink: 0; margin-top: 1.5rem; position: relative; }
+.hero-image img { width: 200%; height: 100%; object-fit: cover; object-position: left; position: absolute; top: 0; left: 0; }
+.hero-light { display: block; }
+.hero-dark { display: none; }
+body.dark .hero-light { display: none; }
+body.dark .hero-dark { display: block; }
 /* Sections */
 .section { margin-bottom: 3.5rem; }
 .section-head { margin-bottom: 1.2rem; }

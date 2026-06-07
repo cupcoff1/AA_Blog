@@ -51,7 +51,7 @@ onMounted(async () => {
 .state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
 .state.error { color: #e53e3e; }
 .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
-.project-card { padding: 1rem 1.2rem; background: rgba(246, 240, 223, 0.6); backdrop-filter: blur(10px); border: 2px solid var(--border); border-radius: var(--radius); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.project-card { padding: 1rem 1.2rem; background: var(--bg-card); backdrop-filter: blur(10px); border: 2px solid var(--border); border-radius: var(--radius); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
 .project-name { font-weight: 600; display: block; margin-bottom: 0.2em; font-size: 1.1em; }
 .project-name[href]:hover { text-decoration: underline; text-decoration-thickness: 2px; }
 .project-card p { color: var(--text-secondary); font-size: 0.92em; margin-bottom: 0.5em; }
