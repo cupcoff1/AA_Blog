@@ -67,13 +67,18 @@ if (dark.value) document.body.classList.add('dark')
 .title-icon { width: 18px; height: 18px; color: var(--text); flex-shrink: 0; }
 .site-name { font-family: var(--heading); font-size: 1.2em; font-weight: 600; color: var(--text); white-space: nowrap; }
 .title-link:hover .site-name { color: var(--link); }
-.theme-btn { background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 4px; border-radius: var(--radius); }
+.theme-btn {
+  display: flex; align-items: center; justify-content: center;
+  border: none; background: transparent; cursor: pointer;
+  width: 38px; height: 38px; border-radius: var(--radius);
+  color: var(--text-secondary);
+}
 .theme-btn:hover { color: var(--link); background: var(--bg-secondary); }
-.sidebar-bio { font-size: 0.93em; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+.sidebar-bio { font-size: 0.92em; color: var(--text-secondary); margin: 0; line-height: 1.5; }
 .sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
 .sidebar-nav a { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.93em; padding: 5px 8px; border-radius: var(--radius); }
 .sidebar-nav a:hover, .sidebar-nav a.router-link-exact-active { color: var(--link); background: var(--bg-secondary); }
-.sidebar-heading { font-family: var(--heading); font-size: 0.85em; font-weight: 600; color: var(--text-secondary); margin: 0 0 0.5em; }
+.sidebar-heading { font-family: var(--heading); font-size: 1em; font-weight: 600; color: var(--text-secondary); margin: 0 0 0.5em; }
 .sidebar-links { display: flex; flex-direction: column; gap: 4px; }
 .sidebar-links a { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.9em; }
 </style>
