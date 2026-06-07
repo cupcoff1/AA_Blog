@@ -11,6 +11,7 @@ const quotes = [
   '如果一个人爱上了这亿万颗星星中独一无二的一朵花',
   '只有用心才能看清',
   '"真怪',
+  'You will be required to do wrong no matter where you go. It is the basic condition of life, to be required to violate your own identity.',
 ]
 const currentQuote = ref(0)
 const quoteVisible = ref(true)
@@ -106,8 +107,8 @@ onUnmounted(() => clearInterval(timer))
 .hero { display: flex; gap: 2rem; align-items: center; margin-bottom: 4rem; }
 .hero-text { flex: 1; }
 .hero h1 { font-size: 3em; margin-bottom: 0.2em; }
-.hero-desc { color: rgba(147, 197, 253, 0.9); font-family: 'Space Mono', monospace; font-size: 0.95em; max-width: 560px; margin-bottom: 1em; min-height: 1.6em; }
-.quote { opacity: 1; transform: translateY(0); transition: opacity 0.4s ease, transform 0.4s ease; }
+.hero-desc { color: rgba(147, 197, 253, 0.9); font-family: 'Space Mono', monospace; font-size: 1.2em; max-width: 560px; margin-top: 2em; margin-bottom: 1em; height: 3.6em; overflow: hidden; }
+.quote { opacity: 1; transform: translateY(0); transition: opacity 0.4s ease, transform 0.4s ease; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .quote:not(.visible) { opacity: 0; transform: translateY(8px); }
 .hero-image { width: 260px; height: 260px; border-radius: 50%; overflow: hidden; flex-shrink: 0; margin-top: 1.5rem; }
 .hero-image img { width: 200%; height: 100%; object-fit: cover; object-position: left; }
@@ -123,7 +124,9 @@ onUnmounted(() => clearInterval(timer))
 .post-item { display: flex; flex-direction: column; gap: 0.2rem; }
 .post-item time { color: var(--text-secondary); font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; }
 .post-title { font-weight: 600; font-size: 1.1em; }
-.no-link { color: var(--text); }
+a.post-title { text-decoration: underline; text-decoration-thickness: 2px; text-decoration-style: dotted; text-decoration-color: var(--text); text-underline-offset: 6px; }
+a.post-title:hover { text-decoration-color: var(--link); }
+.no-link { color: var(--link); }
 .tags { display: flex; gap: 0.4rem; margin-left: auto; flex-wrap: wrap; }
 /* Projects */
 .project-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.8rem; }

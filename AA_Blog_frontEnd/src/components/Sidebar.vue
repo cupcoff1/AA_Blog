@@ -18,7 +18,7 @@ if (dark.value) document.body.classList.add('dark')
       <div class="sidebar-title-row">
         <RouterLink to="/" class="title-link">
           <LogoIcon class="title-icon" />
-          <span class="site-name">AA_</span>
+          <span class="site-name">AA_Blog</span>
         </RouterLink>
         <button class="theme-btn" @click="toggleTheme">
           <Sun v-if="dark" :size="18" />
@@ -29,7 +29,7 @@ if (dark.value) document.body.classList.add('dark')
 
     <section class="sidebar-section">
       <h2 class="sidebar-heading">About Me</h2>
-      <p class="sidebar-bio">I'm <RouterLink to="/about">AA_</RouterLink>, Student. This is my digital garden. 🌱</p>
+      <p class="sidebar-bio">I'm <RouterLink to="/about">AA_</RouterLink> , Student. This is my digital garden. 🌱</p>
     </section>
 
     <section class="sidebar-section">
@@ -75,6 +75,7 @@ if (dark.value) document.body.classList.add('dark')
 }
 .theme-btn:hover { color: var(--link); background: var(--bg-secondary); }
 .sidebar-bio { font-size: 0.92em; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+.sidebar-bio a { text-decoration: underline; text-decoration-thickness: 2px; text-decoration-style: dotted; text-decoration-color: #fff; text-underline-offset: 4px; }
 .sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
 .sidebar-nav a { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.93em; padding: 5px 8px; border-radius: var(--radius); }
 .sidebar-nav a:hover, .sidebar-nav a.router-link-exact-active { color: var(--link); background: var(--bg-secondary); }

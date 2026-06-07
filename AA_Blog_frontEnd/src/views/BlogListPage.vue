@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { BookOpen, Search } from '@lucide/vue'
 import api from '@/api/client'
 import type { BlogListVO } from '@/models/types'
 
@@ -35,54 +36,66 @@ const search = () => {
 
 fetchBlogs()
 watch(() => route.query, fetchBlogs)
-// 浏览器前进后退时同步搜索框
-watch(() => route.query.q, (val) => {
-  keyword.value = (val as string) || ''
-})
+watch(() => route.query.q, (val) => { keyword.value = (val as string) || '' })
 </script>
 
 <template>
   <div class="blog-page">
-    <h1 class="page-title">Blog</h1>
+    <div class="section-head">
+      <h1 class="section-title"><BookOpen :size="32" /> Blog</h1>
+      <p class="section-desc">指南、参考与教程</p>
+    </div>
+
     <div class="search-bar">
+      <Search :size="16" class="search-icon" />
       <input v-model="keyword" @keyup.enter="search" placeholder="搜索文章..." />
     </div>
 
     <div v-if="loading" class="state">加载中...</div>
+    <div v-else-if="error" class="state error">加载失败</div>
     <div v-else-if="!blogs.length" class="state">暂无文章</div>
 
     <div v-else class="post-list">
-      <article v-for="blog in blogs" :key="blog.id" class="post-item">
+      <RouterLink v-for="blog in blogs" :key="blog.id"
+        :to="`/blog/${blog.slug}`" class="post-item">
         <time>{{ blog.publishedAt?.split('T')[0] }}</time>
-        <RouterLink :to="`/blog/${blog.slug}`" class="post-title">{{ blog.title }}</RouterLink>
-        <div class="post-meta">
-          <span class="post-summary">{{ blog.summary }}</span>
-        </div>
-        <div class="tags" v-if="blog.tags?.length">
-          <RouterLink v-for="tag in blog.tags" :key="tag.id"
-            :to="`/blog?tag=${tag.slug}`" class="tag">{{ tag.name }}</RouterLink>
-        </div>
-      </article>
+        <div class="post-title">{{ blog.title }}</div>
+      </RouterLink>
     </div>
   </div>
 </template>
 
 <style scoped>
 .blog-page { padding: 2.5rem 0; }
-.page-title { font-size: 1.8em; margin-bottom: 1rem; }
-.search-bar { margin-bottom: 1.5rem; }
+.section-head { margin-bottom: 1.5rem; }
+.section-title { font-size: 2.8rem; margin-bottom: 0.2em; display: flex; align-items: center; gap: 10px; }
+.section-desc { color: var(--text-secondary); font-size: 0.95em; margin: 0; }
+.search-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 2rem; border: 1px solid var(--border); border-radius: var(--radius); background: rgba(0,0,0,0.06); padding: 0 10px; max-width: 240px; }
+.search-icon { color: var(--text-secondary); flex-shrink: 0; }
 .search-bar input {
-  width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--border);
-  border-radius: var(--radius); font-size: 1em; background: var(--bg-secondary);
-  color: var(--text); outline: none; transition: border-color 0.2s;
+  width: 100%; padding: 8px 0; border: none; border-radius: 0;
+  font-size: 0.9em; background: transparent; color: var(--text); outline: none;
 }
-.search-bar input:focus { border-color: var(--link); background: var(--bg); }
+.search-bar:focus-within { border-color: var(--link); background: var(--bg); }
 .state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
-.post-list { display: flex; flex-direction: column; gap: 1.8rem; }
-.post-item { display: flex; flex-direction: column; gap: 0.2rem; }
-.post-item time { color: var(--text-secondary); font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; }
-.post-title { font-family: var(--heading); font-size: 1.15em; font-weight: 600; }
-.post-meta { color: var(--text-secondary); font-size: 0.88em; margin-top: 0.1em; }
-.post-summary { flex: 1; }
-.tags { display: flex; gap: 0.4rem; margin-top: 0.4rem; flex-wrap: wrap; }
+.state.error { color: #e53e3e; }
+.post-list { display: flex; flex-direction: column; }
+.post-item {
+  display: flex; flex-direction: column; gap: 0.2rem;
+  padding: 6px 0; text-decoration: none; width: fit-content;
+  margin-bottom: 0.5rem; border-radius: var(--radius);
+}
+@media screen and (min-width: 900px) {
+  .post-item { flex-direction: row; align-items: baseline; gap: 1.5rem; }
+}
+.post-item time {
+  color: var(--text-secondary); font-size: 0.8em; font-weight: 400;
+  min-width: 100px; text-decoration: none;
+}
+.post-title {
+  font-weight: 600; font-size: 1.05em;
+  text-decoration: underline; text-decoration-thickness: 2px;
+  text-decoration-style: dotted; text-decoration-color: var(--text); text-underline-offset: 6px;
+}
+.post-item:hover .post-title { text-decoration-color: var(--link); color: var(--link); }
 </style>

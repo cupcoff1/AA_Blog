@@ -29,6 +29,7 @@ body.dark {
   --border: #4e4e55;
   --code-bg: #323239;
 }
+html { scroll-behavior: smooth; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: var(--sans); font-size: 16px; line-height: 1.6;
@@ -50,6 +51,8 @@ pre code { background: none; padding: 0; font-size: 1em; }
 hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 blockquote { border-left: 3px solid var(--link); padding: 0.3em 1em; color: var(--text-secondary); margin: 1em 0; }
 img { max-width: 100%; border-radius: var(--radius); }
+.blog-content a { text-decoration: underline; text-decoration-thickness: 2px; text-decoration-style: dotted; text-decoration-color: var(--link); text-underline-offset: 6px; }
+.blog-content a:hover { text-decoration-color: var(--link-hover); }
 ul, ol { margin-bottom: 0.75rem; padding-left: 1.5em; }
 li { margin-bottom: 0.2em; }
 .tag { font-size: 0.82em; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
