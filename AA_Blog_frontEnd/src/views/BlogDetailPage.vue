@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { ChevronDown, ChevronRight } from '@lucide/vue'
 import api from '@/api/client'
 import type { BlogVO, CommentVO } from '@/models/types'
 import { marked } from 'marked'
@@ -12,7 +13,8 @@ const blog = ref<BlogVO | null>(null)
 const comments = ref<CommentVO[]>([])
 const loading = ref(true)
 const error = ref(false)
-const headings = ref<{ id: string; text: string; level: number }[]>([])
+const showToc = ref(true)
+const headings = ref<{ id: string; text: string; level: number; open: boolean; children: { id: string; text: string }[] }[]>([])
 const activeId = ref('')
 
 marked.setOptions({
@@ -28,11 +30,19 @@ marked.setOptions({
 
 const extractHeadings = () => {
   const els = document.querySelectorAll('.blog-content h2, .blog-content h3')
-  headings.value = Array.from(els).map(el => {
+  const result: typeof headings.value = []
+  let curH2: typeof headings.value[0] | null = null
+  Array.from(els).forEach(el => {
     const id = (el.textContent || '').toLowerCase().replace(/[^\w一-鿿]+/g, '-').replace(/^-|-$/g, '')
     el.id = id
-    return { id, text: el.textContent || '', level: el.tagName === 'H2' ? 2 : 3 }
+    if (el.tagName === 'H2') {
+      curH2 = { id, text: el.textContent || '', level: 2, open: false, children: [] }
+      result.push(curH2)
+    } else if (curH2) {
+      curH2.children.push({ id, text: el.textContent || '' })
+    }
   })
+  headings.value = result
 }
 
 const onScroll = () => {
@@ -92,14 +102,29 @@ const scrollToComments = () => {
       </div>
 
       <aside class="toc-sidebar" v-if="headings.length">
-        <p class="toc-title">目录</p>
-        <nav class="toc-nav">
-          <a v-for="h in headings" :key="h.id"
-            :href="`#${h.id}`"
-            :class="{ active: h.id === activeId, 'toc-h3': h.level === 3 }"
-            >
-            {{ h.text }}
-          </a>
+        <p class="toc-title" @click="showToc = !showToc" style="cursor: pointer;">
+          <ChevronDown v-if="showToc" :size="14" class="toc-chevron" />
+          <ChevronRight v-else :size="14" class="toc-chevron" />
+          目录
+        </p>
+        <nav v-show="showToc" class="toc-nav">
+          <div v-for="h in headings" :key="h.id">
+            <a :href="`#${h.id}`" class="toc-h2"
+              :class="{ active: h.id === activeId }"
+              @click.prevent="
+                h.open = !h.open;
+                document.getElementById(h.id)?.scrollIntoView({ behavior: 'smooth' })
+              ">
+              {{ h.open ? '▾' : '▸' }} {{ h.text }}
+            </a>
+            <template v-if="h.open">
+              <a v-for="c in h.children" :key="c.id"
+                :href="`#${c.id}`" class="toc-h3"
+                :class="{ active: c.id === activeId }">
+                {{ c.text }}
+              </a>
+            </template>
+          </div>
         </nav>
       </aside>
     </div>
@@ -149,17 +174,21 @@ const scrollToComments = () => {
 @media screen and (min-width: 1400px) {
   .toc-sidebar {
     display: block;
-    position: fixed; top: 6rem; right: 2rem;
-    width: 180px;
+    position: fixed; top: 4rem; right: 2rem;
+    width: 180px; max-height: calc(100vh - 6rem);
+    overflow-y: auto; scrollbar-width: none;
+    -ms-overflow-style: none;
     border-left: 1px solid rgba(128,128,128,0.15);
     padding-left: 1rem;
   }
 }
-.toc-title { font-weight: 600; font-size: 0.85em; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.8em; }
-.toc-nav { display: flex; flex-direction: column; gap: 4px; }
-.toc-nav a { color: var(--text-secondary); font-size: 0.85em; line-height: 1.4; display: block; padding: 2px 0; }
+.toc-title { display: flex; align-items: center; gap: 4px; font-weight: 600; font-size: 0.85em; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.8em; cursor: pointer; user-select: none; }
+.toc-chevron { flex-shrink: 0; }
+.toc-nav { display: flex; flex-direction: column; gap: 2px; }
+.toc-nav a { color: var(--text-secondary); font-size: 0.85em; line-height: 1.4; display: block; padding: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .toc-nav a:hover, .toc-nav a.active { color: var(--link); }
-.toc-nav a.toc-h3 { padding-left: 12px; font-size: 0.8em; }
+.toc-h2 { cursor: pointer; }
+.toc-h3 { padding-left: 16px; font-size: 0.8em; }
 
 /* Header */
 .blog-header { margin-bottom: 2.5rem; }
