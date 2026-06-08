@@ -28,7 +28,8 @@ public class SlugUtil {
                     if (pinyin != null && pinyin.length > 0) {
                         sb.append(pinyin[0]);
                     }
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    // 拼音转换失败，跳过该字符
                 }
             }
         }

@@ -7,6 +7,7 @@ import com.javaee.blog.mapper.AboutMapper;
 import com.javaee.blog.service.AboutService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class AboutServiceImpl implements AboutService {
     }
 
     @Override
+    @Transactional
     public void update(AboutUpdateRequest request) {
         About about = aboutMapper.selectById(1L);
         if (about == null) return;

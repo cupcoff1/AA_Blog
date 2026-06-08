@@ -1,10 +1,11 @@
-package com.javaee.blog.service;
+package com.javaee.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.javaee.blog.dto.request.StickyNoteCreateRequest;
 import com.javaee.blog.dto.vo.StickyNoteVO;
 import com.javaee.blog.entity.StickyNote;
 import com.javaee.blog.mapper.StickyNoteMapper;
+import com.javaee.blog.service.StickyNoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

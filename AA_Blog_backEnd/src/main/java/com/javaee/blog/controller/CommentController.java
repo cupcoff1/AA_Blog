@@ -6,6 +6,7 @@ import com.javaee.blog.dto.request.CommentCreateRequest;
 import com.javaee.blog.service.CommentService;
 import com.javaee.blog.util.JwtUtil;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,7 @@ public class CommentController {
         if (header == null || !header.startsWith("Bearer ")) return null;
         try {
             return jwtUtil.parseToken(header.substring(7));
-        } catch (Exception e) {
+        } catch (JwtException e) {
             return null;
         }
     }

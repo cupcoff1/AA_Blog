@@ -15,13 +15,13 @@ public class AuthController {
     private final GitHubAuthService gitHubAuthService;
 
     @GetMapping("/github/url")
-    public Result<?> getAuthorizationUrl() {
+    public Result<Map<String, String>> getAuthorizationUrl() {
         String url = gitHubAuthService.getAuthorizationUrl();
         return Result.ok(Map.of("url", url));
     }
 
     @GetMapping("/github/callback")
-    public Result<?> callback(@RequestParam String code) {
+    public Result<Map<String, Object>> callback(@RequestParam String code) {
         Map<String, Object> result = gitHubAuthService.handleCallback(code);
         return Result.ok(result);
     }

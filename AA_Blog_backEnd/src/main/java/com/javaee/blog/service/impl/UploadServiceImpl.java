@@ -1,5 +1,6 @@
-package com.javaee.blog.service;
+package com.javaee.blog.service.impl;
 
+import com.javaee.blog.service.UploadService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,7 +27,7 @@ public class UploadServiceImpl implements UploadService {
     @Override
     public String upload(MultipartFile file, String type) throws IOException {
         if (file.isEmpty() || file.getSize() > maxSize) {
-            throw new IllegalArgumentException("文件大小超过限制（最大 2MB）");
+            throw new IllegalArgumentException("文件大小超过限制（最大 " + (maxSize / 1024 / 1024) + "MB）");
         }
         if (!ALLOWED_TYPES.contains(file.getContentType())) {
             throw new IllegalArgumentException("仅支持 jpg/png/webp 格式");
@@ -54,7 +55,7 @@ public class UploadServiceImpl implements UploadService {
     @Override
     public String uploadHero(MultipartFile file, String type) throws IOException {
         if (file.isEmpty() || file.getSize() > maxSize) {
-            throw new IllegalArgumentException("文件大小超过限制（最大 2MB）");
+            throw new IllegalArgumentException("文件大小超过限制（最大 " + (maxSize / 1024 / 1024) + "MB）");
         }
         if (!ALLOWED_TYPES.contains(file.getContentType())) {
             throw new IllegalArgumentException("仅支持 jpg/png/webp 格式");

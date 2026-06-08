@@ -1,6 +1,7 @@
 package com.javaee.blog.controller;
 
 import com.javaee.blog.common.Result;
+import com.javaee.blog.entity.HeroQuote;
 import com.javaee.blog.service.HeroQuoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,7 +23,7 @@ public class HeroQuoteController {
     private String baseDir;
 
     @GetMapping("/api/hero-quotes")
-    public Result<?> list() {
+    public Result<List<HeroQuote>> list() {
         return Result.ok(service.list());
     }
 
@@ -38,7 +40,7 @@ public class HeroQuoteController {
     }
 
     @GetMapping("/api/hero-config")
-    public Result<?> heroConfig() {
+    public Result<Map<String, String>> heroConfig() {
         String heroLight = "/hero-light.png";
         String heroDark = "/hero.jpg";
         Path heroDir = Paths.get(baseDir, "hero");

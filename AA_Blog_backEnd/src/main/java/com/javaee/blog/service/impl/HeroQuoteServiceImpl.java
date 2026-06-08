@@ -1,10 +1,12 @@
-package com.javaee.blog.service;
+package com.javaee.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.javaee.blog.entity.HeroQuote;
 import com.javaee.blog.mapper.HeroQuoteMapper;
+import com.javaee.blog.service.HeroQuoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +22,7 @@ public class HeroQuoteServiceImpl implements HeroQuoteService {
     }
 
     @Override
+    @Transactional
     public void create(String content, String author, String source) {
         HeroQuote q = new HeroQuote();
         q.setContent(content);

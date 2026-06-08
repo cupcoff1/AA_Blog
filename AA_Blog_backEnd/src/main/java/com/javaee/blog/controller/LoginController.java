@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import io.jsonwebtoken.JwtException;
+
 import java.util.Map;
 
 @RestController
@@ -20,7 +22,7 @@ public class LoginController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public Result<?> login(@Valid @RequestBody LoginRequest request) {
+    public Result<Map<String, String>> login(@Valid @RequestBody LoginRequest request) {
         String token = authService.login(request);
         if (token == null) {
             return Result.fail(ResultCode.UNAUTHORIZED, "用户名或密码错误");
@@ -29,14 +31,14 @@ public class LoginController {
     }
 
     @PostMapping("/refresh")
-    public Result<?> refresh(@RequestHeader("Authorization") String authHeader) {
+    public Result<Map<String, String>> refresh(@RequestHeader("Authorization") String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Result.fail(ResultCode.UNAUTHORIZED);
         }
         try {
             String newToken = authService.refresh(authHeader.substring(7));
             return Result.ok(Map.of("token", newToken));
-        } catch (Exception e) {
+        } catch (JwtException e) {
             return Result.fail(ResultCode.UNAUTHORIZED, "Token 无效或已过期");
         }
     }
