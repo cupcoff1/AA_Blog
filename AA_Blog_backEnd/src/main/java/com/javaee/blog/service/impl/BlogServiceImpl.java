@@ -7,11 +7,9 @@ import com.javaee.blog.dto.vo.BlogVO;
 import com.javaee.blog.dto.vo.TagVO;
 import com.javaee.blog.entity.Blog;
 import com.javaee.blog.entity.BlogTags;
-import com.javaee.blog.entity.Comment;
 import com.javaee.blog.entity.Tags;
 import com.javaee.blog.mapper.BlogMapper;
 import com.javaee.blog.mapper.BlogTagsMapper;
-import com.javaee.blog.mapper.CommentMapper;
 import com.javaee.blog.mapper.TagsMapper;
 import com.javaee.blog.service.BlogService;
 import com.javaee.blog.util.SlugUtil;
@@ -31,7 +29,6 @@ public class BlogServiceImpl implements BlogService {
     private final BlogMapper blogMapper;
     private final TagsMapper tagsMapper;
     private final BlogTagsMapper blogTagsMapper;
-    private final CommentMapper commentMapper;
 
     @Override
     public List<BlogListVO> list(String keyword, String tagSlug) {
@@ -123,9 +120,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @Transactional
     public void delete(Long id) {
-        // 级联删除 blog_tags 和 comments
         blogTagsMapper.delete(new LambdaQueryWrapper<BlogTags>().eq(BlogTags::getBlogId, id));
-        commentMapper.delete(new LambdaQueryWrapper<Comment>().eq(Comment::getBlogId, id));
         blogMapper.deleteById(id);
     }
 

@@ -8,7 +8,7 @@ const http = axios.create({
 
 // 请求拦截：自动带 Token
 http.interceptors.request.use(config => {
-  const token = localStorage.getItem('admin_token') || localStorage.getItem('commenter_token')
+  const token = localStorage.getItem('admin_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }

@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ChevronDown, ChevronRight } from '@lucide/vue'
 import api from '@/api/client'
-import type { BlogVO, CommentVO } from '@/models/types'
+import type { BlogVO } from '@/models/types'
 import { marked } from 'marked'
 import { markedHighlight } from 'marked-highlight'
 import hljs from 'highlight.js'
@@ -11,10 +11,21 @@ import 'highlight.js/styles/github-dark.min.css'
 
 const route = useRoute()
 const blog = ref<BlogVO | null>(null)
-const comments = ref<CommentVO[]>([])
 const loading = ref(true)
 const error = ref(false)
 const showToc = ref(true)
+
+const loadUtterances = () => {
+  const script = document.createElement('script')
+  script.src = 'https://utteranc.es/client.js'
+  script.setAttribute('repo', 'cupcoff1/AA_Blog')
+  script.setAttribute('issue-term', 'pathname')
+  script.setAttribute('theme', document.body.classList.contains('dark') ? 'github-dark' : 'github-light')
+  script.setAttribute('crossorigin', 'anonymous')
+  script.async = true
+  const el = document.getElementById('utterances')
+  if (el) { el.innerHTML = ''; el.appendChild(script) }
+}
 const headings = ref<{ id: string; text: string; level: number; open: boolean; children: { id: string; text: string }[] }[]>([])
 const activeId = ref('')
 let headingTimer: ReturnType<typeof setTimeout>
@@ -59,14 +70,9 @@ const onScroll = () => {
 
 onMounted(async () => {
   try {
-    const slug = String(route.params.slug)
-    const [blogData, commentData] = await Promise.all([
-      api.get<BlogVO>(`/blog/${slug}`),
-      api.get<CommentVO[]>(`/blog/${slug}/comments`)
-    ])
-    blog.value = blogData
-    comments.value = commentData
+    blog.value = await api.get<BlogVO>(`/blog/${String(route.params.slug)}`)
     headingTimer = setTimeout(extractHeadings, 100)
+    setTimeout(loadUtterances, 300)
   } catch {
     error.value = true
   } finally {
@@ -79,9 +85,7 @@ onUnmounted(() => {
   clearTimeout(headingTimer)
 })
 
-const scrollToComments = () => {
-  document.getElementById('comments')?.scrollIntoView({ behavior: 'smooth' })
-}
+
 </script>
 
 <template>
@@ -96,14 +100,15 @@ const scrollToComments = () => {
           <h1>{{ blog.title }}</h1>
           <div class="blog-meta">
             <time>{{ blog.publishedAt?.split('T')[0] }}</time>
-            <span class="divider">|</span>
-            <a href="#comments" @click.prevent="scrollToComments">
-              {{ comments.length ? `${comments.length} 条评论` : '暂无评论' }}
-            </a>
           </div>
         </header>
 
         <div class="blog-content" v-html="marked(blog.content || '')" />
+
+        <section id="comments" class="comments">
+          <h2>Comments</h2>
+          <div id="utterances" />
+        </section>
 
       </div>
 
@@ -134,35 +139,6 @@ const scrollToComments = () => {
         </nav>
       </aside>
     </div>
-
-    <section id="comments" class="comments">
-      <h2>Comments</h2>
-      <div v-if="comments.length">
-        <div v-for="comment in comments" :key="comment.id" class="comment">
-          <img :src="comment.author_avatar" class="comment-avatar" alt="" />
-          <div class="comment-body">
-            <div class="comment-header">
-              <strong>{{ comment.author_name }}</strong>
-              <time>{{ comment.created_at }}</time>
-            </div>
-            <div v-html="marked(comment.content)" />
-            <div v-if="comment.children?.length" class="replies">
-              <div v-for="reply in comment.children" :key="reply.id" class="comment reply">
-                <img :src="reply.author_avatar" class="comment-avatar" alt="" />
-                <div class="comment-body">
-                  <div class="comment-header">
-                    <strong>{{ reply.author_name }}</strong>
-                    <time>{{ reply.created_at }}</time>
-                  </div>
-                  <div v-html="marked(reply.content)" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <p v-else class="no-comments">还没有评论 (」&#65439;ロ&#65439;)」</p>
-    </section>
   </article>
 </template>
 
@@ -205,7 +181,7 @@ const scrollToComments = () => {
 }
 .blog-meta a { color: var(--text-secondary); }
 .blog-meta a:hover { color: var(--link); }
-.divider { opacity: 0.4; }
+
 
 /* Content */
 .blog-content { line-height: 1.8; font-size: 1.05em; margin-bottom: 2.5rem; }
@@ -213,17 +189,9 @@ const scrollToComments = () => {
 .blog-content :deep(a:hover) { text-decoration-color: var(--link); }
 
 /* Comments */
-.comments { border-top: 1px solid var(--border); padding-top: 1.5rem; }
-.comments h2 { font-size: 1.5em; margin-bottom: 1rem; }
-.comment { display: flex; gap: 0.8rem; margin-bottom: 1.2rem; }
-.comment-avatar { width: 36px; height: 36px; border-radius: 50%; }
-.comment-body { flex: 1; }
-.comment-header { display: flex; gap: 0.8rem; align-items: center; margin-bottom: 0.2em; font-size: 0.92em; }
-.comment-header time { font-size: 0.85em; color: var(--text-secondary); }
-.comment-body :deep(p) { margin-bottom: 0.3em; font-size: 0.95em; }
-.replies { margin-top: 0.8rem; margin-left: 1rem; padding-left: 1rem; border-left: 2px solid var(--border); }
+.comments { border-top: 1px solid var(--border); padding-top: 2rem; margin-top: 3rem; }
+.comments h2 { font-size: 1.5em; margin-bottom: 1rem; font-weight: 600; color: var(--text); }
 
 .state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
 .state.error { color: #e53e3e; }
-.no-comments { color: var(--text-secondary); font-size: 0.95em; }
 </style>

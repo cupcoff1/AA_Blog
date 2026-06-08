@@ -69,10 +69,6 @@ watch(() => route.query.q, (val) => { keyword.value = String(val || '') })
           <time>{{ note.publishedAt?.split('T')[0] }}</time>
           <h2>{{ note.title }}</h2>
         </div>
-        <div class="tags" v-if="note.tags?.length">
-          <RouterLink v-for="tag in note.tags" :key="tag.id"
-            :to="`/notes?tag=${tag.slug}`" class="tag-btn">{{ tag.name }}</RouterLink>
-        </div>
         <div class="note-body" v-html="marked(note.content || '')" />
         <div v-if="isAdmin" class="note-actions">
           <RouterLink :to="`/notes/${note.id}/edit`" class="icon-btn" title="编辑">
@@ -98,19 +94,11 @@ watch(() => route.query.q, (val) => { keyword.value = String(val || '') })
 .search-bar:focus-within { border-color: var(--link); }
 .state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
 .state.error { color: #e53e3e; }
-.note-list { display: flex; flex-direction: column; gap: 2.5rem; }
-.note-item { padding-bottom: 2rem; }
+.note-list { display: flex; flex-direction: column; gap: 1rem; }
+.note-item { padding-bottom: 0; }
 .note-header { display: flex; align-items: baseline; gap: 1rem; }
 .note-item time { color: var(--text-secondary); font-size: 0.8em; min-width: 80px; }
 .note-item h2 { font-size: 1.15em; margin: 0; color: var(--link); }
-.tags { display: flex; gap: 0.4rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
-.tag-btn {
-  display: inline-block; padding: 2px 10px;
-  border: 1px solid var(--border); border-radius: var(--radius);
-  font-size: 0.78em; color: var(--text-secondary);
-  background: var(--bg-secondary);
-}
-.tag-btn:hover { border-color: var(--link); color: var(--link); text-decoration: none; }
 .note-body { line-height: 1.9; font-size: 1.02em; margin-top: 0.8em; background: rgba(0,0,0,0.08); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
 .note-body :deep(a) { text-decoration: underline; text-decoration-thickness: 2px; text-decoration-style: dotted; text-underline-offset: 6px; }
 .note-actions { display: flex; gap: 4px; margin-top: 0.5rem; justify-content: flex-end; }

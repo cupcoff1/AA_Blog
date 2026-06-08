@@ -73,27 +73,6 @@ export interface TagVO {
   slug: string
 }
 
-// ==================== Comments ====================
-export interface CommentVO {
-  id: number
-  content: string
-  parent_id: number | null
-  author_name: string
-  author_avatar: string
-  created_at: string
-  children: CommentVO[]
-}
-
-export interface CommentAdminVO {
-  id: number
-  content: string
-  parent_id: number | null
-  author_name: string
-  blog_id: number
-  blog_title: string
-  created_at: string
-}
-
 // ==================== StickyNote ====================
 export interface StickyNoteVO {
   id: number
@@ -114,12 +93,6 @@ export interface HeroQuoteVO {
 export interface HeroConfigVO {
   heroLight: string
   heroDark: string
-}
-
-// ==================== Auth ====================
-export interface GitHubUser {
-  name: string
-  avatar: string
 }
 
 // ==================== Home ====================

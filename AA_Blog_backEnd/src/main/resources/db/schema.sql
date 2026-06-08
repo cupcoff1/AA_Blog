@@ -78,22 +78,7 @@ CREATE TABLE IF NOT EXISTS projects_tags (
     PRIMARY KEY (project_id, tag_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 8. comments
-CREATE TABLE IF NOT EXISTS comments (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    blog_id BIGINT NOT NULL,
-    content TEXT NOT NULL,
-    parent_id BIGINT,
-    author_name VARCHAR(100) NOT NULL,
-    author_avatar VARCHAR(500) NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY idx_blog_id (blog_id),
-    KEY idx_parent_id (parent_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 9. admin
+-- 8. admin
 CREATE TABLE IF NOT EXISTS admin (
     id BIGINT NOT NULL AUTO_INCREMENT,
     username VARCHAR(100) NOT NULL,
@@ -103,7 +88,7 @@ CREATE TABLE IF NOT EXISTS admin (
     UNIQUE KEY uk_username (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 10. sticky_notes（便签）
+-- 9. sticky_notes（便签）
 CREATE TABLE IF NOT EXISTS sticky_notes (
     id BIGINT NOT NULL AUTO_INCREMENT,
     content VARCHAR(500) NOT NULL,
@@ -113,7 +98,7 @@ CREATE TABLE IF NOT EXISTS sticky_notes (
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 11. hero_quotes（首页引语）
+-- 10. hero_quotes（首页引语）
 CREATE TABLE IF NOT EXISTS hero_quotes (
     id BIGINT NOT NULL AUTO_INCREMENT,
     content VARCHAR(500) NOT NULL,

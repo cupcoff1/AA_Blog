@@ -38,9 +38,6 @@ const router = createRouter({
     // ==================== 后台 ====================
     { path: '/admin/login', name: 'admin-login', component: () => import('@/views/admin/LoginPage.vue') },
     { path: '/admin', redirect: '/admin/home' },
-    { path: '/admin/comments', name: 'admin-comments', component: () => import('@/views/admin/CommentsPage.vue') },
-
-
     { path: '/admin/home', name: 'admin-home', component: () => import('@/views/admin/HomeAdminPage.vue') },
 
     // 编辑页（管理员专用）
