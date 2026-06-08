@@ -79,7 +79,10 @@ export interface StickyNoteVO {
   content: string
   color: string
   rotate: number
-  custom: boolean
+  category: string
+  authorName: string
+  authorAvatar: string
+  own: boolean
 }
 
 // ==================== Hero ====================
@@ -93,6 +96,12 @@ export interface HeroQuoteVO {
 export interface HeroConfigVO {
   heroLight: string
   heroDark: string
+}
+
+// ==================== Auth ====================
+export interface GitHubUser {
+  name: string
+  avatar: string
 }
 
 // ==================== Home ====================

@@ -48,6 +48,12 @@ const router = createRouter({
     { path: '/projects/new', name: 'projects-new', component: () => import('@/views/admin/ProjectsEditPage.vue') },
     { path: '/projects/:id/edit', name: 'projects-edit', component: () => import('@/views/admin/ProjectsEditPage.vue') },
 
+    // ==================== Auth ====================
+    { path: '/auth/callback', name: 'auth-callback', component: () => import('@/views/auth/CallbackPage.vue') },
+
+    // ==================== Guest ====================
+    { path: '/guest', name: 'guest', component: () => import('@/views/GuestWall.vue') },
+
     // ==================== 404 ====================
     {
       path: '/:pathMatch(.*)*',

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { BookOpen, Pencil, FolderOpen, User, Sun, Moon, GitFork, LogOut, Plus } from '@lucide/vue'
+import { BookOpen, Pencil, FolderOpen, User, Sun, Moon, GitFork, LogOut, Plus, MessageSquare } from '@lucide/vue'
 import LogoIcon from './LogoIcon.vue'
 
 const dark = ref(localStorage.getItem('theme') === 'dark')
@@ -56,6 +56,7 @@ if (dark.value) document.body.classList.add('dark')
           <RouterLink v-if="isAdmin" to="/projects/new" class="add-btn" title="新建"><Plus :size="14" /></RouterLink>
         </div>
         <RouterLink to="/about" class="nav-item"><User :size="16" /> About Me</RouterLink>
+        <RouterLink to="/guest" class="nav-item"><MessageSquare :size="16" /> Leave a Note</RouterLink>
       </nav>
     </section>
 

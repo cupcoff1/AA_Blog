@@ -9,5 +9,8 @@ public class StickyNoteVO {
     private String content;
     private String color;
     private Integer rotate;
-    private boolean custom = true;
+    private String category;
+    private String authorName;
+    private String authorAvatar;
+    private boolean own = false;
 }

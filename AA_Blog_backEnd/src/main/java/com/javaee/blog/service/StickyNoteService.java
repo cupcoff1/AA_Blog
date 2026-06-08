@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface StickyNoteService {
 
-    List<StickyNoteVO> list();
+    List<StickyNoteVO> list(String currentUser, String source);
 
-    void create(StickyNoteCreateRequest req);
+    void create(StickyNoteCreateRequest req, String authorName, String authorAvatar);
 
-    void delete(Long id);
+    boolean delete(Long id, String requester, boolean isAdmin);
 }

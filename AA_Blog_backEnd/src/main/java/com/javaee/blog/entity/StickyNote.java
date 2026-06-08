@@ -16,5 +16,8 @@ public class StickyNote {
     private String content;
     private String color;
     private Integer rotate;
+    private String category;
+    private String authorName;
+    private String authorAvatar;
     private LocalDateTime createdAt;
 }

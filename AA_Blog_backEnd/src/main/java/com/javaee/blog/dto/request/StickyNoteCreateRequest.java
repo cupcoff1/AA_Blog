@@ -13,4 +13,6 @@ public class StickyNoteCreateRequest {
     private String color;
 
     private Integer rotate;
+
+    private String category;
 }

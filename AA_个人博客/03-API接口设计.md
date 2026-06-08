@@ -5,11 +5,7 @@
 ### 1.1 统一响应格式
 
 ```json
-{
-  "code": 200,
-  "message": "操作成功",
-  "data": {}
-}
+{ "code": 200, "message": "操作成功", "data": {} }
 ```
 
 | code | 含义 |
@@ -25,7 +21,7 @@
 
 | 角色 | 方式 |
 |---|---|
-| 评论者 | Header `Authorization: Bearer <commenter_token>` |
+| 游客（留言、便签） | Header `Authorization: Bearer <commenter_token>` |
 | 管理员 | Header `Authorization: Bearer <admin_token>` |
 
 管理员接口 `/api/admin/**` 由 JwtInterceptor 统一拦截（排除 `/api/admin/login` 和 `/api/admin/refresh`）。
@@ -39,95 +35,55 @@
 
 ---
 
-## 2. 前台接口（无需认证）
+## 2. 前台接口（无需认证 / 评论者认证）
 
 ### 2.1 首页
 
-**GET** `/api/home`
-
-返回 `HomeVO`：
-
-```json
-{
-  "about": { "nickname": "AA_", "avatar": "...", "bio": "...", "skills": "...", "hobbies": "...", "location": "...", "socialLinks": "..." },
-  "latestBlogs": [ { "id": 1, "title": "...", "slug": "...", "summary": "...", "publishedAt": "...", "tags": [...] } ],
-  "latestNotes": [ { "id": 1, "title": "...", "slug": "...", "content": "...", "publishedAt": "...", "tags": [...] } ],
-  "latestProjects": [ { "id": 1, "name": "...", "slug": "...", "description": "...", "demoUrl": "...", "githubUrl": "...", "tags": [...] } ]
-}
-```
+**GET** `/api/home` — 返回 `HomeVO`（latestBlogs, latestNotes, latestProjects）
 
 ### 2.2 引语
 
-**GET** `/api/hero-quotes`
-
-返回 `List<HeroQuote>`：
-
-```json
-[
-  { "id": 1, "content": "真正重要的东西，眼睛是看不见的", "author": "安托万·德·圣-埃克苏佩里", "source": "小王子" }
-]
-```
+**GET** `/api/hero-quotes` — 返回 `List<HeroQuote>`（含 author, source）
 
 ### 2.3 Hero 图片配置
 
-**GET** `/api/hero-config`
-
-返回 `{ heroLight, heroDark }`：
-
-```json
-{
-  "heroLight": "/uploads/hero/hero-light.png",
-  "heroDark": "/hero.jpg"
-}
-```
-
-有自定义上传图则返回 uploads 路径，否则返回默认路径。
+**GET** `/api/hero-config` — 返回 `{ heroLight, heroDark }`
 
 ### 2.4 Blog
 
-**GET** `/api/blog?q={keyword}&tag={tag_slug}`
+**GET** `/api/blog?q={keyword}&tag={tag_slug}` — 返回 `List<BlogListVO>`
 
-查询参数可选，返回 `List<BlogListVO>`。
+**GET** `/api/blog/{slug}` — 返回 `BlogVO`（含 content、prev、next 导航）
 
-**GET** `/api/blog/{slug}`
+> 评论使用 Utterances 第三方 iframe，存储在 GitHub Issues 中，不走后端 API。
 
-返回 `BlogVO`（含 content、prev、next 导航）。
+### 2.5 Notes
 
-### 2.5 Blog 评论
+**GET** `/api/notes?q={keyword}&tag={tag_slug}` — 返回 `List<NotesVO>`
 
-**GET** `/api/blog/{slug}/comments`
+### 2.6 Projects
 
-返回 `List<CommentVO>`，嵌套 `children` 结构。
+**GET** `/api/projects` — 返回 `List<ProjectsVO>`
 
-### 2.6 Notes
+### 2.7 标签列表
 
-**GET** `/api/notes?q={keyword}&tag={tag_slug}`
+**GET** `/api/tags` — 返回 `List<TagVO>`
 
-返回 `List<NotesVO>`（含全文 content）。
+### 2.8 便签
 
-### 2.7 Projects
+**GET** `/api/sticky-notes?source=admin|guest`
 
-**GET** `/api/projects`
+- `source=admin`：返回管理员创建的便签（About 页用）
+- `source=guest`：返回游客创建的便签（Leave a Note 页用）
+- 返回 `List<StickyNoteVO>`（含 category、authorName、authorAvatar、own 标识）
 
-返回 `List<ProjectsVO>`，按 id DESC。
+**POST** `/api/sticky-notes`（需评论者 token）
 
-### 2.8 About Me
+```json
+{ "content": "...", "color": "#fff3cd", "rotate": 2, "category": "to_aa|to_website" }
+```
 
-**GET** `/api/about`
-
-返回 `AboutVO`。
-
-### 2.9 标签列表
-
-**GET** `/api/tags`
-
-返回 `List<TagVO>`。
-
-### 2.10 便签
-
-**GET** `/api/sticky-notes`
-
-返回 `List<StickyNoteVO>`。
+**DELETE** `/api/sticky-notes/{id}`（需评论者 token，仅可删自己的）
 
 ---
 
@@ -135,68 +91,29 @@
 
 ### 3.1 获取授权 URL
 
-**GET** `/api/auth/github/url`
-
-```json
-{ "url": "https://github.com/login/oauth/authorize?..." }
-```
+**GET** `/api/auth/github/url` → `{ "url": "https://github.com/login/oauth/authorize?..." }`
 
 ### 3.2 授权回调
 
-**GET** `/api/auth/github/callback?code={code}`
+**GET** `/api/auth/github/callback?code={code}` → `{ "token": "eyJ...", "user": { "name": "...", "avatar": "..." } }`
 
-```json
-{
-  "token": "eyJ...",
-  "user": { "name": "cupcoff1", "avatar": "https://avatars.githubusercontent.com/..." }
-}
-```
+回调后前端存储 `commenter_token` 和 `commenter` 信息，跳转至 `/guest` 页。
 
 ---
 
-## 4. 评论者接口
-
-> Header: `Authorization: Bearer <commenter_token>`
-
-### 4.1 发表评论
-
-**POST** `/api/blog/{slug}/comments`
-
-```json
-{ "content": "...", "parentId": null }
-```
-
-### 4.2 删除自己的评论
-
-**DELETE** `/api/comments/{id}`
-
----
-
-## 5. 管理员接口
+## 4. 管理员接口
 
 > Header: `Authorization: Bearer <admin_token>`
 
-### 5.1 认证
+### 4.1 认证
 
-**POST** `/api/admin/login`
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| POST | `/api/admin/login` | 登录 `{ username, password }` → `{ token }` |
+| POST | `/api/admin/refresh` | 刷新 Token |
+| PUT | `/api/admin/password` | 修改密码 `{ oldPassword, newPassword }` |
 
-```json
-{ "username": "AA_", "password": "123456" }
-→ { "token": "eyJ..." }
-```
-
-**POST** `/api/admin/refresh`
-
-> Header: `Authorization: Bearer <old_token>`
-→ `{ "token": "eyJ..." }`
-
-**PUT** `/api/admin/password`
-
-```json
-{ "oldPassword": "...", "newPassword": "..." }
-```
-
-### 5.2 Blog 管理
+### 4.2 Blog 管理
 
 | 方法 | 路径 | 说明 |
 |---|---|---|
@@ -204,131 +121,59 @@
 | GET | `/api/admin/blog/{id}` | 详情 |
 | POST | `/api/admin/blog` | 创建 |
 | PUT | `/api/admin/blog/{id}` | 更新 |
-| DELETE | `/api/admin/blog/{id}` | 删除（含关联标签和评论） |
+| DELETE | `/api/admin/blog/{id}` | 删除（含关联标签） |
 
 POST/PUT body：`BlogCreateRequest { title, summary, content, tagIds?, newTags? }`
 
-### 5.3 Notes 管理
+### 4.3 Notes 管理
+
+同 Blog（不含 summary），body：`NotesCreateRequest { title, content, tagIds?, newTags? }`
+
+### 4.4 Projects 管理
+
+同 Blog，body：`ProjectsCreateRequest { name, description, demoUrl?, githubUrl?, tagIds?, newTags? }`
+
+### 4.5 文件上传
+
+**POST** `/api/admin/upload?type=image|avatar` — multipart/form-data，≤2MB
+
+**POST** `/api/admin/hero-image?type=light|dark` — Hero 图片上传
+
+### 4.6 首页管理
 
 | 方法 | 路径 | 说明 |
 |---|---|---|
-| GET | `/api/admin/notes` | 列表 |
-| GET | `/api/admin/notes/{id}` | 详情 |
-| POST | `/api/admin/notes` | 创建 |
-| PUT | `/api/admin/notes/{id}` | 更新 |
-| DELETE | `/api/admin/notes/{id}` | 删除（含关联标签） |
-
-POST/PUT body：`NotesCreateRequest { title, content, tagIds?, newTags? }`
-
-### 5.4 Projects 管理
-
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| GET | `/api/admin/projects` | 列表 |
-| GET | `/api/admin/projects/{id}` | 详情 |
-| POST | `/api/admin/projects` | 创建 |
-| PUT | `/api/admin/projects/{id}` | 更新 |
-| DELETE | `/api/admin/projects/{id}` | 删除（含关联标签） |
-
-POST/PUT body：`ProjectsCreateRequest { name, description, demoUrl?, githubUrl?, tagIds?, newTags? }`
-
-### 5.5 评论管理
-
-**GET** `/api/admin/comments` — 列表（含 blog_title）  
-**DELETE** `/api/admin/comments/{id}` — 删除（含级联子回复）
-
-### 5.6 About Me 管理
-
-**PUT** `/api/admin/about`
-
-```json
-{ "nickname": "...", "avatar": "...", "bio": "...", "skills": "...", "hobbies": "...", "location": "...", "socialLinks": "..." }
-```
-
-### 5.7 文件上传
-
-**POST** `/api/admin/upload?type=image|avatar`
-
-> Content-Type: multipart/form-data  
-> 字段：file（jpg/png/webp，≤ 2MB）
-
-```json
-{ "url": "/uploads/images/20260608_143022.jpg" }
-```
-
-### 5.8 Hero 图片上传
-
-**POST** `/api/admin/hero-image?type=light|dark`
-
-```json
-{ "url": "/uploads/hero/hero-light.png" }
-```
-
-### 5.9 引语管理
-
-**POST** `/api/admin/hero-quotes`
-
-```json
-{ "content": "...", "author": "...", "source": "..." }
-```
-
-**DELETE** `/api/admin/hero-quotes/{id}`
-
-### 5.10 便签管理
-
-**POST** `/api/admin/sticky-notes`
-
-```json
-{ "content": "...", "color": "#fff3cd", "rotate": 2 }
-```
-
-**DELETE** `/api/admin/sticky-notes/{id}`
+| POST | `/api/admin/hero-quotes` | 创建引语 `{ content, author, source }` |
+| DELETE | `/api/admin/hero-quotes/{id}` | 删除引语 |
+| POST | `/api/admin/sticky-notes` | 创建便签（About 页） |
+| DELETE | `/api/admin/sticky-notes/{id}` | 删除便签 |
 
 ---
 
-## 6. 接口清单汇总
+## 5. 接口清单汇总
 
 | 方法 | 路径 | 认证 | 说明 |
 |---|---|---|---|
 | GET | `/api/home` | 无 | 首页数据 |
 | GET | `/api/hero-quotes` | 无 | 引语列表 |
 | GET | `/api/hero-config` | 无 | Hero 图片配置 |
-| GET | `/api/blog` | 无 | Blog 列表 + 搜索 |
+| GET | `/api/blog` | 无 | Blog 列表 |
 | GET | `/api/blog/{slug}` | 无 | Blog 详情 |
-| GET | `/api/blog/{slug}/comments` | 无 | 文章评论 |
-| GET | `/api/notes` | 无 | Notes 列表 + 搜索 |
+| GET | `/api/notes` | 无 | Notes 列表 |
 | GET | `/api/projects` | 无 | 项目列表 |
-| GET | `/api/about` | 无 | 个人资料 |
 | GET | `/api/tags` | 无 | 标签列表 |
 | GET | `/api/sticky-notes` | 无 | 便签列表 |
+| POST | `/api/sticky-notes` | 评论者 | 创建便签 |
+| DELETE | `/api/sticky-notes/{id}` | 评论者 | 删除便签 |
 | GET | `/api/auth/github/url` | 无 | GitHub 授权 URL |
 | GET | `/api/auth/github/callback` | 无 | GitHub 回调 |
-| POST | `/api/blog/{slug}/comments` | 评论者 | 发表评论 |
-| DELETE | `/api/comments/{id}` | 评论者 | 删除自己的评论 |
 | POST | `/api/admin/login` | 无 | 管理员登录 |
 | POST | `/api/admin/refresh` | 无 | 刷新 Token |
 | PUT | `/api/admin/password` | 管理员 | 修改密码 |
-| GET | `/api/admin/blog` | 管理员 | Blog 列表 |
-| POST | `/api/admin/blog` | 管理员 | 创建文章 |
-| GET | `/api/admin/blog/{id}` | 管理员 | 文章详情 |
-| PUT | `/api/admin/blog/{id}` | 管理员 | 编辑文章 |
-| DELETE | `/api/admin/blog/{id}` | 管理员 | 删除文章 |
-| GET | `/api/admin/notes` | 管理员 | Notes 列表 |
-| POST | `/api/admin/notes` | 管理员 | 创建笔记 |
-| GET | `/api/admin/notes/{id}` | 管理员 | 笔记详情 |
-| PUT | `/api/admin/notes/{id}` | 管理员 | 编辑笔记 |
-| DELETE | `/api/admin/notes/{id}` | 管理员 | 删除笔记 |
-| GET | `/api/admin/projects` | 管理员 | 项目列表 |
-| POST | `/api/admin/projects` | 管理员 | 创建项目 |
-| GET | `/api/admin/projects/{id}` | 管理员 | 项目详情 |
-| PUT | `/api/admin/projects/{id}` | 管理员 | 编辑项目 |
-| DELETE | `/api/admin/projects/{id}` | 管理员 | 删除项目 |
-| GET | `/api/admin/comments` | 管理员 | 评论列表 |
-| DELETE | `/api/admin/comments/{id}` | 管理员 | 删除评论 |
-| PUT | `/api/admin/about` | 管理员 | 编辑个人资料 |
+| GET/POST/PUT/DELETE | `/api/admin/blog` | 管理员 | Blog CRUD |
+| GET/POST/PUT/DELETE | `/api/admin/notes` | 管理员 | Notes CRUD |
+| GET/POST/PUT/DELETE | `/api/admin/projects` | 管理员 | Projects CRUD |
+| POST/DELETE | `/api/admin/sticky-notes` | 管理员 | 便签管理 |
+| POST/DELETE | `/api/admin/hero-quotes` | 管理员 | 引语管理 |
 | POST | `/api/admin/upload` | 管理员 | 上传文件 |
 | POST | `/api/admin/hero-image` | 管理员 | 上传 Hero 图 |
-| POST | `/api/admin/hero-quotes` | 管理员 | 创建引语 |
-| DELETE | `/api/admin/hero-quotes/{id}` | 管理员 | 删除引语 |
-| POST | `/api/admin/sticky-notes` | 管理员 | 创建便签 |
-| DELETE | `/api/admin/sticky-notes/{id}` | 管理员 | 删除便签 |

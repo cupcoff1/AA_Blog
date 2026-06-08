@@ -94,6 +94,9 @@ CREATE TABLE IF NOT EXISTS sticky_notes (
     content VARCHAR(500) NOT NULL,
     color VARCHAR(20) NOT NULL,
     rotate INT DEFAULT 0,
+    category VARCHAR(20) DEFAULT 'to_aa',
+    author_name VARCHAR(100) DEFAULT '',
+    author_avatar VARCHAR(500) DEFAULT '',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

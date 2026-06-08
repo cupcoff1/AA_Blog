@@ -20,30 +20,48 @@ public class StickyNoteServiceImpl implements StickyNoteService {
     private final StickyNoteMapper mapper;
 
     @Override
-    public List<StickyNoteVO> list() {
-        return mapper.selectList(new LambdaQueryWrapper<StickyNote>().orderByDesc(StickyNote::getCreatedAt))
+    public List<StickyNoteVO> list(String currentUser, String source) {
+        LambdaQueryWrapper<StickyNote> wrapper = new LambdaQueryWrapper<StickyNote>().orderByDesc(StickyNote::getCreatedAt);
+        if ("admin".equals(source)) {
+            wrapper.and(w -> w.isNull(StickyNote::getAuthorName).or().eq(StickyNote::getAuthorName, ""));
+        } else if ("guest".equals(source)) {
+            wrapper.isNotNull(StickyNote::getAuthorName).ne(StickyNote::getAuthorName, "");
+        }
+        return mapper.selectList(wrapper)
                 .stream().map(n -> {
                     StickyNoteVO vo = new StickyNoteVO();
                     vo.setId(n.getId());
                     vo.setContent(n.getContent());
                     vo.setColor(n.getColor());
                     vo.setRotate(n.getRotate() != null ? n.getRotate() : 0);
-                    vo.setCustom(true);
+                    vo.setCategory(n.getCategory() != null ? n.getCategory() : "to_aa");
+                    vo.setAuthorName(n.getAuthorName() != null ? n.getAuthorName() : "");
+                    vo.setAuthorAvatar(n.getAuthorAvatar() != null ? n.getAuthorAvatar() : "");
+                    vo.setOwn(n.getAuthorName() != null && n.getAuthorName().equals(currentUser));
                     return vo;
                 }).collect(Collectors.toList());
     }
 
     @Override
-    public void create(StickyNoteCreateRequest req) {
+    public void create(StickyNoteCreateRequest req, String authorName, String authorAvatar) {
         StickyNote note = new StickyNote();
         note.setContent(req.getContent());
         note.setColor(req.getColor());
         note.setRotate(req.getRotate() != null ? req.getRotate() : new Random().nextInt(7) - 3);
+        note.setCategory(req.getCategory() != null ? req.getCategory() : "to_aa");
+        note.setAuthorName(authorName);
+        note.setAuthorAvatar(authorAvatar);
         mapper.insert(note);
     }
 
     @Override
-    public void delete(Long id) {
-        mapper.deleteById(id);
+    public boolean delete(Long id, String requester, boolean isAdmin) {
+        if (isAdmin) { mapper.deleteById(id); return true; }
+        StickyNote note = mapper.selectById(id);
+        if (note != null && requester != null && requester.equals(note.getAuthorName())) {
+            mapper.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }

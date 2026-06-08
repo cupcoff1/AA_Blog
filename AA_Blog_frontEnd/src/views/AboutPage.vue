@@ -25,7 +25,7 @@ const addNote = async () => {
     newContent.value = ''
     showForm.value = false
     // 刷新自定义便签
-    customNotes.value = await api.get<StickyNoteVO[]>('/sticky-notes')
+    customNotes.value = await api.get<StickyNoteVO[]>('/sticky-notes?source=admin')
   } catch {}
 }
 
@@ -37,7 +37,7 @@ const delNote = async (id: number) => {
 
 onMounted(async () => {
   try {
-    customNotes.value = await api.get<StickyNoteVO[]>('/sticky-notes') || []
+    customNotes.value = await api.get<StickyNoteVO[]>('/sticky-notes?source=admin') || []
   } catch { error.value = true }
   finally { loading.value = false }
 })
@@ -53,7 +53,7 @@ onMounted(async () => {
         class="sticky"
         :style="{ '--bg': note.color, transform: `rotate(${note.rotate}deg)` }">
         <div class="sticky-body">{{ note.content }}</div>
-        <button v-if="isAdmin && note.custom"
+        <button v-if="isAdmin"
           class="del-note" @click="delNote(note.id)" title="删除">
           <X :size="14" />
         </button>
