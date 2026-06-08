@@ -46,13 +46,13 @@ public class StickyNoteController {
 
     @PostMapping("/api/admin/sticky-notes")
     public Result<?> adminCreate(@Valid @RequestBody StickyNoteCreateRequest body) {
-        service.create(body, "AA_", "");
+        service.create(body, "", "");
         return Result.ok();
     }
 
     @DeleteMapping("/api/admin/sticky-notes/{id}")
     public Result<?> adminDelete(@PathVariable Long id) {
-        service.delete(id, "AA_", true);
+        service.delete(id, "", true);
         return Result.ok();
     }
 
