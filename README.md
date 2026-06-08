@@ -75,6 +75,38 @@ cd AA_Blog_frontEnd && npm install && npm run dev
 
 首次启动自动创建。登录后侧边栏 Logo 可点击进入首页管理。
 
+## 打包部署
+
+```bash
+# 1. 构建前端
+cd AA_Blog_frontEnd && npm run build
+
+# 2. 复制到后端静态目录
+cp -r dist/* ../AA_Blog_backEnd/src/main/resources/static/
+
+# 3. 打包 JAR
+cd ../AA_Blog_backEnd && mvn package -DskipTests
+
+# 4. 复制 .env 到 target/
+cp .env target/
+
+# 5. 运行
+cd target && java -jar AA_Blog_backEnd-1.0-SNAPSHOT.jar
+```
+
+前端 SPA 路由刷新问题由 `SpaForwardFilter` 解决——非 API、非静态资源请求自动转发到 `index.html`。
+
+公网暴露推荐 ngrok（开发测试）或 Nginx 反代 + 域名（生产）。
+
+国内环境部署需配 Cloudflare WARP 或代理让 JVM 能访问 GitHub API（用于 GitHub OAuth 登录）。
+
+## GitHub OAuth 配置
+
+1. 在 [GitHub Developer Settings](https://github.com/settings/developers) 创建 OAuth App
+2. 回调 URL 填 `https://你的域名/auth/callback`
+3. `.env` 中 `GITHUB_REDIRECT_URI` 保持一致
+4. GitHub OAuth App 设置和设备注册表与 `.env` 中 `client_id`/`client_secret` 一致
+
 ## 环境变量
 
 | 变量 | 说明 |

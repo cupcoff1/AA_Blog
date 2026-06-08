@@ -58,6 +58,9 @@ const extractHeadings = () => {
   headings.value = result
 }
 
+const scrollTo = (id: string) => {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+}
 const onScroll = () => {
   const hs = document.querySelectorAll('.blog-content h2, .blog-content h3')
   let current = ''
@@ -122,10 +125,7 @@ onUnmounted(() => {
           <div v-for="h in headings" :key="h.id">
             <a :href="`#${h.id}`" class="toc-h2"
               :class="{ active: h.id === activeId }"
-              @click.prevent="
-                h.open = !h.open;
-                document.getElementById(h.id)?.scrollIntoView({ behavior: 'smooth' })
-              ">
+              @click.prevent="h.open = !h.open; scrollTo(h.id)">
               {{ h.open ? '▾' : '▸' }} {{ h.text }}
             </a>
             <template v-if="h.open">
@@ -144,6 +144,10 @@ onUnmounted(() => {
 
 <style scoped>
 .blog-detail { padding: 2.5rem 0; }
+@media screen and (max-width: 600px) {
+  .blog-detail { padding: 1.5rem 0; }
+  .blog-header h1 { font-size: 1.8rem; }
+}
 
 /* Layout */
 .blog-layout { position: relative; }

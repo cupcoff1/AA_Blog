@@ -131,6 +131,7 @@ onMounted(fetchNotes)
 .guest-wall { padding: 2rem 0; max-width: 800px; }
 .section-head { margin-bottom: 1.5rem; }
 .section-title { font-size: 2.8rem; margin-bottom: 0.2em; display: flex; align-items: center; gap: 10px; }
+@media screen and (max-width: 600px) { .section-title { font-size: 1.8rem; } }
 .section-desc { color: var(--text-secondary); font-size: 0.95em; margin: 0; }
 .state { text-align: center; color: var(--text-secondary); padding: 3rem 0; }
 .state.error { color: #e53e3e; }

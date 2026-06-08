@@ -44,7 +44,7 @@ const uploadHero = async (type: 'light' | 'dark', e: Event) => {
   if (!input.files?.length) return
   const form = new FormData()
   form.append('file', input.files[0])
-  const { url } = await api.post('/admin/hero-image?type=' + type, form)
+  const { url } = await api.post<{ url: string }>('/admin/hero-image?type=' + type, form)
   heroConfig.value[type === 'light' ? 'heroLight' : 'heroDark'] = url + '?t=' + Date.now()
 }
 

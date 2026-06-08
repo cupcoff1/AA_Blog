@@ -18,7 +18,7 @@ const login = async () => {
   error.value = ''
   loading.value = true
   try {
-    const { token } = await api.post('/admin/login', {
+    const { token } = await api.post<{ token: string }>('/admin/login', {
       username: username.value,
       password: password.value
     })

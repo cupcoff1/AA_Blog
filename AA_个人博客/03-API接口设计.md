@@ -150,7 +150,30 @@ POST/PUT body：`BlogCreateRequest { title, summary, content, tagIds?, newTags? 
 
 ---
 
-## 5. 接口清单汇总
+### 4.7 Auth（GitHub OAuth）
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/api/auth/github/url` | 获取 GitHub OAuth 登录 URL |
+| GET | `/api/auth/github/callback` | GitHub OAuth 回调 |
+
+### 4.8 Admin Auth
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| POST | `/api/admin/login` | 管理员登录 |
+| POST | `/api/admin/refresh` | 刷新 Token |
+| PUT | `/api/admin/password` | 修改密码 |
+
+---
+
+## 5. SPA 路由处理
+
+`SpaForwardFilter` 拦截所有请求，非 `/api/`、非 `/uploads/`、不包含 `.` 的路径统一转发到 `/index.html`，解决 Vue Router history mode 刷新 404 问题。
+
+---
+
+## 6. 接口清单汇总
 
 | 方法 | 路径 | 认证 | 说明 |
 |---|---|---|---|

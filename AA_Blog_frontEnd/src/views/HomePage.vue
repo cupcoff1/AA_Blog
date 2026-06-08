@@ -117,6 +117,12 @@ onUnmounted(() => clearInterval(timer))
 .hero-text { flex: 1; }
 .hero h1 { font-size: 3em; margin-bottom: 0.2em; }
 .hero-desc { font-family: 'Space Mono', monospace; font-size: 1.2em; max-width: 560px; margin-top: 2em; margin-bottom: 1em; min-height: 3.6em; color: rgba(34, 139, 34, 0.8); }
+@media screen and (max-width: 600px) {
+  .hero { flex-direction: column-reverse; gap: 1rem; align-items: flex-start; margin-bottom: 2rem; }
+  .hero h1 { font-size: 2em; }
+  .hero-desc { font-size: 1em; margin-top: 1em; min-height: auto; }
+  .hero-image { width: 160px; height: 160px; margin-top: 0; }
+}
 body.dark .hero-desc { color: rgba(147, 197, 253, 0.9); }
 .quote-attribution { display: block; font-size: 0.75em; margin-top: 0.4em; opacity: 0.7; }
 .quote { opacity: 1; transform: translateY(0); transition: opacity 0.4s ease, transform 0.4s ease; }
@@ -131,6 +137,10 @@ body.dark .hero-dark { display: block; }
 .section { margin-bottom: 3.5rem; }
 .section-head { margin-bottom: 1.2rem; }
 .section-title { font-size: 1.8em; margin: 0 0 0.2em; display: flex; align-items: center; gap: 8px; }
+@media screen and (max-width: 600px) {
+  .section-title { font-size: 1.4em; }
+  .project-list { grid-template-columns: 1fr; }
+}
 .section-desc { color: var(--text-secondary); font-size: 0.95em; margin: 0; }
 
 /* Post list */

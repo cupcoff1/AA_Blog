@@ -27,10 +27,9 @@ const uploadImage = async (e: Event) => {
   try {
     const form = new FormData()
     form.append('file', file)
-    const res = await api.post('/admin/upload?type=image', form, {
+    const { url } = await api.post<{ url: string }>('/admin/upload?type=image', form, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
-    const url = res.url
     const ta = textareaRef.value
     if (ta) {
       const pos = ta.selectionStart

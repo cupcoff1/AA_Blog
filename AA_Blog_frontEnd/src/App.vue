@@ -22,6 +22,7 @@ const isLogin = computed(() => route.path === '/admin/login')
 <style scoped>
 .layout-full { min-height: 100vh; }
 .layout { min-height: 100vh; }
+.main-content { padding: 1rem 1rem 0; max-width: 100%; overflow-x: hidden; }
 @media screen and (min-width: 900px) {
   .layout {
     display: grid;
@@ -29,6 +30,6 @@ const isLogin = computed(() => route.path === '/admin/login')
     gap: 5rem;
     padding-left: 10rem;
   }
+  .main-content { padding: 1rem 2rem 0; max-width: var(--max-width); }
 }
-.main-content { padding: 1rem 2rem 0; max-width: var(--max-width); }
 </style>

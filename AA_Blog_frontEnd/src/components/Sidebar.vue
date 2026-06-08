@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { BookOpen, Pencil, FolderOpen, User, Sun, Moon, GitFork, LogOut, Plus, MessageSquare } from '@lucide/vue'
+import { BookOpen, Pencil, FolderOpen, User, Sun, Moon, GitFork, LogOut, Plus, MessageSquare, Menu } from '@lucide/vue'
 import LogoIcon from './LogoIcon.vue'
 
 const dark = ref(localStorage.getItem('theme') === 'dark')
 const isAdmin = computed(() => !!localStorage.getItem('admin_token'))
+const menuOpen = ref(false)
 
 const toggleTheme = () => {
   dark.value = !dark.value
@@ -20,6 +21,38 @@ if (dark.value) document.body.classList.add('dark')
 </script>
 
 <template>
+  <!-- 移动端顶部导航 -->
+  <header class="mobile-nav">
+    <RouterLink :to="isAdmin ? '/admin/home' : '/'" class="mobile-logo" title="首页管理">
+      <LogoIcon class="title-icon" />
+    </RouterLink>
+    <RouterLink to="/" class="mobile-site-name">AA_Blog</RouterLink>
+    <div class="mobile-actions">
+      <button class="theme-btn" @click="toggleTheme">
+        <Sun v-if="dark" :size="18" />
+        <Moon v-else :size="18" />
+      </button>
+      <button class="menu-btn" @click="menuOpen = !menuOpen">
+        <Menu :size="20" />
+      </button>
+    </div>
+    <Teleport to="body">
+      <Transition name="fade">
+        <div v-if="menuOpen" class="mobile-overlay" @click="menuOpen = false">
+          <nav class="mobile-menu" @click.stop>
+            <RouterLink to="/" @click="menuOpen = false">Home</RouterLink>
+            <RouterLink to="/blog" @click="menuOpen = false">Blog</RouterLink>
+            <RouterLink to="/notes" @click="menuOpen = false">Notes</RouterLink>
+            <RouterLink to="/projects" @click="menuOpen = false">Projects</RouterLink>
+            <RouterLink to="/about" @click="menuOpen = false">About Me</RouterLink>
+            <RouterLink to="/guest" @click="menuOpen = false">Leave a Note</RouterLink>
+            <a v-if="isAdmin" href="#" @click.prevent="logout" class="logout-link">退出</a>
+          </nav>
+        </div>
+      </Transition>
+    </Teleport>
+  </header>
+
   <aside class="sidebar">
     <section class="sidebar-section">
       <div class="sidebar-title-row">
@@ -75,6 +108,24 @@ if (dark.value) document.body.classList.add('dark')
 </template>
 
 <style scoped>
+/* 移动端顶部导航 */
+.mobile-nav { display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 100; background: var(--bg); border-bottom: 1px solid rgba(128,128,128,0.08); padding: 0 1rem; height: 48px; }
+.mobile-logo { display: flex; }
+.mobile-site-name { font-family: var(--heading); font-size: 1.1em; font-weight: 600; color: var(--text); flex: 1; }
+.mobile-actions { display: flex; align-items: center; gap: 4px; }
+.menu-btn { display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; color: var(--text); padding: 4px; }
+
+.mobile-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.25); display: flex; justify-content: flex-end; }
+.mobile-menu { width: 240px; height: 100%; background: var(--bg); padding: 5rem 1.5rem 2rem; display: flex; flex-direction: column; gap: 4px; box-shadow: -4px 0 16px rgba(0,0,0,0.08); }
+.mobile-menu a { display: block; padding: 0.6rem 0.5rem; color: var(--text-secondary); font-size: 1.05em; border-radius: 6px; }
+.mobile-menu a:hover { background: var(--bg-secondary); color: var(--link); }
+.mobile-menu .logout-link { color: #e53e3e; margin-top: 1rem; }
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+@media screen and (min-width: 900px) { .mobile-nav { display: none; } }
+
 .sidebar {
   display: none;
   position: sticky; top: 0; height: 100vh; overflow-y: auto;
