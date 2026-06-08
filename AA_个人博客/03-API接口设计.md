@@ -7,7 +7,7 @@
 ```json
 {
   "code": 200,
-  "message": "success",
+  "message": "操作成功",
   "data": {}
 }
 ```
@@ -25,8 +25,10 @@
 
 | 角色 | 方式 |
 |---|---|
-| 评论者 | Header `Authorization: Bearer <github_token>` |
-| 管理员 | Header `Authorization: Bearer <jwt_token>` |
+| 评论者 | Header `Authorization: Bearer <commenter_token>` |
+| 管理员 | Header `Authorization: Bearer <admin_token>` |
+
+管理员接口 `/api/admin/**` 由 JwtInterceptor 统一拦截（排除 `/api/admin/login` 和 `/api/admin/refresh`）。
 
 ### 1.3 接口前缀
 
@@ -43,189 +45,89 @@
 
 **GET** `/api/home`
 
-返回：
+返回 `HomeVO`：
 
 ```json
 {
-  "about": {
-    "nickname": "AA",
-    "avatar": "/uploads/avatar.jpg",
-    "bio": "A passionate developer...",
-    "skills": ["Java", "Spring Boot", "Vue"],
-    "social_links": {
-      "github": "https://github.com/cupcoff1",
-      "email": "aa@example.com"
-    }
-  },
-  "latest_blogs": [
-    {
-      "id": 1,
-      "title": "...",
-      "slug": "...",
-      "summary": "...",
-      "published_at": "2026-06-01",
-      "tags": [{"id": 1, "name": "Java", "slug": "java"}]
-    }
-  ],
-  "latest_notes": [
-    {
-      "id": 1,
-      "title": "...",
-      "slug": "...",
-      "published_at": "2026-06-03",
-      "tags": [{"id": 1, "name": "Spring", "slug": "spring"}]
-    }
-  ],
-  "latest_projects": [
-    {
-      "id": 1,
-      "name": "...",
-      "slug": "...",
-      "description": "...",
-      "demo_url": "...",
-      "github_url": "...",
-      "tags": [{"id": 1, "name": "Vue", "slug": "vue"}]
-    }
-  ]
+  "about": { "nickname": "AA_", "avatar": "...", "bio": "...", "skills": "...", "hobbies": "...", "location": "...", "socialLinks": "..." },
+  "latestBlogs": [ { "id": 1, "title": "...", "slug": "...", "summary": "...", "publishedAt": "...", "tags": [...] } ],
+  "latestNotes": [ { "id": 1, "title": "...", "slug": "...", "content": "...", "publishedAt": "...", "tags": [...] } ],
+  "latestProjects": [ { "id": 1, "name": "...", "slug": "...", "description": "...", "demoUrl": "...", "githubUrl": "...", "tags": [...] } ]
 }
 ```
 
-### 2.2 Blog
+### 2.2 引语
+
+**GET** `/api/hero-quotes`
+
+返回 `List<HeroQuote>`：
+
+```json
+[
+  { "id": 1, "content": "真正重要的东西，眼睛是看不见的", "author": "安托万·德·圣-埃克苏佩里", "source": "小王子" }
+]
+```
+
+### 2.3 Hero 图片配置
+
+**GET** `/api/hero-config`
+
+返回 `{ heroLight, heroDark }`：
+
+```json
+{
+  "heroLight": "/uploads/hero/hero-light.png",
+  "heroDark": "/hero.jpg"
+}
+```
+
+有自定义上传图则返回 uploads 路径，否则返回默认路径。
+
+### 2.4 Blog
 
 **GET** `/api/blog?q={keyword}&tag={tag_slug}`
 
-查询参数可选，返回数组：
-
-```json
-{
-  "list": [
-    {
-      "id": 1,
-      "title": "...",
-      "slug": "...",
-      "summary": "...",
-      "published_at": "2026-06-01",
-      "tags": [{"id": 1, "name": "Java", "slug": "java"}]
-    }
-  ]
-}
-```
+查询参数可选，返回 `List<BlogListVO>`。
 
 **GET** `/api/blog/{slug}`
 
-```json
-{
-  "id": 1,
-  "title": "...",
-  "slug": "...",
-  "summary": "...",
-  "content": "# Markdown content...",
-  "published_at": "2026-06-01",
-  "tags": [{"id": 1, "name": "Java", "slug": "java"}],
-  "prev": {"title": "...", "slug": "..."},
-  "next": {"title": "...", "slug": "..."}
-}
-```
+返回 `BlogVO`（含 content、prev、next 导航）。
 
-### 2.3 Blog 评论
+### 2.5 Blog 评论
 
 **GET** `/api/blog/{slug}/comments`
 
-返回嵌套结构：
+返回 `List<CommentVO>`，嵌套 `children` 结构。
 
-```json
-{
-  "list": [
-    {
-      "id": 1,
-      "content": "Great post!",
-      "parent_id": null,
-      "author_name": "cupcoff1",
-      "author_avatar": "https://avatars.githubusercontent.com/...",
-      "created_at": "2026-06-05 10:30:00",
-      "children": [
-        {
-          "id": 2,
-          "content": "Thanks!",
-          "parent_id": 1,
-          "author_name": "AA",
-          "author_avatar": "...",
-          "created_at": "2026-06-05 10:35:00",
-          "children": []
-        }
-      ]
-    }
-  ]
-}
-```
-
-### 2.4 Notes
+### 2.6 Notes
 
 **GET** `/api/notes?q={keyword}&tag={tag_slug}`
 
-```json
-{
-  "list": [
-    {
-      "id": 1,
-      "title": "...",
-      "slug": "...",
-      "content": "# Full markdown content...",
-      "published_at": "2026-06-03",
-      "tags": [{"id": 1, "name": "Spring", "slug": "spring"}]
-    }
-  ]
-}
-```
+返回 `List<NotesVO>`（含全文 content）。
 
-### 2.5 Projects
+### 2.7 Projects
 
 **GET** `/api/projects`
 
-按 id DESC 排序，返回：
+返回 `List<ProjectsVO>`，按 id DESC。
 
-```json
-{
-  "list": [
-    {
-      "id": 1,
-      "name": "...",
-      "slug": "...",
-      "description": "...",
-      "demo_url": "...",
-      "github_url": "...",
-      "tags": [{"id": 1, "name": "Vue", "slug": "vue"}]
-    }
-  ]
-}
-```
-
-
-### 2.6 About Me
+### 2.8 About Me
 
 **GET** `/api/about`
 
-```json
-{
-  "nickname": "AA",
-  "avatar": "/uploads/avatar.jpg",
-  "bio": "...",
-  "skills": ["Java", "Spring Boot"],
-  "social_links": {"github": "...", "email": "..."}
-}
-```
+返回 `AboutVO`。
 
-### 2.7 标签列表
+### 2.9 标签列表
 
 **GET** `/api/tags`
 
-```json
-{
-  "list": [
-    {"id": 1, "name": "Java", "slug": "java"}
-  ]
-}
-```
+返回 `List<TagVO>`。
+
+### 2.10 便签
+
+**GET** `/api/sticky-notes`
+
+返回 `List<StickyNoteVO>`。
 
 ---
 
@@ -236,355 +138,151 @@
 **GET** `/api/auth/github/url`
 
 ```json
-{
-  "url": "https://github.com/login/oauth/authorize?client_id=xxx&redirect_uri=xxx&scope=user:email"
-}
+{ "url": "https://github.com/login/oauth/authorize?..." }
 ```
 
 ### 3.2 授权回调
 
 **GET** `/api/auth/github/callback?code={code}`
 
-后端用 code 换取 GitHub access_token，调 GitHub API 获取用户名和头像，签发评论者 JWT。
-
 ```json
 {
   "token": "eyJ...",
-  "user": {
-    "name": "cupcoff1",
-    "avatar": "https://avatars.githubusercontent.com/u/xxx"
-  }
+  "user": { "name": "cupcoff1", "avatar": "https://avatars.githubusercontent.com/..." }
 }
 ```
-
-### 3.3 评论者认证方式
-
-发表/删除评论时携带：
-
-> Header: `Authorization: Bearer <commenter_token>`
-
-后端从 JWT 解析出 `username` 和 `avatar`，无需额外传参。
 
 ---
 
 ## 4. 评论者接口
 
-> Header: `Authorization: Bearer <token>`
+> Header: `Authorization: Bearer <commenter_token>`
 
 ### 4.1 发表评论
 
 **POST** `/api/blog/{slug}/comments`
 
 ```json
-{
-  "content": "Markdown content...",
-  "parent_id": null
-}
+{ "content": "...", "parentId": null }
 ```
-
-返回创建的评论对象。
 
 ### 4.2 删除自己的评论
 
 **DELETE** `/api/comments/{id}`
 
-返回 200。code 403 如评论不属于当前用户。如有子回复则级联删除。
-
 ---
 
 ## 5. 管理员接口
 
-> Header: `Authorization: Bearer <jwt_token>`
+> Header: `Authorization: Bearer <admin_token>`
 
 ### 5.1 认证
 
 **POST** `/api/admin/login`
 
 ```json
-{
-  "username": "admin",
-  "password": "password123"
-}
-```
-
-```json
-{
-  "token": "eyJ..."
-}
+{ "username": "AA_", "password": "123456" }
+→ { "token": "eyJ..." }
 ```
 
 **POST** `/api/admin/refresh`
 
 > Header: `Authorization: Bearer <old_token>`
-
-```json
-{
-  "token": "eyJ..."
-}
-```
+→ `{ "token": "eyJ..." }`
 
 **PUT** `/api/admin/password`
 
-> Header: `Authorization: Bearer <token>`
-
 ```json
-{
-  "old_password": "123456",
-  "new_password": "new_password"
-}
+{ "oldPassword": "...", "newPassword": "..." }
 ```
 
-### 5.2 仪表盘
+### 5.2 Blog 管理
 
-**GET** `/api/admin/dashboard`
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/api/admin/blog` | 列表 |
+| GET | `/api/admin/blog/{id}` | 详情 |
+| POST | `/api/admin/blog` | 创建 |
+| PUT | `/api/admin/blog/{id}` | 更新 |
+| DELETE | `/api/admin/blog/{id}` | 删除（含关联标签和评论） |
 
-```json
-{
-  "blog_count": 10,
-  "note_count": 25,
-  "project_count": 6,
-  "comment_count": 15,
-  "tags": [
-    {
-      "name": "Java",
-      "slug": "java",
-      "blog_count": 3,
-      "note_count": 2,
-      "project_count": 1
-    }
-  ],
-  "recent_comments": [
-    {
-      "id": 1,
-      "content": "...",
-      "author_name": "...",
-      "blog_title": "...",
-      "created_at": "..."
-    }
-  ]
-}
-```
+POST/PUT body：`BlogCreateRequest { title, summary, content, tagIds?, newTags? }`
 
-### 5.3 Blog 管理
+### 5.3 Notes 管理
 
-**GET** `/api/admin/blog`
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/api/admin/notes` | 列表 |
+| GET | `/api/admin/notes/{id}` | 详情 |
+| POST | `/api/admin/notes` | 创建 |
+| PUT | `/api/admin/notes/{id}` | 更新 |
+| DELETE | `/api/admin/notes/{id}` | 删除（含关联标签） |
 
-返回所有文章（id DESC）：
+POST/PUT body：`NotesCreateRequest { title, content, tagIds?, newTags? }`
 
-```json
-{
-  "list": [
-    {
-      "id": 1,
-      "title": "...",
-      "slug": "...",
-      "summary": "...",
-      "published_at": "2026-06-01",
-      "tags": [{"id": 1, "name": "Java"}]
-    }
-  ]
-}
-```
+### 5.4 Projects 管理
 
-**POST** `/api/admin/blog`
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/api/admin/projects` | 列表 |
+| GET | `/api/admin/projects/{id}` | 详情 |
+| POST | `/api/admin/projects` | 创建 |
+| PUT | `/api/admin/projects/{id}` | 更新 |
+| DELETE | `/api/admin/projects/{id}` | 删除（含关联标签） |
 
-```json
-{
-  "title": "...",
-  "summary": "...",
-  "content": "# Markdown...",
-  "tag_ids": [1, 2],
-  "new_tags": ["新标签名"]
-}
-```
+POST/PUT body：`ProjectsCreateRequest { name, description, demoUrl?, githubUrl?, tagIds?, newTags? }`
 
-slug 后端自动生成，published_at 自动取当前时间。
+### 5.5 评论管理
 
-**PUT** `/api/admin/blog/{id}`
+**GET** `/api/admin/comments` — 列表（含 blog_title）  
+**DELETE** `/api/admin/comments/{id}` — 删除（含级联子回复）
 
-参数同 POST。
-
-**DELETE** `/api/admin/blog/{id}`
-
-> 同时删除关联的 blog_tags 记录和该文章下的所有评论。
-
-**GET** `/api/admin/blog/{id}`
-
-返回单篇文章完整数据，供编辑页填充表单。
-
-```json
-{
-  "id": 1,
-  "title": "...",
-  "summary": "...",
-  "content": "# Markdown...",
-  "tags": [{"id": 1, "name": "Java"}]
-}
-```
-
-### 5.4 Notes 管理
-
-**GET** `/api/admin/notes`
-
-返回所有笔记（id DESC）：
-
-```json
-{
-  "list": [
-    {
-      "id": 1,
-      "title": "...",
-      "slug": "...",
-      "published_at": "2026-06-03",
-      "tags": [{"id": 1, "name": "Spring"}]
-    }
-  ]
-}
-```
-
-**POST** `/api/admin/notes`
-
-```json
-{
-  "title": "...",
-  "content": "# Markdown...",
-  "tag_ids": [],
-  "new_tags": []
-}
-```
-
-**PUT** `/api/admin/notes/{id}`
-
-参数同 POST。
-
-**DELETE** `/api/admin/notes/{id}`
-
-> 同时删除关联的 notes_tags 记录。
-
-**GET** `/api/admin/notes/{id}`
-
-返回单条笔记完整数据，供编辑页填充表单。
-
-```json
-{
-  "id": 1,
-  "title": "...",
-  "content": "# Markdown...",
-  "tags": [{"id": 1, "name": "Spring"}]
-}
-```
-
-### 5.5 Projects 管理
-
-**GET** `/api/admin/projects`
-
-返回所有项目（id DESC）：
-
-```json
-{
-  "list": [
-    {
-      "id": 1,
-      "name": "...",
-      "slug": "...",
-      "description": "...",
-      "demo_url": "...",
-      "github_url": "...",
-      "tags": [{"id": 1, "name": "Vue"}]
-    }
-  ]
-}
-```
-
-**POST** `/api/admin/projects`
-
-```json
-{
-  "name": "...",
-  "description": "...",
-  "demo_url": "...",
-  "github_url": "...",
-  "tag_ids": [],
-  "new_tags": []
-}
-```
-
-**PUT** `/api/admin/projects/{id}`
-
-参数同 POST。
-
-**DELETE** `/api/admin/projects/{id}`
-
-> 同时删除关联的 projects_tags 记录。
-
-**GET** `/api/admin/projects/{id}`
-
-返回单个项目完整数据，供编辑页填充表单。
-
-```json
-{
-  "id": 1,
-  "name": "...",
-  "description": "...",
-  "demo_url": "...",
-  "github_url": "...",
-  "tags": [{"id": 1, "name": "Vue"}]
-}
-```
-
-### 5.6 评论管理
-
-**GET** `/api/admin/comments`
-
-```json
-{
-  "list": [
-    {
-      "id": 1,
-      "content": "...",
-      "parent_id": null,
-      "author_name": "...",
-      "blog_id": 1,
-      "blog_title": "...",
-      "created_at": "..."
-    }
-  ]
-}
-```
-
-**DELETE** `/api/admin/comments/{id}`
-
-> 级联删除所有子回复。
-
-### 5.7 About Me 管理
+### 5.6 About Me 管理
 
 **PUT** `/api/admin/about`
 
 ```json
-{
-  "nickname": "AA",
-  "avatar": "/uploads/avatar.jpg",
-  "bio": "...",
-  "skills": ["Java", "Spring Boot"],
-  "social_links": {"github": "..."}
-}
+{ "nickname": "...", "avatar": "...", "bio": "...", "skills": "...", "hobbies": "...", "location": "...", "socialLinks": "..." }
 ```
 
-### 5.8 文件上传
+### 5.7 文件上传
 
-**POST** `/api/admin/upload`
+**POST** `/api/admin/upload?type=image|avatar`
 
-> Content-Type: multipart/form-data
-
-| 字段 | 说明 |
-|---|---|
-| file | 图片文件（jpg/png/webp，≤ 2MB） |
+> Content-Type: multipart/form-data  
+> 字段：file（jpg/png/webp，≤ 2MB）
 
 ```json
-{
-  "url": "/uploads/avatar_20260605.jpg"
-}
+{ "url": "/uploads/images/20260608_143022.jpg" }
 ```
+
+### 5.8 Hero 图片上传
+
+**POST** `/api/admin/hero-image?type=light|dark`
+
+```json
+{ "url": "/uploads/hero/hero-light.png" }
+```
+
+### 5.9 引语管理
+
+**POST** `/api/admin/hero-quotes`
+
+```json
+{ "content": "...", "author": "...", "source": "..." }
+```
+
+**DELETE** `/api/admin/hero-quotes/{id}`
+
+### 5.10 便签管理
+
+**POST** `/api/admin/sticky-notes`
+
+```json
+{ "content": "...", "color": "#fff3cd", "rotate": 2 }
+```
+
+**DELETE** `/api/admin/sticky-notes/{id}`
 
 ---
 
@@ -593,13 +291,16 @@ slug 后端自动生成，published_at 自动取当前时间。
 | 方法 | 路径 | 认证 | 说明 |
 |---|---|---|---|
 | GET | `/api/home` | 无 | 首页数据 |
+| GET | `/api/hero-quotes` | 无 | 引语列表 |
+| GET | `/api/hero-config` | 无 | Hero 图片配置 |
 | GET | `/api/blog` | 无 | Blog 列表 + 搜索 |
 | GET | `/api/blog/{slug}` | 无 | Blog 详情 |
-| GET | `/api/blog/{slug}/comments` | 无 | 文章评论列表 |
+| GET | `/api/blog/{slug}/comments` | 无 | 文章评论 |
 | GET | `/api/notes` | 无 | Notes 列表 + 搜索 |
 | GET | `/api/projects` | 无 | 项目列表 |
 | GET | `/api/about` | 无 | 个人资料 |
 | GET | `/api/tags` | 无 | 标签列表 |
+| GET | `/api/sticky-notes` | 无 | 便签列表 |
 | GET | `/api/auth/github/url` | 无 | GitHub 授权 URL |
 | GET | `/api/auth/github/callback` | 无 | GitHub 回调 |
 | POST | `/api/blog/{slug}/comments` | 评论者 | 发表评论 |
@@ -607,23 +308,27 @@ slug 后端自动生成，published_at 自动取当前时间。
 | POST | `/api/admin/login` | 无 | 管理员登录 |
 | POST | `/api/admin/refresh` | 无 | 刷新 Token |
 | PUT | `/api/admin/password` | 管理员 | 修改密码 |
-| GET | `/api/admin/dashboard` | 管理员 | 仪表盘统计 |
-| GET | `/api/admin/blog` | 管理员 | Blog 管理列表 |
+| GET | `/api/admin/blog` | 管理员 | Blog 列表 |
 | POST | `/api/admin/blog` | 管理员 | 创建文章 |
+| GET | `/api/admin/blog/{id}` | 管理员 | 文章详情 |
 | PUT | `/api/admin/blog/{id}` | 管理员 | 编辑文章 |
 | DELETE | `/api/admin/blog/{id}` | 管理员 | 删除文章 |
-| GET | `/api/admin/blog/{id}` | 管理员 | 获取单篇文章 |
-| GET | `/api/admin/notes` | 管理员 | Notes 管理列表 |
+| GET | `/api/admin/notes` | 管理员 | Notes 列表 |
 | POST | `/api/admin/notes` | 管理员 | 创建笔记 |
+| GET | `/api/admin/notes/{id}` | 管理员 | 笔记详情 |
 | PUT | `/api/admin/notes/{id}` | 管理员 | 编辑笔记 |
 | DELETE | `/api/admin/notes/{id}` | 管理员 | 删除笔记 |
-| GET | `/api/admin/notes/{id}` | 管理员 | 获取单条笔记 |
-| GET | `/api/admin/projects` | 管理员 | 项目管理列表 |
+| GET | `/api/admin/projects` | 管理员 | 项目列表 |
 | POST | `/api/admin/projects` | 管理员 | 创建项目 |
+| GET | `/api/admin/projects/{id}` | 管理员 | 项目详情 |
 | PUT | `/api/admin/projects/{id}` | 管理员 | 编辑项目 |
 | DELETE | `/api/admin/projects/{id}` | 管理员 | 删除项目 |
-| GET | `/api/admin/projects/{id}` | 管理员 | 获取单个项目 |
-| GET | `/api/admin/comments` | 管理员 | 评论管理列表 |
+| GET | `/api/admin/comments` | 管理员 | 评论列表 |
 | DELETE | `/api/admin/comments/{id}` | 管理员 | 删除评论 |
 | PUT | `/api/admin/about` | 管理员 | 编辑个人资料 |
 | POST | `/api/admin/upload` | 管理员 | 上传文件 |
+| POST | `/api/admin/hero-image` | 管理员 | 上传 Hero 图 |
+| POST | `/api/admin/hero-quotes` | 管理员 | 创建引语 |
+| DELETE | `/api/admin/hero-quotes/{id}` | 管理员 | 删除引语 |
+| POST | `/api/admin/sticky-notes` | 管理员 | 创建便签 |
+| DELETE | `/api/admin/sticky-notes/{id}` | 管理员 | 删除便签 |

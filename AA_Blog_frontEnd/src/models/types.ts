@@ -94,17 +94,6 @@ export interface CommentAdminVO {
   created_at: string
 }
 
-// ==================== About ====================
-export interface AboutVO {
-  nickname: string
-  avatar: string
-  bio: string
-  skills: string
-  hobbies: string
-  location: string
-  socialLinks: string
-}
-
 // ==================== StickyNote ====================
 export interface StickyNoteVO {
   id: number
@@ -133,27 +122,11 @@ export interface GitHubUser {
   avatar: string
 }
 
-// ==================== Dashboard ====================
+// ==================== Home ====================
 export interface HomeVO {
-  about: AboutVO
   latestBlogs: BlogListVO[]
   latestNotes: NotesVO[]
   latestProjects: ProjectsVO[]
 }
 
-export interface DashboardVO {
-  blogCount: number
-  noteCount: number
-  projectCount: number
-  commentCount: number
-  tags: TagStatVO[]
-  recentComments: CommentAdminVO[]
-}
 
-export interface TagStatVO {
-  name: string
-  slug: string
-  blogCount: number
-  noteCount: number
-  projectCount: number
-}

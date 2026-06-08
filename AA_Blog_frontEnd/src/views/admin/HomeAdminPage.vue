@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Home, Plus, X } from '@lucide/vue'
+import { Home, Plus, X, Key } from '@lucide/vue'
 import api from '@/api/client'
 import type { HeroQuoteVO, HeroConfigVO } from '@/models/types'
 
@@ -48,6 +48,30 @@ const uploadHero = async (type: 'light' | 'dark', e: Event) => {
   heroConfig.value[type === 'light' ? 'heroLight' : 'heroDark'] = url + '?t=' + Date.now()
 }
 
+const oldPassword = ref('')
+const newPassword = ref('')
+const pwdMsg = ref('')
+const pwdOk = ref(false)
+
+const changePassword = async () => {
+  if (!oldPassword.value || !newPassword.value) {
+    pwdMsg.value = '请填写新旧密码'; pwdOk.value = false; return
+  }
+  try {
+    await api.put('/admin/password', {
+      oldPassword: oldPassword.value,
+      newPassword: newPassword.value
+    })
+    pwdMsg.value = '密码修改成功'
+    pwdOk.value = true
+    oldPassword.value = ''
+    newPassword.value = ''
+  } catch (e: unknown) {
+    pwdMsg.value = e instanceof Error ? e.message : '修改失败'
+    pwdOk.value = false
+  }
+}
+
 const fetchHeroConfig = async () => {
   try { heroConfig.value = await api.get<HeroConfigVO>('/hero-config') }
   catch { /* use defaults */ }
@@ -88,6 +112,17 @@ onMounted(() => {
           <input v-model="newSource" placeholder="作品名" />
         </div>
         <button class="btn" @click="addQuote"><Plus :size="16" /> 添加</button>
+      </div>
+    </section>
+
+    <!-- 修改密码 -->
+    <section class="section">
+      <h2>修改密码</h2>
+      <div class="pwd-form">
+        <input v-model="oldPassword" type="password" placeholder="旧密码" />
+        <input v-model="newPassword" type="password" placeholder="新密码" />
+        <button class="btn" @click="changePassword"><Key :size="16" /> 修改</button>
+        <span v-if="pwdMsg" :class="pwdOk ? 'msg-ok' : 'msg-err'">{{ pwdMsg }}</span>
       </div>
     </section>
 
@@ -134,6 +169,10 @@ h2 { font-size: 1.2em; margin-bottom: 0.8rem; }
 .btn { display: flex; align-items: center; gap: 4px; border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.8rem; background: var(--bg-secondary); color: var(--text); cursor: pointer; font-size: 0.95em; }
 .btn:hover { border-color: var(--link); color: var(--link); }
 
+.pwd-form { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.pwd-form input { border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.6rem; background: var(--bg); color: var(--text); font-size: 0.95em; max-width: 200px; }
+.msg-ok { color: #276749; font-size: 0.9em; }
+.msg-err { color: #e53e3e; font-size: 0.9em; }
 .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .hero-card { display: flex; flex-direction: column; gap: 0.5rem; }
 .hero-card label { font-weight: 600; font-size: 0.95em; }

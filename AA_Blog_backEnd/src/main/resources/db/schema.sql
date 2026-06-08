@@ -93,21 +93,7 @@ CREATE TABLE IF NOT EXISTS comments (
     KEY idx_parent_id (parent_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 9. about
-CREATE TABLE IF NOT EXISTS about (
-    id BIGINT NOT NULL,
-    nickname VARCHAR(100) NOT NULL,
-    avatar VARCHAR(500) NOT NULL,
-    bio TEXT NOT NULL,
-    skills JSON,
-    hobbies JSON,
-    location VARCHAR(200),
-    social_links JSON,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 10. admin
+-- 9. admin
 CREATE TABLE IF NOT EXISTS admin (
     id BIGINT NOT NULL AUTO_INCREMENT,
     username VARCHAR(100) NOT NULL,
@@ -117,7 +103,7 @@ CREATE TABLE IF NOT EXISTS admin (
     UNIQUE KEY uk_username (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 11. sticky_notes（便签）
+-- 10. sticky_notes（便签）
 CREATE TABLE IF NOT EXISTS sticky_notes (
     id BIGINT NOT NULL AUTO_INCREMENT,
     content VARCHAR(500) NOT NULL,
@@ -127,7 +113,7 @@ CREATE TABLE IF NOT EXISTS sticky_notes (
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 12. hero_quotes（首页引语）
+-- 11. hero_quotes（首页引语）
 CREATE TABLE IF NOT EXISTS hero_quotes (
     id BIGINT NOT NULL AUTO_INCREMENT,
     content VARCHAR(500) NOT NULL,
@@ -136,3 +122,5 @@ CREATE TABLE IF NOT EXISTS hero_quotes (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 默认管理员 AA_ / 123456（首次启动自动 BCrypt 加密创建）

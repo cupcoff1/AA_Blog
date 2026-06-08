@@ -2,7 +2,7 @@ package com.javaee.blog.controller;
 
 import com.javaee.blog.common.Result;
 import com.javaee.blog.dto.vo.HomeVO;
-import com.javaee.blog.service.DashboardService;
+import com.javaee.blog.service.HomeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class HomeController {
 
-    private final DashboardService dashboardService;
+    private final HomeService homeService;
 
     @GetMapping("/home")
     public Result<HomeVO> home() {
-        HomeVO vo = dashboardService.getHome();
+        HomeVO vo = homeService.getHome();
         return Result.ok(vo);
     }
 }
