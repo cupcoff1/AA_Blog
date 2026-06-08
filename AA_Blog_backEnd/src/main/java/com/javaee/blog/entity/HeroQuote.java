@@ -8,13 +8,13 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("sticky_notes")
-public class StickyNote {
+@TableName("hero_quotes")
+public class HeroQuote {
 
     @TableId(type = IdType.AUTO)
     private Long id;
     private String content;
-    private String color;
-    private Integer rotate;
+    private String author;
+    private String source;
     private LocalDateTime createdAt;
 }

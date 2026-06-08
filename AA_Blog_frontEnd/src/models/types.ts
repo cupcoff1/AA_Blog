@@ -114,6 +114,19 @@ export interface StickyNoteVO {
   custom: boolean
 }
 
+// ==================== Hero ====================
+export interface HeroQuoteVO {
+  id: number
+  content: string
+  author: string
+  source: string
+}
+
+export interface HeroConfigVO {
+  heroLight: string
+  heroDark: string
+}
+
 // ==================== Auth ====================
 export interface GitHubUser {
   name: string

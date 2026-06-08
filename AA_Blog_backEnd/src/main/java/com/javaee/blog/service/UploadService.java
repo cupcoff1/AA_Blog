@@ -50,4 +50,25 @@ public class UploadService {
 
         return "/uploads/" + subDir + "/" + filename;
     }
+
+    public String uploadHero(MultipartFile file, String type) throws IOException {
+        if (file.isEmpty() || file.getSize() > maxSize) {
+            throw new IllegalArgumentException("文件大小超过限制（最大 2MB）");
+        }
+        if (!ALLOWED_TYPES.contains(file.getContentType())) {
+            throw new IllegalArgumentException("仅支持 jpg/png/webp 格式");
+        }
+        if (!"light".equals(type) && !"dark".equals(type)) {
+            throw new IllegalArgumentException("type 必须为 light 或 dark");
+        }
+
+        Path dir = Paths.get(baseDir, "hero");
+        Files.createDirectories(dir);
+
+        String filename = "light".equals(type) ? "hero-light.png" : "hero-dark.jpg";
+        Path dest = dir.resolve(filename);
+        file.transferTo(dest);
+
+        return "/uploads/hero/" + filename;
+    }
 }

@@ -23,10 +23,12 @@ if (dark.value) document.body.classList.add('dark')
   <aside class="sidebar">
     <section class="sidebar-section">
       <div class="sidebar-title-row">
-        <RouterLink to="/" class="title-link">
-          <LogoIcon class="title-icon" />
-          <span class="site-name">AA_Blog</span>
-        </RouterLink>
+        <div class="title-link">
+          <RouterLink :to="isAdmin ? '/admin/home' : '/'" class="logo-link" title="首页管理">
+            <LogoIcon class="title-icon" />
+          </RouterLink>
+          <RouterLink to="/" class="site-name">AA_Blog</RouterLink>
+        </div>
         <button class="theme-btn" @click="toggleTheme">
           <Sun v-if="dark" :size="18" />
           <Moon v-else :size="18" />
@@ -67,6 +69,7 @@ if (dark.value) document.body.classList.add('dark')
     <section v-if="isAdmin" class="sidebar-section sidebar-footer">
       <a href="#" @click.prevent="logout" class="logout-link"><LogOut :size="16" /> 退出</a>
     </section>
+
   </aside>
 </template>
 
@@ -84,9 +87,11 @@ if (dark.value) document.body.classList.add('dark')
 .sidebar-section:last-child { border-bottom: none; }
 .sidebar-title-row { display: flex; align-items: center; justify-content: space-between; }
 .title-link { display: flex; align-items: center; gap: 8px; }
+.logo-link { display: flex; }
 .title-icon { width: 18px; height: 18px; color: var(--text); flex-shrink: 0; }
+.logo-link:hover .title-icon { color: var(--link); }
 .site-name { font-family: var(--heading); font-size: 1.2em; font-weight: 600; color: var(--text); white-space: nowrap; }
-.title-link:hover .site-name { color: var(--link); }
+.site-name:hover { color: var(--link); }
 .theme-btn {
   display: flex; align-items: center; justify-content: center;
   border: none; background: transparent; cursor: pointer;
@@ -113,4 +118,5 @@ if (dark.value) document.body.classList.add('dark')
 .logout-link:hover { background: var(--bg-secondary); }
 .secret-link { color: inherit; text-decoration: none !important; opacity: 0.6; }
 .secret-link:hover { opacity: 1; }
+
 </style>

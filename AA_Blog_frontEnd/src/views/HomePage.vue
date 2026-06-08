@@ -2,31 +2,36 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { BookOpen, Pencil, FolderOpen } from '@lucide/vue'
 import api from '@/api/client'
-import type { HomeVO } from '@/models/types'
+import type { HomeVO, HeroQuoteVO } from '@/models/types'
 
-const quotes = [
-  '请给我画只绵羊吧',
-  '真正重要的东西，眼睛是看不见的',
-  '是你为你的玫瑰花费的时间，才使你的玫瑰变得如此重要',
-  '如果一个人爱上了这亿万颗星星中独一无二的一朵花',
-  '只有用心才能看清',
-  '"真怪',
-  'You will be required to do wrong no matter where you go. It is the basic condition of life, to be required to violate your own identity.',
-]
+const quotes = ref<HeroQuoteVO[]>([{ id: 0, content: '真正重要的东西，眼睛是看不见的', author: '', source: '' }])
 const currentQuote = ref(0)
 const quoteVisible = ref(true)
 let timer: ReturnType<typeof setInterval>
 
 const data = ref<HomeVO | null>(null)
 const error = ref(false)
+const heroLight = ref('/hero-light.png')
+const heroDark = ref('/hero.jpg')
 
 onMounted(async () => {
   try { data.value = await api.get('/home') }
   catch { error.value = true }
+
+  try {
+    const qs: HeroQuoteVO[] = await api.get('/hero-quotes')
+    if (qs && qs.length) quotes.value = qs
+  } catch {}
+
+  try {
+    const cfg = await api.get('/hero-config')
+    if (cfg) { heroLight.value = cfg.heroLight; heroDark.value = cfg.heroDark }
+  } catch {}
+
   timer = setInterval(() => {
     quoteVisible.value = false
     setTimeout(() => {
-      currentQuote.value = (currentQuote.value + 1) % quotes.length
+      currentQuote.value = (currentQuote.value + 1) % quotes.value.length
       quoteVisible.value = true
     }, 400)
   }, 5000)
@@ -40,12 +45,15 @@ onUnmounted(() => clearInterval(timer))
     <section class="hero">
       <div class="hero-text">
         <h1>Hey, I'm AA_!</h1>
-        <p class="hero-desc" :class="{ quote: true, visible: quoteVisible }">{{ quotes[currentQuote] }}</p>
+        <p class="hero-desc" :class="{ quote: true, visible: quoteVisible }">
+          {{ quotes[currentQuote].content }}
+          <span v-if="quotes[currentQuote].author" class="quote-attribution">—— {{ quotes[currentQuote].author }}《{{ quotes[currentQuote].source }}》</span>
+        </p>
 
       </div>
       <div class="hero-image">
-        <img src="/hero-light.png" alt="Hero" class="hero-light" />
-        <img src="/hero.jpg" alt="Hero" class="hero-dark" />
+        <img :src="heroLight" alt="Hero" class="hero-light" />
+        <img :src="heroDark" alt="Hero" class="hero-dark" />
       </div>
     </section>
 
@@ -108,9 +116,10 @@ onUnmounted(() => clearInterval(timer))
 .hero { display: flex; gap: 2rem; align-items: center; margin-bottom: 4rem; }
 .hero-text { flex: 1; }
 .hero h1 { font-size: 3em; margin-bottom: 0.2em; }
-.hero-desc { font-family: 'Space Mono', monospace; font-size: 1.2em; max-width: 560px; margin-top: 2em; margin-bottom: 1em; height: 3.6em; overflow: hidden; color: rgba(34, 139, 34, 0.8); }
+.hero-desc { font-family: 'Space Mono', monospace; font-size: 1.2em; max-width: 560px; margin-top: 2em; margin-bottom: 1em; min-height: 3.6em; color: rgba(34, 139, 34, 0.8); }
 body.dark .hero-desc { color: rgba(147, 197, 253, 0.9); }
-.quote { opacity: 1; transform: translateY(0); transition: opacity 0.4s ease, transform 0.4s ease; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.quote-attribution { display: block; font-size: 0.75em; margin-top: 0.4em; opacity: 0.7; }
+.quote { opacity: 1; transform: translateY(0); transition: opacity 0.4s ease, transform 0.4s ease; }
 .quote:not(.visible) { opacity: 0; transform: translateY(8px); }
 .hero-image { width: 260px; height: 260px; border-radius: 50%; overflow: hidden; flex-shrink: 0; margin-top: 1.5rem; position: relative; }
 .hero-image img { width: 200%; height: 100%; object-fit: cover; object-position: left; position: absolute; top: 0; left: 0; }

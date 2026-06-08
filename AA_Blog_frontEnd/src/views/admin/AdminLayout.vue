@@ -11,6 +11,7 @@ if (!token) {
 
 const navItems = [
   { path: '/admin', label: '仪表盘' },
+  { path: '/admin/home', label: '首页管理' },
   { path: '/admin/blog', label: '文章' },
   { path: '/admin/notes', label: '笔记' },
   { path: '/admin/projects', label: '项目' },

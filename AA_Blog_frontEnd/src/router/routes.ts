@@ -40,6 +40,7 @@ const router = createRouter({
     { path: '/admin', name: 'admin-dashboard', component: () => import('@/views/admin/DashboardPage.vue') },
     { path: '/admin/comments', name: 'admin-comments', component: () => import('@/views/admin/CommentsPage.vue') },
     { path: '/admin/about', name: 'admin-about', component: () => import('@/views/admin/AboutPage.vue') },
+    { path: '/admin/home', name: 'admin-home', component: () => import('@/views/admin/HomeAdminPage.vue') },
 
     // 编辑页（管理员专用）
     { path: '/blog/new', name: 'blog-new', component: () => import('@/views/admin/BlogEditPage.vue') },

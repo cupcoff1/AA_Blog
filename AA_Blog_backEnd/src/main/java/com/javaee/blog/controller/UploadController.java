@@ -22,4 +22,11 @@ public class UploadController {
         String url = uploadService.upload(file, type);
         return Result.ok(Map.of("url", url));
     }
+
+    @PostMapping("/hero-image")
+    public Result<?> uploadHero(@RequestParam("file") MultipartFile file,
+                                @RequestParam String type) throws IOException {
+        String url = uploadService.uploadHero(file, type);
+        return Result.ok(Map.of("url", url));
+    }
 }
