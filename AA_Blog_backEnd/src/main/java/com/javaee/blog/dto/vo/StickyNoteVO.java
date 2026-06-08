@@ -9,5 +9,7 @@ public class StickyNoteVO {
     private String content;
     private String color;
     private Integer rotate;
-    private boolean custom; // true=自定义（可删除）
+    private Integer posX;
+    private Integer posY;
+    private boolean custom = true;
 }
