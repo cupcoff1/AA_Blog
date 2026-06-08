@@ -14,6 +14,7 @@ import com.javaee.blog.mapper.TagsMapper;
 import com.javaee.blog.service.AboutService;
 import com.javaee.blog.service.BlogService;
 import com.javaee.blog.service.CommentService;
+import com.javaee.blog.service.DashboardService;
 import com.javaee.blog.service.NotesService;
 import com.javaee.blog.service.ProjectsService;
 import lombok.RequiredArgsConstructor;
