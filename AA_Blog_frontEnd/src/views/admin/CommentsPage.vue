@@ -7,7 +7,7 @@ const comments = ref<CommentAdminVO[]>([])
 const loading = ref(true); const error = ref(false)
 const fetchList = async () => {
   loading.value = true; error.value = false
-  try { comments.value = await api.get('/admin/comments') }
+  try { comments.value = await api.get<CommentAdminVO[]>('/admin/comments') }
   catch { error.value = true }
   finally { loading.value = false }
 }

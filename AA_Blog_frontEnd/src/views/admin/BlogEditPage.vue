@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api/client'
+import TagEditor from '@/components/TagEditor.vue'
+import type { BlogVO, BlogCreateRequest, TagVO } from '@/models/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -11,18 +13,12 @@ const title = ref('')
 const summary = ref('')
 const content = ref('')
 const tagIds = ref<number[]>([])
-const newTagInput = ref('')
 const newTags = ref<string[]>([])
 const loading = ref(false)
 const error = ref('')
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const uploading = ref(false)
-
-const addNewTag = () => {
-  const name = newTagInput.value.trim()
-  if (name && !newTags.value.includes(name)) { newTags.value.push(name); newTagInput.value = '' }
-}
 
 const uploadImage = async (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0]
@@ -44,7 +40,6 @@ const uploadImage = async (e: Event) => {
   } catch { error.value = '图片上传失败' }
   finally { uploading.value = false; (e.target as HTMLInputElement).value = '' }
 }
-const removeNewTag = (name: string) => { newTags.value = newTags.value.filter(t => t !== name) }
 
 const submit = async () => {
   if (!title.value || !summary.value || !content.value) {
@@ -52,19 +47,19 @@ const submit = async () => {
   }
   loading.value = true; error.value = ''
   try {
-    const body = { title: title.value, summary: summary.value, content: content.value, tagIds: tagIds.value, newTags: newTags.value }
+    const body: BlogCreateRequest = { title: title.value, summary: summary.value, content: content.value, tagIds: tagIds.value, newTags: newTags.value }
     if (editId) await api.put(`/admin/blog/${editId}`, body)
     else await api.post('/admin/blog', body)
     router.push('/blog')
-  } catch (e: any) { error.value = e.message || '保存失败' }
+  } catch (e: unknown) { error.value = e instanceof Error ? e.message : '保存失败' }
   finally { loading.value = false }
 }
 
 onMounted(async () => {
   if (editId) {
-    const blog = await api.get(`/admin/blog/${editId}`)
+    const blog = await api.get<BlogVO>(`/admin/blog/${editId}`)
     title.value = blog.title; summary.value = blog.summary; content.value = blog.content
-    tagIds.value = blog.tags?.map((t: any) => t.id) || []
+    tagIds.value = blog.tags?.map((t: TagVO) => t.id) || []
   }
 })
 </script>
@@ -92,15 +87,7 @@ onMounted(async () => {
       <textarea ref="textareaRef" v-model="content" rows="16" placeholder="Markdown 内容" />
 
       <label>新标签</label>
-      <div class="tag-area">
-        <span v-for="t in newTags" :key="t" class="tag-pill">
-          {{ t }} <button type="button" @click="removeNewTag(t)">&times;</button>
-        </span>
-        <div class="tag-input">
-          <input v-model="newTagInput" @keyup.enter.prevent="addNewTag" placeholder="输入标签，回车添加" />
-          <button type="button" @click="addNewTag" class="tag-add">+</button>
-        </div>
-      </div>
+      <TagEditor v-model="newTags" />
 
       <button type="submit" class="submit-btn" :disabled="loading">
         {{ loading ? '保存中...' : '保存' }}
@@ -123,12 +110,6 @@ input, textarea {
   font-size: 0.95em; font-family: inherit; background: var(--bg); color: var(--text); outline: none;
 }
 input:focus, textarea:focus { border-color: var(--link); box-shadow: 0 0 0 2px rgba(177,45,108,0.08); }
-.tag-area { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
-.tag-pill { display: flex; align-items: center; gap: 4px; background: var(--bg-secondary); padding: 3px 10px; border-radius: 20px; font-size: 0.85em; }
-.tag-pill button { background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 1em; padding: 0; line-height: 1; }
-.tag-input { display: flex; gap: 0; }
-.tag-input input { flex: 1; border-top-right-radius: 0; border-bottom-right-radius: 0; font-size: 0.85em; padding: 5px 8px; }
-.tag-add { padding: 5px 12px; border: 1px solid var(--border); border-left: none; border-radius: 0 var(--radius) var(--radius) 0; background: var(--bg-secondary); cursor: pointer; color: var(--text-secondary); }
 .submit-btn { margin-top: 1rem; padding: 0.5rem 1.5rem; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius); font-size: 0.9em; font-weight: 500; cursor: pointer; transition: opacity 0.2s; width: fit-content; }
 .submit-btn:hover { opacity: 0.85; }
 .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }

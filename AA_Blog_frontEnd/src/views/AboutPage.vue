@@ -8,17 +8,11 @@ import type { StickyNoteVO } from '@/models/types'
 const customNotes = ref<StickyNoteVO[]>([])
 const loading = ref(true)
 const error = ref(false)
-const isAdmin = !!localStorage.getItem('admin_token')
+const isAdmin = computed(() => !!localStorage.getItem('admin_token'))
 const showForm = ref(false)
 const newContent = ref('')
 const newColor = ref('#fff3cd')
 const colors = ['#fff3cd', '#d4edda', '#cce5ff', '#f8d7da', '#e8daef', '#d1ecf1']
-
-const allNotes = computed(() => {
-  return customNotes.value.map(n => ({
-    id: n.id, title: '', content: n.content, color: n.color, rotate: n.rotate, custom: true
-  }))
-})
 
 const addNote = async () => {
   if (!newContent.value.trim()) return
@@ -31,7 +25,7 @@ const addNote = async () => {
     newContent.value = ''
     showForm.value = false
     // 刷新自定义便签
-    customNotes.value = await api.get('/sticky-notes')
+    customNotes.value = await api.get<StickyNoteVO[]>('/sticky-notes')
   } catch {}
 }
 
@@ -43,7 +37,7 @@ const delNote = async (id: number) => {
 
 onMounted(async () => {
   try {
-    customNotes.value = await api.get('/sticky-notes') || []
+    customNotes.value = await api.get<StickyNoteVO[]>('/sticky-notes') || []
   } catch { error.value = true }
   finally { loading.value = false }
 })
@@ -55,12 +49,12 @@ onMounted(async () => {
     <div v-else-if="error" class="state error">加载失败</div>
 
     <div v-else class="sticky-wall">
-      <div v-for="(note, i) in allNotes" :key="i"
-        class="sticky" :class="{ 'is-custom': (note as any).custom }"
+      <div v-for="note in customNotes" :key="note.id"
+        class="sticky"
         :style="{ '--bg': note.color, transform: `rotate(${note.rotate}deg)` }">
         <div class="sticky-body">{{ note.content }}</div>
-        <button v-if="isAdmin && (note as any).custom"
-          class="del-note" @click="delNote((note as any).id)" title="删除">
+        <button v-if="isAdmin && note.custom"
+          class="del-note" @click="delNote(note.id)" title="删除">
           <X :size="14" />
         </button>
       </div>
@@ -115,7 +109,6 @@ onMounted(async () => {
     repeating-linear-gradient(transparent 0, transparent 23px, rgba(0,0,0,0.02) 23px, rgba(0,0,0,0.02) 24px);
   pointer-events: none;
 }
-.sticky-title { font-size: 1.5em; margin-bottom: 0.5em; }
 .sticky-body { font-family: 'Ma Shan Zheng', cursive; font-size: 1.05em; color: rgba(0,0,0,0.65); line-height: 1.6; }
 .del-note { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(0,0,0,0.08); color: rgba(0,0,0,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; }
 .del-note:hover { background: rgba(229,62,62,0.2); color: #e53e3e; }

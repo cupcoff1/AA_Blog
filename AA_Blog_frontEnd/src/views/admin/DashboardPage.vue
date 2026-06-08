@@ -9,7 +9,7 @@ const error = ref(false)
 
 onMounted(async () => {
   try {
-    data.value = await api.get('/admin/dashboard')
+    data.value = await api.get<DashboardVO>('/admin/dashboard')
   } catch {
     error.value = true
   } finally {
@@ -84,7 +84,6 @@ onMounted(async () => {
 
 .comment-item { padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
 .comment-item p { margin-top: 0.3rem; color: var(--text-secondary); font-size: 0.9em; }
-.comment-meta { font-size: 0.85em; color: var(--text-secondary); }
 .comment-blog { margin-left: 0.5rem; }
 .comment-date { margin-left: 0.5rem; color: var(--text-secondary); font-size: 0.85em; }
 .empty { color: var(--text-secondary); font-size: 0.95em; }

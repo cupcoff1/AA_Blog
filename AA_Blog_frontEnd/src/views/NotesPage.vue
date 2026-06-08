@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Pencil, Search, Trash2 } from '@lucide/vue'
 import api from '@/api/client'
@@ -11,8 +11,8 @@ const router = useRouter()
 const notes = ref<NotesVO[]>([])
 const loading = ref(true)
 const error = ref(false)
-const isAdmin = !!localStorage.getItem('admin_token')
-const keyword = ref((route.query.q as string) || '')
+const isAdmin = computed(() => !!localStorage.getItem('admin_token'))
+const keyword = ref(String(route.query.q || ''))
 
 const deleteNote = async (id: number, title: string) => {
   if (!confirm(`删除「${title}」？`)) return
@@ -24,9 +24,9 @@ const fetchNotes = async () => {
   loading.value = true
   error.value = false
   try {
-    const q = (route.query.q as string) || ''
-    const tag = (route.query.tag as string) || ''
-    notes.value = await api.get('/notes', { params: { q, tag } })
+    const q = String(route.query.q || '')
+    const tag = String(route.query.tag || '')
+    notes.value = await api.get<NotesVO[]>('/notes', { params: { q, tag } })
   } catch {
     error.value = true
   } finally {
@@ -37,14 +37,14 @@ const fetchNotes = async () => {
 const search = () => {
   const query: Record<string, string> = {}
   if (keyword.value) query.q = keyword.value
-  const tag = route.query.tag as string
+  const tag = String(route.query.tag || '')
   if (tag) query.tag = tag
   router.replace({ query })
 }
 
 fetchNotes()
 watch(() => route.query, fetchNotes)
-watch(() => route.query.q, (val) => { keyword.value = (val as string) || '' })
+watch(() => route.query.q, (val) => { keyword.value = String(val || '') })
 </script>
 
 <template>

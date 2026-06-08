@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { FolderOpen, Pencil, Trash2 } from '@lucide/vue'
 import api from '@/api/client'
 import type { ProjectsVO } from '@/models/types'
@@ -7,7 +7,7 @@ import type { ProjectsVO } from '@/models/types'
 const projects = ref<ProjectsVO[]>([])
 const loading = ref(true)
 const error = ref(false)
-const isAdmin = !!localStorage.getItem('admin_token')
+const isAdmin = computed(() => !!localStorage.getItem('admin_token'))
 
 const deleteProject = async (id: number, name: string) => {
   if (!confirm(`删除「${name}」？`)) return
@@ -17,7 +17,7 @@ const deleteProject = async (id: number, name: string) => {
 
 onMounted(async () => {
   try {
-    projects.value = await api.get('/projects')
+    projects.value = await api.get<ProjectsVO[]>('/projects')
   } catch {
     error.value = true
   } finally {
@@ -67,12 +67,6 @@ onMounted(async () => {
 .project-name { font-weight: 600; display: block; margin-bottom: 0.2em; font-size: 1.1em; }
 .project-name[href]:hover { text-decoration: underline; text-decoration-thickness: 2px; }
 .project-card p { color: var(--text-secondary); font-size: 0.92em; margin-bottom: 0.5em; }
-.tag-btn {
-  display: inline-block; padding: 2px 10px;
-  border: 1px solid var(--border); border-radius: var(--radius);
-  font-size: 0.78em; color: var(--text-secondary);
-  background: var(--bg-secondary);
-}
 .card-actions { display: flex; gap: 4px; margin-top: 0.5rem; justify-content: flex-end; }
 .icon-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; color: var(--text-secondary); background: none; border: none; cursor: pointer; }
 .icon-btn:hover { background: rgba(147, 197, 253, 0.25); color: rgba(147, 197, 253, 1); }

@@ -1,12 +1,13 @@
 import axios from 'axios'
+import type { AxiosRequestConfig } from 'axios'
 
-const api = axios.create({
+const http = axios.create({
   baseURL: '/api',
   timeout: 10000
 })
 
 // 请求拦截：自动带 Token
-api.interceptors.request.use(config => {
+http.interceptors.request.use(config => {
   const token = localStorage.getItem('admin_token') || localStorage.getItem('commenter_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
@@ -15,11 +16,11 @@ api.interceptors.request.use(config => {
 })
 
 // 响应拦截：解包 Result，处理 401
-api.interceptors.response.use(
+http.interceptors.response.use(
   res => {
     const result = res.data
     if (result.code === 200) {
-      return result.data      // 只返回 data，调用方不用写 .data.data
+      return result.data
     }
     return Promise.reject(new Error(result.message || '请求失败'))
   },
@@ -34,5 +35,21 @@ api.interceptors.response.use(
     return Promise.reject(err)
   }
 )
+
+// 泛型包装：调用方 api.get<T>(...) 返回 T，不用手动标注
+const api = {
+  get<T = unknown>(url: string, config?: AxiosRequestConfig) {
+    return http.get(url, config) as Promise<T>
+  },
+  post<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig) {
+    return http.post(url, data, config) as Promise<T>
+  },
+  put<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig) {
+    return http.put(url, data, config) as Promise<T>
+  },
+  delete<T = unknown>(url: string, config?: AxiosRequestConfig) {
+    return http.delete(url, config) as Promise<T>
+  }
+}
 
 export default api

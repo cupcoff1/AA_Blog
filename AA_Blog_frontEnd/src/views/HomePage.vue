@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { BookOpen, Pencil, FolderOpen } from '@lucide/vue'
 import api from '@/api/client'
-import type { HomeVO, HeroQuoteVO } from '@/models/types'
+import type { HomeVO, HeroQuoteVO, HeroConfigVO } from '@/models/types'
 
 const quotes = ref<HeroQuoteVO[]>([{ id: 0, content: '真正重要的东西，眼睛是看不见的', author: '', source: '' }])
 const currentQuote = ref(0)
@@ -15,16 +15,16 @@ const heroLight = ref('/hero-light.png')
 const heroDark = ref('/hero.jpg')
 
 onMounted(async () => {
-  try { data.value = await api.get('/home') }
+  try { data.value = await api.get<HomeVO>('/home') }
   catch { error.value = true }
 
   try {
-    const qs: HeroQuoteVO[] = await api.get('/hero-quotes')
+    const qs = await api.get<HeroQuoteVO[]>('/hero-quotes')
     if (qs && qs.length) quotes.value = qs
   } catch {}
 
   try {
-    const cfg = await api.get('/hero-config')
+    const cfg = await api.get<HeroConfigVO>('/hero-config')
     if (cfg) { heroLight.value = cfg.heroLight; heroDark.value = cfg.heroDark }
   } catch {}
 
@@ -131,7 +131,6 @@ body.dark .hero-dark { display: block; }
 .section { margin-bottom: 3.5rem; }
 .section-head { margin-bottom: 1.2rem; }
 .section-title { font-size: 1.8em; margin: 0 0 0.2em; display: flex; align-items: center; gap: 8px; }
-.section-title a { color: var(--text); }
 .section-desc { color: var(--text-secondary); font-size: 0.95em; margin: 0; }
 
 /* Post list */

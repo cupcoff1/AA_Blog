@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { BookOpen, Search, Pencil, Trash2 } from '@lucide/vue'
 import api from '@/api/client'
@@ -10,22 +10,22 @@ const router = useRouter()
 const blogs = ref<BlogListVO[]>([])
 const loading = ref(true)
 const error = ref(false)
-const isAdmin = !!localStorage.getItem('admin_token')
+const isAdmin = computed(() => !!localStorage.getItem('admin_token'))
 
 const deleteBlog = async (id: number, title: string) => {
   if (!confirm(`删除「${title}」？`)) return
   await api.delete(`/admin/blog/${id}`)
   blogs.value = blogs.value.filter(b => b.id !== id)
 }
-const keyword = ref((route.query.q as string) || '')
+const keyword = ref(String(route.query.q || ''))
 
 const fetchBlogs = async () => {
   loading.value = true
   error.value = false
   try {
-    const q = (route.query.q as string) || ''
-    const tag = (route.query.tag as string) || ''
-    blogs.value = await api.get('/blog', { params: { q, tag } })
+    const q = String(route.query.q || '')
+    const tag = String(route.query.tag || '')
+    blogs.value = await api.get<BlogListVO[]>('/blog', { params: { q, tag } })
   } catch {
     error.value = true
   } finally {
@@ -36,14 +36,14 @@ const fetchBlogs = async () => {
 const search = () => {
   const query: Record<string, string> = {}
   if (keyword.value) query.q = keyword.value
-  const tag = route.query.tag as string
+  const tag = String(route.query.tag || '')
   if (tag) query.tag = tag
   router.replace({ query })
 }
 
 fetchBlogs()
 watch(() => route.query, fetchBlogs)
-watch(() => route.query.q, (val) => { keyword.value = (val as string) || '' })
+watch(() => route.query.q, (val) => { keyword.value = String(val || '') })
 </script>
 
 <template>

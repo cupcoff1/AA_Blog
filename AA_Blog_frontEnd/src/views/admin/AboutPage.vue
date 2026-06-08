@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import api from '@/api/client'
+import type { AboutVO } from '@/models/types'
 
 const nickname = ref(''); const avatar = ref(''); const bio = ref('')
 const skills = ref(''); const hobbies = ref(''); const location = ref(''); const socialLinks = ref('')
@@ -15,12 +16,12 @@ const submit = async () => {
       socialLinks: socialLinks.value
     })
     message.value = '保存成功'
-  } catch (e: any) { message.value = e.message || '保存失败' }
+  } catch (e: unknown) { message.value = e instanceof Error ? e.message : '保存失败' }
   finally { loading.value = false }
 }
 onMounted(async () => {
   try {
-    const a = await api.get('/about')
+    const a = await api.get<AboutVO>('/about')
     nickname.value = a.nickname; avatar.value = a.avatar; bio.value = a.bio
     skills.value = a.skills || ''; hobbies.value = a.hobbies || ''
     location.value = a.location || ''; socialLinks.value = a.socialLinks || ''

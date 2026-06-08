@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ChevronDown, ChevronRight } from '@lucide/vue'
 import api from '@/api/client'
 import type { BlogVO, CommentVO } from '@/models/types'
 import { marked } from 'marked'
+import { markedHighlight } from 'marked-highlight'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.min.css'
 
@@ -16,17 +17,18 @@ const error = ref(false)
 const showToc = ref(true)
 const headings = ref<{ id: string; text: string; level: number; open: boolean; children: { id: string; text: string }[] }[]>([])
 const activeId = ref('')
+let headingTimer: ReturnType<typeof setTimeout>
 
-marked.setOptions({
-  gfm: true,
-  breaks: true,
+marked.setOptions({ gfm: true, breaks: true })
+marked.use(markedHighlight({
+  langPrefix: 'hljs language-',
   highlight(code: string, lang: string) {
     if (lang && hljs.getLanguage(lang)) {
       return hljs.highlight(code, { language: lang }).value
     }
     return hljs.highlightAuto(code).value
   }
-})
+}))
 
 const extractHeadings = () => {
   const els = document.querySelectorAll('.blog-content h2, .blog-content h3')
@@ -57,20 +59,24 @@ const onScroll = () => {
 
 onMounted(async () => {
   try {
-    const slug = route.params.slug as string
+    const slug = String(route.params.slug)
     const [blogData, commentData] = await Promise.all([
-      api.get(`/blog/${slug}`),
-      api.get(`/blog/${slug}/comments`)
+      api.get<BlogVO>(`/blog/${slug}`),
+      api.get<CommentVO[]>(`/blog/${slug}/comments`)
     ])
     blog.value = blogData
     comments.value = commentData
-    setTimeout(extractHeadings, 100)
+    headingTimer = setTimeout(extractHeadings, 100)
   } catch {
     error.value = true
   } finally {
     loading.value = false
   }
   window.addEventListener('scroll', onScroll)
+})
+onUnmounted(() => {
+  window.removeEventListener('scroll', onScroll)
+  clearTimeout(headingTimer)
 })
 
 const scrollToComments = () => {
@@ -102,7 +108,7 @@ const scrollToComments = () => {
       </div>
 
       <aside class="toc-sidebar" v-if="headings.length">
-        <p class="toc-title" @click="showToc = !showToc" style="cursor: pointer;">
+        <p class="toc-title" @click="showToc = !showToc">
           <ChevronDown v-if="showToc" :size="14" class="toc-chevron" />
           <ChevronRight v-else :size="14" class="toc-chevron" />
           目录
@@ -201,8 +207,6 @@ const scrollToComments = () => {
 .blog-meta a:hover { color: var(--link); }
 .divider { opacity: 0.4; }
 
-/* Tags as buttons */
-.tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 /* Content */
 .blog-content { line-height: 1.8; font-size: 1.05em; margin-bottom: 2.5rem; }
 .blog-content :deep(a) { text-decoration: underline; text-decoration-thickness: 2px; text-decoration-style: dotted; text-underline-offset: 6px; }

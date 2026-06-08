@@ -15,7 +15,7 @@ const heroConfig = ref<HeroConfigVO>({ heroLight: '/hero-light.png', heroDark: '
 
 const fetchQuotes = async () => {
   loading.value = true; error.value = false
-  try { quotes.value = await api.get('/hero-quotes') || [] }
+  try { quotes.value = await api.get<HeroQuoteVO[]>('/hero-quotes') || [] }
   catch { error.value = true }
   finally { loading.value = false }
 }
@@ -49,7 +49,7 @@ const uploadHero = async (type: 'light' | 'dark', e: Event) => {
 }
 
 const fetchHeroConfig = async () => {
-  try { heroConfig.value = await api.get('/hero-config') }
+  try { heroConfig.value = await api.get<HeroConfigVO>('/hero-config') }
   catch { /* use defaults */ }
 }
 
