@@ -105,6 +105,15 @@ export interface AboutVO {
   socialLinks: string
 }
 
+// ==================== StickyNote ====================
+export interface StickyNoteVO {
+  id: number
+  content: string
+  color: string
+  rotate: number
+  custom: boolean
+}
+
 // ==================== Auth ====================
 export interface GitHubUser {
   name: string

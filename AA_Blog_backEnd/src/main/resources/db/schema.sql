@@ -116,3 +116,13 @@ CREATE TABLE IF NOT EXISTS admin (
     PRIMARY KEY (id),
     UNIQUE KEY uk_username (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 11. sticky_notes（便签）
+CREATE TABLE IF NOT EXISTS sticky_notes (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    content VARCHAR(500) NOT NULL,
+    color VARCHAR(20) NOT NULL,
+    rotate INT DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
