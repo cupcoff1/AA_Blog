@@ -61,7 +61,7 @@ onUnmounted(() => clearInterval(timer))
     <section class="section">
       <div class="section-head">
         <h2 class="section-title"><BookOpen :size="22" /> Blog</h2>
-        <p class="section-desc">指南、参考与教程</p>
+        <p class="section-desc">生活、项目以及一切</p>
       </div>
       <div v-if="data.latestBlogs.length" class="post-list">
         <article v-for="blog in data.latestBlogs" :key="blog.id" class="post-item">
@@ -78,7 +78,7 @@ onUnmounted(() => clearInterval(timer))
     <section class="section">
       <div class="section-head">
         <h2 class="section-title"><Pencil :size="22" /> Notes</h2>
-        <p class="section-desc">生活、项目以及一切</p>
+        <p class="section-desc">指南、参考与教程</p>
       </div>
       <div v-if="data.latestNotes.length" class="post-list">
         <article v-for="note in data.latestNotes" :key="note.id" class="post-item">

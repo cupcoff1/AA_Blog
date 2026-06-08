@@ -87,34 +87,16 @@ const login = async () => {
     repeating-linear-gradient(transparent 0, transparent 23px, rgba(0,0,0,0.02) 23px, rgba(0,0,0,0.02) 24px);
   pointer-events: none;
 }
-.note-1 { top: 8%; left: 3%; background: #fff3cd; transform: rotate(-6deg); }
-.note-2 { top: 5%; right: 6%; background: #d4edda; transform: rotate(4deg); }
-.note-3 { bottom: 25%; left: 10%; background: #cce5ff; transform: rotate(-3deg); }
-.note-4 { bottom: 8%; right: 2%; background: #f8d7da; transform: rotate(7deg); }
+.note-1 { top: 12%; left: 8%; background: #fff3cd; transform: rotate(-6deg); }
+.note-2 { top: 10%; right: 12%; background: #d4edda; transform: rotate(4deg); }
+.note-3 { bottom: 28%; left: 12%; background: #cce5ff; transform: rotate(-3deg); }
+@media screen and (max-width: 600px) { .note-3 { bottom: 15%; } }
+.note-4 { bottom: 12%; right: 8%; background: #f8d7da; transform: rotate(7deg); }
 .login-card {
   width: 100%;
   max-width: 380px;
   padding: 3rem 2rem 2.5rem;
   position: relative;
-  background-color: rgba(200, 146, 231, 0.15);
-  box-shadow: 2px 3px 8px rgba(0,0,0,0.1);
-  transform: rotate(-0.5deg);
-  overflow: hidden;
-}
-.login-card::before {
-  content: ''; position: absolute; top: 0; left: 0;
-  width: 0; height: 0;
-  border-style: solid;
-  border-width: 40px 40px 0 0;
-  border-color: var(--bg) transparent transparent transparent;
-  z-index: 2;
-}
-.login-card::after {
-  content: ''; position: absolute; inset: 0;
-  background:
-    repeating-linear-gradient(transparent 0, transparent 26px, rgba(0,0,0,0.04) 26px, rgba(0,0,0,0.04) 28px),
-    repeating-linear-gradient(transparent 0, transparent 23px, rgba(0,0,0,0.02) 23px, rgba(0,0,0,0.02) 24px);
-  pointer-events: none;
 }
 .login-logo {
   display: flex;

@@ -69,7 +69,7 @@ onMounted(fetchNotes)
   <div class="guest-wall">
     <div class="section-head">
       <h1 class="section-title"><MessageSquare :size="32" /> Leave a Note</h1>
-      <p class="section-desc">留下你想对我说的话，或者对网站的建议</p>
+      <p class="section-desc">想对我说的话，或者对网站的建议</p>
     </div>
 
     <div v-if="loading" class="state">加载中...</div>

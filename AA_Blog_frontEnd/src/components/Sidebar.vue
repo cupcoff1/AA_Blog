@@ -40,13 +40,18 @@ if (dark.value) document.body.classList.add('dark')
       <Transition name="fade">
         <div v-if="menuOpen" class="mobile-overlay" @click="menuOpen = false">
           <nav class="mobile-menu" @click.stop>
-            <RouterLink to="/" @click="menuOpen = false">Home</RouterLink>
+            <RouterLink :to="isAdmin ? '/admin/home' : '/'" @click="menuOpen = false">Home</RouterLink>
             <RouterLink to="/blog" @click="menuOpen = false">Blog</RouterLink>
             <RouterLink to="/notes" @click="menuOpen = false">Notes</RouterLink>
             <RouterLink to="/projects" @click="menuOpen = false">Projects</RouterLink>
             <RouterLink to="/about" @click="menuOpen = false">About Me</RouterLink>
             <RouterLink to="/guest" @click="menuOpen = false">Leave a Note</RouterLink>
-            <a v-if="isAdmin" href="#" @click.prevent="logout" class="logout-link">退出</a>
+            <a href="https://github.com/cupcoff1" target="_blank" class="mobile-gh">GitHub</a>
+            <div class="mobile-divider" />
+            <a v-if="isAdmin" href="#" @click.prevent="logout" class="logout-link"><LogOut :size="16" /></a>
+            <div class="mobile-bio">
+              I'm AA_ , Student. This is my digital garden. <RouterLink to="/admin/login" @click="menuOpen = false" class="secret-link">🌱</RouterLink>
+            </div>
           </nav>
         </div>
       </Transition>
@@ -120,6 +125,10 @@ if (dark.value) document.body.classList.add('dark')
 .mobile-menu a { display: block; padding: 0.6rem 0.5rem; color: var(--text-secondary); font-size: 1.05em; border-radius: 6px; }
 .mobile-menu a:hover { background: var(--bg-secondary); color: var(--link); }
 .mobile-menu .logout-link { color: #e53e3e; margin-top: 1rem; }
+.mobile-gh { display: block; padding: 0.6rem 0.5rem; color: var(--text-secondary); font-size: 1.05em; border-radius: 6px; }
+.mobile-gh:hover { background: var(--bg-secondary); color: var(--link); }
+.mobile-divider { height: 1px; background: rgba(128,128,128,0.1); margin: 0.5rem 0; }
+.mobile-bio { padding-top: 1rem; font-size: 0.85em; color: var(--text-secondary); line-height: 1.5; }
 
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
