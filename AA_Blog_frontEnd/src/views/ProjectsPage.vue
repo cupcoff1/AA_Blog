@@ -42,8 +42,6 @@ onMounted(async () => {
         <a v-if="proj.githubUrl" :href="proj.githubUrl" target="_blank" class="project-name">{{ proj.name }}</a>
         <span v-else class="project-name">{{ proj.name }}</span>
         <p>{{ proj.description }}</p>
-        <div class="tags" v-if="proj.tags?.length">
-        </div>
         <div v-if="isAdmin" class="card-actions">
           <RouterLink :to="`/projects/${proj.id}/edit`" class="icon-btn" title="编辑">
             <Pencil :size="14" />
@@ -69,7 +67,6 @@ onMounted(async () => {
 .project-name { font-weight: 600; display: block; margin-bottom: 0.2em; font-size: 1.1em; }
 .project-name[href]:hover { text-decoration: underline; text-decoration-thickness: 2px; }
 .project-card p { color: var(--text-secondary); font-size: 0.92em; margin-bottom: 0.5em; }
-.tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 .tag-btn {
   display: inline-block; padding: 2px 10px;
   border: 1px solid var(--border); border-radius: var(--radius);

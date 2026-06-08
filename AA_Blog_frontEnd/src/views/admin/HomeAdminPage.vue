@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Plus, X } from '@lucide/vue'
+import { Home, Plus, X } from '@lucide/vue'
 import api from '@/api/client'
 import type { HeroQuoteVO, HeroConfigVO } from '@/models/types'
 
@@ -61,7 +61,10 @@ onMounted(() => {
 
 <template>
   <div class="admin-list">
-    <h1>首页管理</h1>
+    <div class="section-head">
+      <h1 class="section-title"><Home :size="32" /> Home</h1>
+      <p class="section-desc">Hero 引语与首图管理</p>
+    </div>
 
     <!-- 引语管理 -->
     <section class="section">
@@ -109,8 +112,10 @@ onMounted(() => {
 
 <style scoped>
 .admin-list { padding: 1rem 0; max-width: 700px; }
+.section-head { margin-bottom: 1.5rem; }
+.section-title { font-size: 2.8rem; margin-bottom: 0.2em; display: flex; align-items: center; gap: 10px; }
+.section-desc { color: var(--text-secondary); font-size: 0.95em; margin: 0; }
 .section { margin-top: 2rem; }
-h1 { margin-bottom: 1rem; }
 h2 { font-size: 1.2em; margin-bottom: 0.8rem; }
 .state { color: var(--text-secondary); padding: 1rem 0; }
 .state.error { color: #e53e3e; }

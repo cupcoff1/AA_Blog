@@ -142,7 +142,6 @@ body.dark .hero-dark { display: block; }
 a.post-title { text-decoration: underline; text-decoration-thickness: 2px; text-decoration-style: dotted; text-decoration-color: var(--text); text-underline-offset: 6px; }
 a.post-title:hover { text-decoration-color: var(--link); }
 .no-link { color: var(--link); }
-.tags { display: flex; gap: 0.4rem; margin-left: auto; flex-wrap: wrap; }
 /* Projects */
 .project-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.8rem; }
 .project-card { padding: 0.8rem 1rem; background: var(--bg-card); backdrop-filter: blur(10px); border: 2px solid var(--border); border-radius: var(--radius); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
