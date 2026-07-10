@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api/client'
+import { refreshAuth } from '@/router/auth'
 import LogoIcon from '@/components/LogoIcon.vue'
 
 const router = useRouter()
@@ -18,11 +19,11 @@ const login = async () => {
   error.value = ''
   loading.value = true
   try {
-    const { token } = await api.post<{ token: string }>('/admin/login', {
+    await api.post('/admin/login', {
       username: username.value,
       password: password.value
     })
-    localStorage.setItem('admin_token', token)
+    await refreshAuth()
     router.push('/')
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : '登录失败'
@@ -38,7 +39,7 @@ const login = async () => {
     <div class="deco-note note-1">记得<br>喝水<br>(´▽`ʃ♡ƪ)</div>
     <div class="deco-note note-2">咕咕<br>嘎嘎<br>(°〆°)〜☆</div>
     <div class="deco-note note-3">我要<br>成为<br>...高手!<br>(๑•̀ㅂ•́)و✧</div>
-    <div class="deco-note note-4">用户名<br>root<br>密码<br>admin123</div>
+    <div class="deco-note note-4">用户名<br>FKXQS<br>密码<br>vivo50</div>
 
     <div class="login-card">
       <RouterLink to="/" class="login-logo">

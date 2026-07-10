@@ -21,7 +21,18 @@ const submit = async () => {
   } catch (e: unknown) { error.value = e instanceof Error ? e.message : '保存失败' } finally { loading.value = false }
 }
 onMounted(async () => {
-  if (editId) { const p = await api.get<ProjectsVO>(`/admin/projects/${editId}`); name.value = p.name; description.value = p.description; demoUrl.value = p.demoUrl; githubUrl.value = p.githubUrl; tagIds.value = p.tags?.map((t: TagVO) => t.id) || [] }
+  if (!editId) return
+  loading.value = true
+  try {
+    const p = await api.get<ProjectsVO>(`/admin/projects/${editId}`)
+    name.value = p.name; description.value = p.description
+    demoUrl.value = p.demoUrl; githubUrl.value = p.githubUrl
+    tagIds.value = p.tags?.map((t: TagVO) => t.id) || []
+  } catch {
+    error.value = '加载项目失败'
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 <template>

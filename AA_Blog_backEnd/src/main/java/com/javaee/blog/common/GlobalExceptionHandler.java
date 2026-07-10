@@ -3,11 +3,15 @@ package com.javaee.blog.common;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.util.NoSuchElementException;
 
 @Slf4j
 @RestControllerAdvice
@@ -40,9 +44,24 @@ public class GlobalExceptionHandler {
         return Result.fail(ResultCode.BAD_REQUEST, "文件大小超过限制");
     }
 
+    @ExceptionHandler(NoSuchElementException.class)
+    public Result<?> handleNotFound(NoSuchElementException e) {
+        return Result.fail(ResultCode.NOT_FOUND, e.getMessage());
+    }
+
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public Result<?> handleMissingParam(MissingServletRequestParameterException e) {
         return Result.fail(ResultCode.BAD_REQUEST, "缺少必要参数：" + e.getParameterName());
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public Result<?> handleMethodNotAllowed(HttpRequestMethodNotSupportedException e) {
+        return Result.fail(ResultCode.BAD_REQUEST, "不支持的请求方法：" + e.getMethod());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public Result<?> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        return Result.fail(ResultCode.BAD_REQUEST, "参数类型错误：" + e.getName());
     }
 
     @ExceptionHandler(Exception.class)

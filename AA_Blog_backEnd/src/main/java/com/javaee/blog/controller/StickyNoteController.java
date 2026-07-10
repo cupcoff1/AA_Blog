@@ -8,6 +8,7 @@ import com.javaee.blog.service.StickyNoteService;
 import com.javaee.blog.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,10 +58,19 @@ public class StickyNoteController {
     }
 
     private Claims getClaims(HttpServletRequest req) {
-        String header = req.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) return null;
-        try { return jwtUtil.parseToken(header.substring(7)); }
+        String token = extractToken(req, "commenter_token");
+        if (token == null) token = extractToken(req, "admin_token");
+        if (token == null) return null;
+        try { return jwtUtil.parseToken(token); }
         catch (JwtException e) { return null; }
+    }
+
+    private String extractToken(HttpServletRequest req, String name) {
+        if (req.getCookies() == null) return null;
+        for (Cookie cookie : req.getCookies()) {
+            if (name.equals(cookie.getName())) return cookie.getValue();
+        }
+        return null;
     }
 
     private String getUsername(HttpServletRequest req, boolean isAdmin) {

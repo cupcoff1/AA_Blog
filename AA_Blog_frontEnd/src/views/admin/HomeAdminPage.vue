@@ -22,30 +22,42 @@ const fetchQuotes = async () => {
 
 const addQuote = async () => {
   if (!newContent.value.trim()) return
-  await api.post('/admin/hero-quotes', {
-    content: newContent.value.trim(),
-    author: newAuthor.value.trim(),
-    source: newSource.value.trim()
-  })
-  newContent.value = ''
-  newAuthor.value = ''
-  newSource.value = ''
-  fetchQuotes()
+  try {
+    await api.post('/admin/hero-quotes', {
+      content: newContent.value.trim(),
+      author: newAuthor.value.trim(),
+      source: newSource.value.trim()
+    })
+    newContent.value = ''
+    newAuthor.value = ''
+    newSource.value = ''
+    fetchQuotes()
+  } catch {
+    alert('添加引语失败')
+  }
 }
 
 const delQuote = async (id: number) => {
   if (!confirm('删除这条引语？')) return
-  await api.delete(`/admin/hero-quotes/${id}`)
-  quotes.value = quotes.value.filter(q => q.id !== id)
+  try {
+    await api.delete(`/admin/hero-quotes/${id}`)
+    quotes.value = quotes.value.filter(q => q.id !== id)
+  } catch {
+    alert('删除引语失败')
+  }
 }
 
 const uploadHero = async (type: 'light' | 'dark', e: Event) => {
   const input = e.target as HTMLInputElement
   if (!input.files?.length) return
-  const form = new FormData()
-  form.append('file', input.files[0])
-  const { url } = await api.post<{ url: string }>('/admin/hero-image?type=' + type, form)
-  heroConfig.value[type === 'light' ? 'heroLight' : 'heroDark'] = url + '?t=' + Date.now()
+  try {
+    const form = new FormData()
+    form.append('file', input.files[0])
+    const { url } = await api.post<{ url: string }>('/admin/hero-image?type=' + type, form)
+    heroConfig.value[type === 'light' ? 'heroLight' : 'heroDark'] = url + '?t=' + Date.now()
+  } catch {
+    alert('上传失败')
+  }
 }
 
 const oldPassword = ref('')

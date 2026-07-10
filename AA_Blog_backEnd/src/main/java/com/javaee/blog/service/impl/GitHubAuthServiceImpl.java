@@ -25,10 +25,11 @@ public class GitHubAuthServiceImpl implements GitHubAuthService {
     private String redirectUri;
 
     private final JwtUtil jwtUtil;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
-    public GitHubAuthServiceImpl(JwtUtil jwtUtil) {
+    public GitHubAuthServiceImpl(JwtUtil jwtUtil, RestTemplate restTemplate) {
         this.jwtUtil = jwtUtil;
+        this.restTemplate = restTemplate;
     }
 
     @Override

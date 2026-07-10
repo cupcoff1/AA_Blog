@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { BookOpen, Search, Pencil, Trash2 } from '@lucide/vue'
 import api from '@/api/client'
+import { isAdmin } from '@/router/auth'
 import type { BlogListVO } from '@/models/types'
 
 const route = useRoute()
@@ -10,12 +11,15 @@ const router = useRouter()
 const blogs = ref<BlogListVO[]>([])
 const loading = ref(true)
 const error = ref(false)
-const isAdmin = computed(() => !!localStorage.getItem('admin_token'))
 
 const deleteBlog = async (id: number, title: string) => {
   if (!confirm(`删除「${title}」？`)) return
-  await api.delete(`/admin/blog/${id}`)
-  blogs.value = blogs.value.filter(b => b.id !== id)
+  try {
+    await api.delete(`/admin/blog/${id}`)
+    blogs.value = blogs.value.filter(b => b.id !== id)
+  } catch {
+    alert('删除失败，请重试')
+  }
 }
 const keyword = ref(String(route.query.q || ''))
 

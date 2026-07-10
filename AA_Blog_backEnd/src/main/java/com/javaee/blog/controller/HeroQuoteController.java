@@ -1,15 +1,14 @@
 package com.javaee.blog.controller;
 
 import com.javaee.blog.common.Result;
-import com.javaee.blog.entity.HeroQuote;
+import com.javaee.blog.dto.request.HeroQuoteCreateRequest;
+import com.javaee.blog.dto.vo.HeroQuoteVO;
 import com.javaee.blog.service.HeroQuoteService;
+import com.javaee.blog.service.UploadService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -18,18 +17,16 @@ import java.util.Map;
 public class HeroQuoteController {
 
     private final HeroQuoteService service;
-
-    @Value("${upload.base-dir}")
-    private String baseDir;
+    private final UploadService uploadService;
 
     @GetMapping("/api/hero-quotes")
-    public Result<List<HeroQuote>> list() {
+    public Result<List<HeroQuoteVO>> list() {
         return Result.ok(service.list());
     }
 
     @PostMapping("/api/admin/hero-quotes")
-    public Result<?> create(@RequestBody Map<String, String> body) {
-        service.create(body.get("content"), body.get("author"), body.get("source"));
+    public Result<?> create(@Valid @RequestBody HeroQuoteCreateRequest request) {
+        service.create(request);
         return Result.ok();
     }
 
@@ -41,15 +38,6 @@ public class HeroQuoteController {
 
     @GetMapping("/api/hero-config")
     public Result<Map<String, String>> heroConfig() {
-        String heroLight = "/hero-light.png";
-        String heroDark = "/hero.jpg";
-        Path heroDir = Paths.get(baseDir, "hero");
-        if (Files.exists(heroDir.resolve("hero-light.png"))) {
-            heroLight = "/uploads/hero/hero-light.png";
-        }
-        if (Files.exists(heroDir.resolve("hero-dark.jpg"))) {
-            heroDark = "/uploads/hero/hero-dark.jpg";
-        }
-        return Result.ok(Map.of("heroLight", heroLight, "heroDark", heroDark));
+        return Result.ok(uploadService.getHeroConfig());
     }
 }

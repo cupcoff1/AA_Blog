@@ -20,7 +20,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/api/admin/**")
-                .excludePathPatterns("/api/admin/login", "/api/admin/refresh");
+                .excludePathPatterns("/api/admin/login", "/api/admin/refresh",
+                        "/api/admin/status", "/api/admin/logout");
     }
 
     @Override

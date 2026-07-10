@@ -7,7 +7,8 @@ import type { HomeVO, HeroQuoteVO, HeroConfigVO } from '@/models/types'
 const quotes = ref<HeroQuoteVO[]>([{ id: 0, content: '真正重要的东西，眼睛是看不见的', author: '', source: '' }])
 const currentQuote = ref(0)
 const quoteVisible = ref(true)
-let timer: ReturnType<typeof setInterval>
+let intervalTimer: ReturnType<typeof setInterval>
+let fadeTimer: ReturnType<typeof setTimeout>
 
 const data = ref<HomeVO | null>(null)
 const error = ref(false)
@@ -28,15 +29,18 @@ onMounted(async () => {
     if (cfg) { heroLight.value = cfg.heroLight; heroDark.value = cfg.heroDark }
   } catch {}
 
-  timer = setInterval(() => {
+  intervalTimer = setInterval(() => {
     quoteVisible.value = false
-    setTimeout(() => {
+    fadeTimer = setTimeout(() => {
       currentQuote.value = (currentQuote.value + 1) % quotes.value.length
       quoteVisible.value = true
     }, 400)
   }, 5000)
 })
-onUnmounted(() => clearInterval(timer))
+onUnmounted(() => {
+  clearInterval(intervalTimer)
+  clearTimeout(fadeTimer)
+})
 </script>
 
 <template>

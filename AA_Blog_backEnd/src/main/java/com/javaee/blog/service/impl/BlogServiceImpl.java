@@ -18,8 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,7 +56,29 @@ public class BlogServiceImpl implements BlogService {
         }
         if (limit != null) wrapper.last("LIMIT " + limit);
         List<Blog> blogs = blogMapper.selectList(wrapper);
-        return blogs.stream().map(this::toListVO).collect(Collectors.toList());
+        // 批量查所有 tag，避免 N+1
+        Map<Long, List<TagVO>> tagMap = batchGetTags(blogs.stream().map(Blog::getId).collect(Collectors.toList()));
+        return blogs.stream().map(b -> toListVO(b, tagMap.getOrDefault(b.getId(), Collections.emptyList()))).collect(Collectors.toList());
+    }
+
+    /** 批量查询多个 blog 的 tag，1 次查关联 + 1 次查 tag 实现 */
+    private Map<Long, List<TagVO>> batchGetTags(List<Long> blogIds) {
+        if (blogIds.isEmpty()) return Collections.emptyMap();
+        List<BlogTags> links = blogTagsMapper.selectList(
+                new LambdaQueryWrapper<BlogTags>().in(BlogTags::getBlogId, blogIds));
+        if (links.isEmpty()) return Collections.emptyMap();
+        List<Long> tagIds = links.stream().map(BlogTags::getTagId).distinct().collect(Collectors.toList());
+        List<Tags> tags = tagsMapper.selectBatchIds(tagIds);
+        Map<Long, TagVO> tagVoMap = tags.stream().collect(Collectors.toMap(Tags::getId, t -> {
+            TagVO vo = new TagVO(); vo.setId(t.getId()); vo.setName(t.getName()); vo.setSlug(t.getSlug());
+            return vo;
+        }));
+        Map<Long, List<TagVO>> result = new HashMap<>();
+        for (BlogTags link : links) {
+            TagVO vo = tagVoMap.get(link.getTagId());
+            if (vo != null) result.computeIfAbsent(link.getBlogId(), k -> new ArrayList<>()).add(vo);
+        }
+        return result;
     }
 
     @Override
@@ -86,7 +107,7 @@ public class BlogServiceImpl implements BlogService {
     public void create(BlogCreateRequest request) {
         Blog blog = new Blog();
         blog.setTitle(request.getTitle());
-        blog.setSlug(generateSlug(request.getTitle()));
+        blog.setSlug(SlugUtil.toUniqueSlug(request.getTitle()));
         blog.setSummary(request.getSummary());
         blog.setContent(request.getContent());
         blog.setPublishedAt(LocalDateTime.now());
@@ -99,7 +120,7 @@ public class BlogServiceImpl implements BlogService {
     @Transactional
     public void update(Long id, BlogCreateRequest request) {
         Blog blog = blogMapper.selectById(id);
-        if (blog == null) return;
+        if (blog == null) throw new java.util.NoSuchElementException("文章不存在");
         blog.setTitle(request.getTitle());
         blog.setSummary(request.getSummary());
         blog.setContent(request.getContent());
@@ -126,14 +147,14 @@ public class BlogServiceImpl implements BlogService {
 
     // ==================== 私有方法 ====================
 
-    private BlogListVO toListVO(Blog blog) {
+    private BlogListVO toListVO(Blog blog, List<TagVO> tags) {
         BlogListVO vo = new BlogListVO();
         vo.setId(blog.getId());
         vo.setTitle(blog.getTitle());
         vo.setSlug(blog.getSlug());
         vo.setSummary(blog.getSummary());
         vo.setPublishedAt(blog.getPublishedAt());
-        vo.setTags(getTagsByBlogId(blog.getId()));
+        vo.setTags(tags);
         return vo;
     }
 
@@ -193,14 +214,6 @@ public class BlogServiceImpl implements BlogService {
                 blogTagsMapper.insert(link);
             }
         }
-    }
-
-    private String generateSlug(String title) {
-        String slug = SlugUtil.toSlug(title);
-        // 查重，重复则追加序号
-        Long count = blogMapper.selectCount(new LambdaQueryWrapper<Blog>().eq(Blog::getSlug, slug));
-        if (count > 0) slug += "-" + (count + 1);
-        return slug;
     }
 
 }

@@ -18,6 +18,10 @@ public class JwtUtil {
 
     public JwtUtil(@Value("${jwt.secret}") String secret,
                    @Value("${jwt.ttl}") long ttl) {
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalStateException(
+                    "JWT_SECRET 未配置或长度不足（需 ≥ 32 字节），请检查 .env 文件或环境变量");
+        }
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.ttl = ttl;
     }

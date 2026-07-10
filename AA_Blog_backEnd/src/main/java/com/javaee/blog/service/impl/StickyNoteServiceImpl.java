@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,7 +47,7 @@ public class StickyNoteServiceImpl implements StickyNoteService {
         StickyNote note = new StickyNote();
         note.setContent(req.getContent());
         note.setColor(req.getColor());
-        note.setRotate(req.getRotate() != null ? req.getRotate() : new Random().nextInt(7) - 3);
+        note.setRotate(req.getRotate() != null ? req.getRotate() : ThreadLocalRandom.current().nextInt(7) - 3);
         note.setCategory(req.getCategory() != null ? req.getCategory() : "to_aa");
         note.setAuthorName(authorName);
         note.setAuthorAvatar(authorAvatar);
@@ -56,12 +56,12 @@ public class StickyNoteServiceImpl implements StickyNoteService {
 
     @Override
     public boolean delete(Long id, String requester, boolean isAdmin) {
-        if (isAdmin) { mapper.deleteById(id); return true; }
-        StickyNote note = mapper.selectById(id);
-        if (note != null && requester != null && requester.equals(note.getAuthorName())) {
-            mapper.deleteById(id);
-            return true;
-        }
-        return false;
+        if (isAdmin) return mapper.deleteById(id) > 0;
+        if (requester == null) return false;
+        // 单条 DELETE + WHERE 条件，消除 TOCTOU 竞态窗口
+        int rows = mapper.delete(new LambdaQueryWrapper<StickyNote>()
+                .eq(StickyNote::getId, id)
+                .eq(StickyNote::getAuthorName, requester));
+        return rows > 0;
     }
 }

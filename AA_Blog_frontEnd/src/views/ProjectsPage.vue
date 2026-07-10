@@ -1,18 +1,22 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { FolderOpen, Pencil, Trash2 } from '@lucide/vue'
 import api from '@/api/client'
+import { isAdmin } from '@/router/auth'
 import type { ProjectsVO } from '@/models/types'
 
 const projects = ref<ProjectsVO[]>([])
 const loading = ref(true)
 const error = ref(false)
-const isAdmin = computed(() => !!localStorage.getItem('admin_token'))
 
 const deleteProject = async (id: number, name: string) => {
   if (!confirm(`删除「${name}」？`)) return
-  await api.delete(`/admin/projects/${id}`)
-  projects.value = projects.value.filter(p => p.id !== id)
+  try {
+    await api.delete(`/admin/projects/${id}`)
+    projects.value = projects.value.filter(p => p.id !== id)
+  } catch {
+    alert('删除失败，请重试')
+  }
 }
 
 onMounted(async () => {

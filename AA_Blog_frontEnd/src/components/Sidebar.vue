@@ -1,21 +1,27 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { BookOpen, Pencil, FolderOpen, User, Sun, Moon, GitFork, LogOut, Plus, MessageSquare, Menu } from '@lucide/vue'
+import api from '@/api/client'
+import { isAdmin, refreshAuth } from '@/router/auth'
 import LogoIcon from './LogoIcon.vue'
 
+const router = useRouter()
 const dark = ref(localStorage.getItem('theme') === 'dark')
-const isAdmin = computed(() => !!localStorage.getItem('admin_token'))
 const menuOpen = ref(false)
+
+onMounted(() => { if (isAdmin.value === null) refreshAuth() })
 
 const toggleTheme = () => {
   dark.value = !dark.value
   document.body.classList.toggle('dark', dark.value)
   localStorage.setItem('theme', dark.value ? 'dark' : 'light')
 }
-const logout = () => {
+const logout = async () => {
   if (!confirm('(╥﹏╥) 真的要走了吗？')) return
-  localStorage.removeItem('admin_token')
-  location.href = '/'
+  await api.post('/admin/logout')
+  await refreshAuth()
+  router.push('/')
 }
 if (dark.value) document.body.classList.add('dark')
 </script>

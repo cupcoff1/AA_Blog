@@ -7,6 +7,10 @@ spring:
     username: root
     password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
 
 upload:
   base-dir: ./uploads/blog/

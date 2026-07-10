@@ -1,14 +1,15 @@
 package com.javaee.blog.service;
 
-import com.javaee.blog.entity.HeroQuote;
+import com.javaee.blog.dto.request.HeroQuoteCreateRequest;
+import com.javaee.blog.dto.vo.HeroQuoteVO;
 
 import java.util.List;
 
 public interface HeroQuoteService {
 
-    List<HeroQuote> list();
+    List<HeroQuoteVO> list();
 
-    void create(String content, String author, String source);
+    void create(HeroQuoteCreateRequest request);
 
     void delete(Long id);
 }

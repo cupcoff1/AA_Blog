@@ -1,4 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { isAdmin, refreshAuth } from './auth'
+
+/** 需要管理员认证的路由 */
+const ADMIN_PATTERNS = [
+  /^\/admin\/(?!login)/,   // /admin/* 除了 /admin/login
+  /^\/blog\/new$/,
+  /^\/blog\/\d+\/edit$/,
+  /^\/notes\/new$/,
+  /^\/notes\/\d+\/edit$/,
+  /^\/projects\/new$/,
+  /^\/projects\/\d+\/edit$/,
+]
+
+function needsAuth(path: string): boolean {
+  return ADMIN_PATTERNS.some(p => p.test(path))
+}
 
 const router = createRouter({
   history: createWebHistory(),
@@ -61,6 +77,14 @@ const router = createRouter({
       component: () => import('@/views/NotFoundPage.vue')
     }
   ]
+})
+
+router.beforeEach(async (to) => {
+  if (!needsAuth(to.path)) return true
+
+  if (isAdmin.value === null) await refreshAuth()
+  if (!isAdmin.value) return { path: '/admin/login' }
+  return true
 })
 
 export default router

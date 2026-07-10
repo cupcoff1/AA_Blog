@@ -11,9 +11,8 @@ onMounted(async () => {
   const code = route.query.code as string
   if (!code) { error.value = '缺少授权码'; return }
   try {
-    const data = await api.get<{ token: string; user: { name: string; avatar: string } }>(`/auth/github/callback?code=${encodeURIComponent(code)}`)
-    localStorage.setItem('commenter_token', data.token)
-    localStorage.setItem('commenter', JSON.stringify(data.user))
+    const data = await api.get<{ name: string; avatar: string }>(`/auth/github/callback?code=${encodeURIComponent(code)}`)
+    localStorage.setItem('commenter', JSON.stringify(data))
     router.replace('/guest')
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : '授权失败'

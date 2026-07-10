@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class UploadServiceImpl implements UploadService {
@@ -43,8 +43,7 @@ public class UploadServiceImpl implements UploadService {
         if (originalName != null && originalName.contains(".")) {
             ext = originalName.substring(originalName.lastIndexOf("."));
         }
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        String filename = timestamp + ext;
+        String filename = UUID.randomUUID().toString().replace("-", "") + ext;
 
         Path dest = dir.resolve(filename);
         file.transferTo(dest);
@@ -72,5 +71,19 @@ public class UploadServiceImpl implements UploadService {
         file.transferTo(dest);
 
         return "/uploads/hero/" + filename;
+    }
+
+    @Override
+    public Map<String, String> getHeroConfig() {
+        String heroLight = "/hero-light.png";
+        String heroDark = "/hero.jpg";
+        Path heroDir = Paths.get(baseDir, "hero");
+        if (Files.exists(heroDir.resolve("hero-light.png"))) {
+            heroLight = "/uploads/hero/hero-light.png";
+        }
+        if (Files.exists(heroDir.resolve("hero-dark.jpg"))) {
+            heroDark = "/uploads/hero/hero-dark.jpg";
+        }
+        return Map.of("heroLight", heroLight, "heroDark", heroDark);
     }
 }

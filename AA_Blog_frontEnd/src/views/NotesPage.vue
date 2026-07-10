@@ -3,21 +3,30 @@ import { ref, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Pencil, Search, Trash2 } from '@lucide/vue'
 import api from '@/api/client'
+import { isAdmin } from '@/router/auth'
 import type { NotesVO } from '@/models/types'
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 
 const route = useRoute()
 const router = useRouter()
 const notes = ref<NotesVO[]>([])
 const loading = ref(true)
 const error = ref(false)
-const isAdmin = computed(() => !!localStorage.getItem('admin_token'))
 const keyword = ref(String(route.query.q || ''))
+
+const renderedContents = computed(() => new Map(
+  notes.value.map(n => [n.id, DOMPurify.sanitize(marked(n.content || '') as string)] as const)
+))
 
 const deleteNote = async (id: number, title: string) => {
   if (!confirm(`删除「${title}」？`)) return
-  await api.delete(`/admin/notes/${id}`)
-  notes.value = notes.value.filter(n => n.id !== id)
+  try {
+    await api.delete(`/admin/notes/${id}`)
+    notes.value = notes.value.filter(n => n.id !== id)
+  } catch {
+    alert('删除失败，请重试')
+  }
 }
 
 const fetchNotes = async () => {
@@ -69,7 +78,7 @@ watch(() => route.query.q, (val) => { keyword.value = String(val || '') })
           <time>{{ note.publishedAt?.split('T')[0] }}</time>
           <h2>{{ note.title }}</h2>
         </div>
-        <div class="note-body" v-html="marked(note.content || '')" />
+        <div class="note-body" v-html="renderedContents.get(note.id)" />
         <div v-if="isAdmin" class="note-actions">
           <RouterLink :to="`/notes/${note.id}/edit`" class="icon-btn" title="编辑">
             <Pencil :size="14" />

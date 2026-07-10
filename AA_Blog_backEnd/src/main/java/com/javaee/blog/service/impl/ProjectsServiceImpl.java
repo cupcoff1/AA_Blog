@@ -16,8 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +42,27 @@ public class ProjectsServiceImpl implements ProjectsService {
                 .orderByDesc(Projects::getId);
         if (limit != null) wrapper.last("LIMIT " + limit);
         List<Projects> projects = projectsMapper.selectList(wrapper);
-        return projects.stream().map(this::toVO).collect(Collectors.toList());
+        Map<Long, List<TagVO>> tagMap = batchGetTags(projects.stream().map(Projects::getId).collect(Collectors.toList()));
+        return projects.stream().map(p -> toVO(p, tagMap.getOrDefault(p.getId(), Collections.emptyList()))).collect(Collectors.toList());
+    }
+
+    private Map<Long, List<TagVO>> batchGetTags(List<Long> projectIds) {
+        if (projectIds.isEmpty()) return Collections.emptyMap();
+        List<ProjectsTags> links = projectsTagsMapper.selectList(
+                new LambdaQueryWrapper<ProjectsTags>().in(ProjectsTags::getProjectId, projectIds));
+        if (links.isEmpty()) return Collections.emptyMap();
+        List<Long> tagIds = links.stream().map(ProjectsTags::getTagId).distinct().collect(Collectors.toList());
+        List<Tags> tags = tagsMapper.selectBatchIds(tagIds);
+        Map<Long, TagVO> tagVoMap = tags.stream().collect(Collectors.toMap(Tags::getId, t -> {
+            TagVO vo = new TagVO(); vo.setId(t.getId()); vo.setName(t.getName()); vo.setSlug(t.getSlug());
+            return vo;
+        }));
+        Map<Long, List<TagVO>> result = new HashMap<>();
+        for (ProjectsTags link : links) {
+            TagVO vo = tagVoMap.get(link.getTagId());
+            if (vo != null) result.computeIfAbsent(link.getProjectId(), k -> new ArrayList<>()).add(vo);
+        }
+        return result;
     }
 
     @Override
@@ -51,7 +70,7 @@ public class ProjectsServiceImpl implements ProjectsService {
     public void create(ProjectsCreateRequest request) {
         Projects project = new Projects();
         project.setName(request.getName());
-        project.setSlug(generateSlug(request.getName()));
+        project.setSlug(SlugUtil.toUniqueSlug(request.getName()));
         project.setDescription(request.getDescription());
         project.setDemoUrl(request.getDemoUrl());
         project.setGithubUrl(request.getGithubUrl());
@@ -64,7 +83,7 @@ public class ProjectsServiceImpl implements ProjectsService {
     @Transactional
     public void update(Long id, ProjectsCreateRequest request) {
         Projects project = projectsMapper.selectById(id);
-        if (project == null) return;
+        if (project == null) throw new java.util.NoSuchElementException("项目不存在");
         project.setName(request.getName());
         project.setDescription(request.getDescription());
         project.setDemoUrl(request.getDemoUrl());
@@ -79,7 +98,7 @@ public class ProjectsServiceImpl implements ProjectsService {
     public ProjectsVO getById(Long id) {
         Projects project = projectsMapper.selectById(id);
         if (project == null) return null;
-        return toVO(project);
+        return toVO(project, getTagsByProjectId(project.getId()));
     }
 
     @Override
@@ -91,7 +110,7 @@ public class ProjectsServiceImpl implements ProjectsService {
 
     // ==================== 私有方法 ====================
 
-    private ProjectsVO toVO(Projects project) {
+    private ProjectsVO toVO(Projects project, List<TagVO> tags) {
         ProjectsVO vo = new ProjectsVO();
         vo.setId(project.getId());
         vo.setName(project.getName());
@@ -99,7 +118,7 @@ public class ProjectsServiceImpl implements ProjectsService {
         vo.setDescription(project.getDescription());
         vo.setDemoUrl(project.getDemoUrl());
         vo.setGithubUrl(project.getGithubUrl());
-        vo.setTags(getTagsByProjectId(project.getId()));
+        vo.setTags(tags);
         return vo;
     }
 
@@ -144,12 +163,5 @@ public class ProjectsServiceImpl implements ProjectsService {
                 projectsTagsMapper.insert(link);
             }
         }
-    }
-
-    private String generateSlug(String name) {
-        String slug = SlugUtil.toSlug(name);
-        Long count = projectsMapper.selectCount(new LambdaQueryWrapper<Projects>().eq(Projects::getSlug, slug));
-        if (count > 0) slug += "-" + (count + 1);
-        return slug;
     }
 }

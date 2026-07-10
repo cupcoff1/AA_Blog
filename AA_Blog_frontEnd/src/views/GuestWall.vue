@@ -1,18 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { GitFork, Send, X, MessageSquare, LogOut } from '@lucide/vue'
 import api from '@/api/client'
+import { isAdmin } from '@/router/auth'
 import type { StickyNoteVO } from '@/models/types'
 
 const notes = ref<StickyNoteVO[]>([])
 const loading = ref(true)
 const error = ref(false)
 
-const commenter = computed(() => {
-  const raw = localStorage.getItem('commenter')
-  return raw ? JSON.parse(raw) as { name: string; avatar: string } : null
-})
-const isAdmin = computed(() => !!localStorage.getItem('admin_token'))
+const commenter = ref<{ name: string; avatar: string } | null>(null)
 
 const newContent = ref('')
 const newCategory = ref<'to_aa' | 'to_website'>('to_aa')
@@ -24,10 +21,10 @@ const login = async () => {
   const { url } = await api.get<{ url: string }>('/auth/github/url')
   window.location.href = url
 }
-const logout = () => {
-  localStorage.removeItem('commenter_token')
+const logout = async () => {
+  await api.post('/auth/logout')
   localStorage.removeItem('commenter')
-  window.location.reload()
+  commenter.value = null
 }
 
 const fetchNotes = async () => {
@@ -62,7 +59,19 @@ const del = async (id: number) => {
   } catch { alert('无权删除此便签') }
 }
 
-onMounted(fetchNotes)
+const fetchAuth = async () => {
+  try {
+    const data = await api.get<{ authenticated: boolean; name?: string; avatar?: string }>('/auth/status')
+    if (data.authenticated && data.name) {
+      commenter.value = { name: data.name, avatar: data.avatar || '' }
+    }
+  } catch { /* 未登录 */ }
+}
+
+onMounted(async () => {
+  await fetchAuth()
+  await fetchNotes()
+})
 </script>
 
 <template>

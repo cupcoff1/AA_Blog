@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 
 import { Plus, X, Check } from '@lucide/vue'
 import api from '@/api/client'
+import { isAdmin } from '@/router/auth'
 import type { StickyNoteVO } from '@/models/types'
 
 const customNotes = ref<StickyNoteVO[]>([])
 const loading = ref(true)
 const error = ref(false)
-const isAdmin = computed(() => !!localStorage.getItem('admin_token'))
 const showForm = ref(false)
 const newContent = ref('')
 const newColor = ref('#fff3cd')
@@ -31,8 +31,12 @@ const addNote = async () => {
 
 const delNote = async (id: number) => {
   if (!confirm('删除这张便签？')) return
-  await api.delete(`/admin/sticky-notes/${id}`)
-  customNotes.value = customNotes.value.filter(n => n.id !== id)
+  try {
+    await api.delete(`/admin/sticky-notes/${id}`)
+    customNotes.value = customNotes.value.filter(n => n.id !== id)
+  } catch {
+    alert('删除失败，请重试')
+  }
 }
 
 onMounted(async () => {

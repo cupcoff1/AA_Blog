@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ChevronDown, ChevronRight } from '@lucide/vue'
 import api from '@/api/client'
@@ -7,6 +7,7 @@ import type { BlogVO } from '@/models/types'
 import { marked } from 'marked'
 import { markedHighlight } from 'marked-highlight'
 import hljs from 'highlight.js'
+import DOMPurify from 'dompurify'
 import 'highlight.js/styles/github-dark.min.css'
 
 const route = useRoute()
@@ -14,6 +15,9 @@ const blog = ref<BlogVO | null>(null)
 const loading = ref(true)
 const error = ref(false)
 const showToc = ref(true)
+const renderedContent = computed(() =>
+  blog.value ? DOMPurify.sanitize(marked(blog.value.content || '') as string) : ''
+)
 
 const loadUtterances = () => {
   const script = document.createElement('script')
@@ -93,8 +97,7 @@ onUnmounted(() => {
 
 <template>
   <div v-if="loading" class="state">加载中...</div>
-  <div v-else-if="error" class="state error">加载失败</div>
-  <div v-else-if="!blog" class="state">文章不存在</div>
+  <div v-else-if="error || !blog" class="state error">加载失败</div>
 
   <article v-else class="blog-detail">
     <div class="blog-layout">
@@ -106,7 +109,7 @@ onUnmounted(() => {
           </div>
         </header>
 
-        <div class="blog-content" v-html="marked(blog.content || '')" />
+        <div class="blog-content" v-html="renderedContent" />
 
         <section id="comments" class="comments">
           <h2>Comments</h2>

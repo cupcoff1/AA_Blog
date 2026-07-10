@@ -21,7 +21,17 @@ const submit = async () => {
   } catch (e: unknown) { error.value = e instanceof Error ? e.message : '保存失败' } finally { loading.value = false }
 }
 onMounted(async () => {
-  if (editId) { const n = await api.get<NotesVO>(`/admin/notes/${editId}`); title.value = n.title; content.value = n.content; tagIds.value = n.tags?.map((t: TagVO) => t.id) || [] }
+  if (!editId) return
+  loading.value = true
+  try {
+    const n = await api.get<NotesVO>(`/admin/notes/${editId}`)
+    title.value = n.title; content.value = n.content
+    tagIds.value = n.tags?.map((t: TagVO) => t.id) || []
+  } catch {
+    error.value = '加载笔记失败'
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 <template>

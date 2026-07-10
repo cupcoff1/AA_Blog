@@ -7,7 +7,7 @@ import com.javaee.blog.mapper.AdminMapper;
 import com.javaee.blog.service.AuthService;
 import com.javaee.blog.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,14 +17,14 @@ public class AuthServiceImpl implements AuthService {
 
     private final AdminMapper adminMapper;
     private final JwtUtil jwtUtil;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public String login(LoginRequest request) {
         Admin admin = adminMapper.selectOne(
                 new LambdaQueryWrapper<Admin>().eq(Admin::getUsername, request.getUsername()));
         if (admin == null || !passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
-            return null;
+            throw new IllegalArgumentException("用户名或密码错误");
         }
         return jwtUtil.generateToken(admin.getUsername());
     }

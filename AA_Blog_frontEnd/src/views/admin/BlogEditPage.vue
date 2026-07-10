@@ -27,9 +27,7 @@ const uploadImage = async (e: Event) => {
   try {
     const form = new FormData()
     form.append('file', file)
-    const { url } = await api.post<{ url: string }>('/admin/upload?type=image', form, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
+    const { url } = await api.post<{ url: string }>('/admin/upload?type=image', form)
     const ta = textareaRef.value
     if (ta) {
       const pos = ta.selectionStart
@@ -55,10 +53,16 @@ const submit = async () => {
 }
 
 onMounted(async () => {
-  if (editId) {
+  if (!editId) return
+  loading.value = true
+  try {
     const blog = await api.get<BlogVO>(`/admin/blog/${editId}`)
     title.value = blog.title; summary.value = blog.summary; content.value = blog.content
     tagIds.value = blog.tags?.map((t: TagVO) => t.id) || []
+  } catch {
+    error.value = '加载文章失败'
+  } finally {
+    loading.value = false
   }
 })
 </script>

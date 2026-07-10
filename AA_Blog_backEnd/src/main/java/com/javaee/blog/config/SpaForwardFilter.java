@@ -17,8 +17,10 @@ public class SpaForwardFilter implements Filter {
 
         if (path.startsWith("/api/") || path.startsWith("/uploads/") || path.contains(".")) {
             chain.doFilter(req, res);
-        } else {
+        } else if ("GET".equalsIgnoreCase(request.getMethod())) {
             request.getRequestDispatcher("/index.html").forward(req, res);
+        } else {
+            chain.doFilter(req, res);  // POST/PUT/DELETE 等交给 Spring 返回 405
         }
     }
 }

@@ -3,16 +3,8 @@ import type { AxiosRequestConfig } from 'axios'
 
 const http = axios.create({
   baseURL: '/api',
-  timeout: 10000
-})
-
-// 请求拦截：自动带 Token
-http.interceptors.request.use(config => {
-  const token = localStorage.getItem('admin_token') || localStorage.getItem('commenter_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
+  timeout: 10000,
+  withCredentials: true  // 发送 Cookie（httpOnly token）
 })
 
 // 响应拦截：解包 Result，处理 401
@@ -26,7 +18,6 @@ http.interceptors.response.use(
   },
   err => {
     if (err.response?.status === 401) {
-      localStorage.removeItem('admin_token')
       const path = window.location.pathname
       if (path.startsWith('/admin')) {
         window.location.href = '/admin/login'

@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS blog (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    UNIQUE KEY uk_slug (slug)
+    UNIQUE KEY uk_slug (slug),
+    INDEX idx_published_at (published_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 2. notes
@@ -28,7 +29,8 @@ CREATE TABLE IF NOT EXISTS notes (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    UNIQUE KEY uk_slug (slug)
+    UNIQUE KEY uk_slug (slug),
+    INDEX idx_published_at (published_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 3. projects
@@ -61,21 +63,30 @@ CREATE TABLE IF NOT EXISTS tags (
 CREATE TABLE IF NOT EXISTS blog_tags (
     blog_id BIGINT NOT NULL,
     tag_id BIGINT NOT NULL,
-    PRIMARY KEY (blog_id, tag_id)
+    PRIMARY KEY (blog_id, tag_id),
+    INDEX idx_tag_id (tag_id),
+    FOREIGN KEY (blog_id) REFERENCES blog(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 6. notes_tags
 CREATE TABLE IF NOT EXISTS notes_tags (
     notes_id BIGINT NOT NULL,
     tag_id BIGINT NOT NULL,
-    PRIMARY KEY (notes_id, tag_id)
+    PRIMARY KEY (notes_id, tag_id),
+    INDEX idx_tag_id (tag_id),
+    FOREIGN KEY (notes_id) REFERENCES notes(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 7. projects_tags
 CREATE TABLE IF NOT EXISTS projects_tags (
     project_id BIGINT NOT NULL,
     tag_id BIGINT NOT NULL,
-    PRIMARY KEY (project_id, tag_id)
+    PRIMARY KEY (project_id, tag_id),
+    INDEX idx_tag_id (tag_id),
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 8. admin
@@ -98,7 +109,8 @@ CREATE TABLE IF NOT EXISTS sticky_notes (
     author_name VARCHAR(100) DEFAULT '',
     author_avatar VARCHAR(500) DEFAULT '',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    INDEX idx_category (category)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 10. hero_quotes（首页引语）
@@ -111,4 +123,3 @@ CREATE TABLE IF NOT EXISTS hero_quotes (
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 默认管理员 AA_ / 123456（首次启动自动 BCrypt 加密创建）

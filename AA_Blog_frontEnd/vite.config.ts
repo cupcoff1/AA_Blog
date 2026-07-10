@@ -15,5 +15,9 @@ export default defineConfig({
       '/api': 'http://localhost:8080',
       '/uploads': 'http://localhost:8080'
     }
+  },
+  build: {
+    outDir: '../AA_Blog_backEnd/src/main/resources/static',
+    emptyOutDir: true
   }
 })

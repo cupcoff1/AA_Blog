@@ -17,8 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,7 +55,27 @@ public class NotesServiceImpl implements NotesService {
         }
         if (limit != null) wrapper.last("LIMIT " + limit);
         List<Notes> notes = notesMapper.selectList(wrapper);
-        return notes.stream().map(this::toVO).collect(Collectors.toList());
+        Map<Long, List<TagVO>> tagMap = batchGetTags(notes.stream().map(Notes::getId).collect(Collectors.toList()));
+        return notes.stream().map(n -> toVO(n, tagMap.getOrDefault(n.getId(), Collections.emptyList()))).collect(Collectors.toList());
+    }
+
+    private Map<Long, List<TagVO>> batchGetTags(List<Long> noteIds) {
+        if (noteIds.isEmpty()) return Collections.emptyMap();
+        List<NotesTags> links = notesTagsMapper.selectList(
+                new LambdaQueryWrapper<NotesTags>().in(NotesTags::getNotesId, noteIds));
+        if (links.isEmpty()) return Collections.emptyMap();
+        List<Long> tagIds = links.stream().map(NotesTags::getTagId).distinct().collect(Collectors.toList());
+        List<Tags> tags = tagsMapper.selectBatchIds(tagIds);
+        Map<Long, TagVO> tagVoMap = tags.stream().collect(Collectors.toMap(Tags::getId, t -> {
+            TagVO vo = new TagVO(); vo.setId(t.getId()); vo.setName(t.getName()); vo.setSlug(t.getSlug());
+            return vo;
+        }));
+        Map<Long, List<TagVO>> result = new HashMap<>();
+        for (NotesTags link : links) {
+            TagVO vo = tagVoMap.get(link.getTagId());
+            if (vo != null) result.computeIfAbsent(link.getNotesId(), k -> new ArrayList<>()).add(vo);
+        }
+        return result;
     }
 
     @Override
@@ -64,7 +83,7 @@ public class NotesServiceImpl implements NotesService {
     public void create(NotesCreateRequest request) {
         Notes note = new Notes();
         note.setTitle(request.getTitle());
-        note.setSlug(generateSlug(request.getTitle()));
+        note.setSlug(SlugUtil.toUniqueSlug(request.getTitle()));
         note.setContent(request.getContent());
         note.setPublishedAt(LocalDateTime.now());
         notesMapper.insert(note);
@@ -76,7 +95,7 @@ public class NotesServiceImpl implements NotesService {
     @Transactional
     public void update(Long id, NotesCreateRequest request) {
         Notes note = notesMapper.selectById(id);
-        if (note == null) return;
+        if (note == null) throw new java.util.NoSuchElementException("笔记不存在");
         note.setTitle(request.getTitle());
         note.setContent(request.getContent());
         notesMapper.updateById(note);
@@ -89,7 +108,7 @@ public class NotesServiceImpl implements NotesService {
     public NotesVO getById(Long id) {
         Notes note = notesMapper.selectById(id);
         if (note == null) return null;
-        return toVO(note);
+        return toVO(note, getTagsByNoteId(note.getId()));
     }
 
     @Override
@@ -101,14 +120,14 @@ public class NotesServiceImpl implements NotesService {
 
     // ==================== 私有方法 ====================
 
-    private NotesVO toVO(Notes note) {
+    private NotesVO toVO(Notes note, List<TagVO> tags) {
         NotesVO vo = new NotesVO();
         vo.setId(note.getId());
         vo.setTitle(note.getTitle());
         vo.setSlug(note.getSlug());
         vo.setContent(note.getContent());
         vo.setPublishedAt(note.getPublishedAt());
-        vo.setTags(getTagsByNoteId(note.getId()));
+        vo.setTags(tags);
         return vo;
     }
 
@@ -153,12 +172,5 @@ public class NotesServiceImpl implements NotesService {
                 notesTagsMapper.insert(link);
             }
         }
-    }
-
-    private String generateSlug(String title) {
-        String slug = SlugUtil.toSlug(title);
-        Long count = notesMapper.selectCount(new LambdaQueryWrapper<Notes>().eq(Notes::getSlug, slug));
-        if (count > 0) slug += "-" + (count + 1);
-        return slug;
     }
 }
