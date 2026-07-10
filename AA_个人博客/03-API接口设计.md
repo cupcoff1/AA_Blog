@@ -145,7 +145,7 @@ POST/PUT body：`BlogCreateRequest { title, summary, content, tagIds?, newTags? 
 
 | 方法 | 路径 | 说明 |
 |---|---|---|
-| POST | `/api/admin/hero-quotes` | 创建引语 `{ content, author, source }` |
+| POST | `/api/admin/hero-quotes` | 创建引语 `{ content (必填), author, source }` |
 | DELETE | `/api/admin/hero-quotes/{id}` | 删除引语 |
 | POST | `/api/admin/sticky-notes` | 创建便签（About 页） |
 | DELETE | `/api/admin/sticky-notes/{id}` | 删除便签 |
@@ -165,7 +165,17 @@ POST/PUT body：`BlogCreateRequest { title, summary, content, tagIds?, newTags? 
 
 ## 5. SPA 路由处理
 
-`SpaForwardFilter` 拦截所有请求，非 `/api/`、非 `/uploads/`、不包含 `.` 的路径统一转发到 `/index.html`，解决 Vue Router history mode 刷新 404 问题。
+`SpaForwardFilter` 实现 Vue Router history mode 刷新不 404：
+
+| 请求 | 处理 |
+|------|------|
+| `/api/**` | 放行（后端 API） |
+| `/uploads/**` | 放行（静态文件） |
+| 包含 `.` 的路径 | 放行（JS/CSS/图片等静态资源） |
+| 其他 GET 请求 | 转发 `/index.html`（Vue Router 接管） |
+| 其他 POST/PUT/DELETE | 放行（由 Spring 返回 405） |
+
+> 仅 `GET` 请求转发 SPA，避免 POST 请求收到 HTML。
 
 ---
 
@@ -182,8 +192,8 @@ POST/PUT body：`BlogCreateRequest { title, summary, content, tagIds?, newTags? 
 | GET | `/api/projects` | 无 | 项目列表 |
 | GET | `/api/tags` | 无 | 标签列表 |
 | GET | `/api/sticky-notes` | 无 | 便签列表 |
-| POST | `/api/sticky-notes` | 评论者 | 创建便签 |
-| DELETE | `/api/sticky-notes/{id}` | 评论者 | 删除便签 |
+| POST | `/api/sticky-notes` | 评论者 Cookie | 创建便签 |
+| DELETE | `/api/sticky-notes/{id}` | 评论者 Cookie | 删除便签（仅自己的） |
 | GET | `/api/auth/github/url` | 无 | GitHub 授权 URL |
 | GET | `/api/auth/github/callback` | 无 | GitHub 回调 |
 | GET | `/api/auth/status` | 无 | 评论者登录状态 |
@@ -192,11 +202,11 @@ POST/PUT body：`BlogCreateRequest { title, summary, content, tagIds?, newTags? 
 | POST | `/api/admin/refresh` | 无 | 刷新 Token |
 | GET | `/api/admin/status` | 无 | 管理员登录状态 |
 | POST | `/api/admin/logout` | 管理员 | 退出管理员登录 |
-| PUT | `/api/admin/password` | 管理员 | 修改密码 |
-| GET/POST/PUT/DELETE | `/api/admin/blog` | 管理员 | Blog CRUD |
-| GET/POST/PUT/DELETE | `/api/admin/notes` | 管理员 | Notes CRUD |
-| GET/POST/PUT/DELETE | `/api/admin/projects` | 管理员 | Projects CRUD |
-| POST/DELETE | `/api/admin/sticky-notes` | 管理员 | 便签管理 |
-| POST/DELETE | `/api/admin/hero-quotes` | 管理员 | 引语管理 |
-| POST | `/api/admin/upload` | 管理员 | 上传文件 |
-| POST | `/api/admin/hero-image` | 管理员 | 上传 Hero 图 |
+| PUT | `/api/admin/password` | 管理员 Cookie | 修改密码 |
+| GET/POST/PUT/DELETE | `/api/admin/blog` | 管理员 Cookie | Blog CRUD |
+| GET/POST/PUT/DELETE | `/api/admin/notes` | 管理员 Cookie | Notes CRUD |
+| GET/POST/PUT/DELETE | `/api/admin/projects` | 管理员 Cookie | Projects CRUD |
+| POST/DELETE | `/api/admin/sticky-notes` | 管理员 Cookie | 便签管理 |
+| POST/DELETE | `/api/admin/hero-quotes` | 管理员 Cookie | 引语管理 |
+| POST | `/api/admin/upload` | 管理员 Cookie | 上传文件（UUID 重命名） |
+| POST | `/api/admin/hero-image` | 管理员 Cookie | 上传 Hero 图 |
