@@ -21,10 +21,10 @@
 
 | 角色 | 方式 |
 |---|---|
-| 游客（留言、便签） | Header `Authorization: Bearer <commenter_token>` |
-| 管理员 | Header `Authorization: Bearer <admin_token>` |
+| 游客（留言、便签） | httpOnly Cookie `commenter_token`（浏览器自动发送） |
+| 管理员 | httpOnly Cookie `admin_token`（浏览器自动发送） |
 
-管理员接口 `/api/admin/**` 由 JwtInterceptor 统一拦截（排除 `/api/admin/login` 和 `/api/admin/refresh`）。
+管理员接口 `/api/admin/**` 由 JwtInterceptor 统一拦截（排除 `/api/admin/login`、`/api/admin/refresh`、`/api/admin/status`、`/api/admin/logout`）。
 
 ### 1.3 接口前缀
 
@@ -43,7 +43,7 @@
 
 ### 2.2 引语
 
-**GET** `/api/hero-quotes` — 返回 `List<HeroQuote>`（含 author, source）
+**GET** `/api/hero-quotes` — 返回 `List<HeroQuoteVO>`（id, content, author, source）
 
 ### 2.3 Hero 图片配置
 
@@ -95,22 +95,24 @@
 
 ### 3.2 授权回调
 
-**GET** `/api/auth/github/callback?code={code}` → `{ "token": "eyJ...", "user": { "name": "...", "avatar": "..." } }`
+**GET** `/api/auth/github/callback?code={code}` → `{ "name": "...", "avatar": "..." }`
 
-回调后前端存储 `commenter_token` 和 `commenter` 信息，跳转至 `/guest` 页。
+回调后 `commenter_token` 写入 httpOnly Cookie，body 只返回用户信息。前端存储 `commenter` 信息到 localStorage，跳转至 `/guest` 页。
 
 ---
 
 ## 4. 管理员接口
 
-> Header: `Authorization: Bearer <admin_token>`
+> httpOnly Cookie `admin_token` 自动携带
 
 ### 4.1 认证
 
 | 方法 | 路径 | 说明 |
 |---|---|---|
-| POST | `/api/admin/login` | 登录 `{ username, password }` → `{ token }` |
-| POST | `/api/admin/refresh` | 刷新 Token |
+| POST | `/api/admin/login` | 登录 `{ username, password }` → 设 httpOnly Cookie，body 为空 |
+| POST | `/api/admin/refresh` | 刷新 Cookie 中的 Token |
+| GET | `/api/admin/status` | 检查登录状态 → `{ authenticated: true/false }` |
+| POST | `/api/admin/logout` | 退出登录（清除 Cookie） |
 | PUT | `/api/admin/password` | 修改密码 `{ oldPassword, newPassword }` |
 
 ### 4.2 Blog 管理
@@ -155,15 +157,9 @@ POST/PUT body：`BlogCreateRequest { title, summary, content, tagIds?, newTags? 
 | 方法 | 路径 | 说明 |
 |---|---|---|
 | GET | `/api/auth/github/url` | 获取 GitHub OAuth 登录 URL |
-| GET | `/api/auth/github/callback` | GitHub OAuth 回调 |
-
-### 4.8 Admin Auth
-
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| POST | `/api/admin/login` | 管理员登录 |
-| POST | `/api/admin/refresh` | 刷新 Token |
-| PUT | `/api/admin/password` | 修改密码 |
+| GET | `/api/auth/github/callback` | GitHub OAuth 回调（设 httpOnly Cookie `commenter_token`） |
+| GET | `/api/auth/status` | 检查评论者登录状态 → `{ authenticated, name?, avatar? }` |
+| POST | `/api/auth/logout` | 退出评论者登录（清除 Cookie） |
 
 ---
 
@@ -190,8 +186,12 @@ POST/PUT body：`BlogCreateRequest { title, summary, content, tagIds?, newTags? 
 | DELETE | `/api/sticky-notes/{id}` | 评论者 | 删除便签 |
 | GET | `/api/auth/github/url` | 无 | GitHub 授权 URL |
 | GET | `/api/auth/github/callback` | 无 | GitHub 回调 |
+| GET | `/api/auth/status` | 无 | 评论者登录状态 |
+| POST | `/api/auth/logout` | 评论者 | 退出评论者登录 |
 | POST | `/api/admin/login` | 无 | 管理员登录 |
 | POST | `/api/admin/refresh` | 无 | 刷新 Token |
+| GET | `/api/admin/status` | 无 | 管理员登录状态 |
+| POST | `/api/admin/logout` | 管理员 | 退出管理员登录 |
 | PUT | `/api/admin/password` | 管理员 | 修改密码 |
 | GET/POST/PUT/DELETE | `/api/admin/blog` | 管理员 | Blog CRUD |
 | GET/POST/PUT/DELETE | `/api/admin/notes` | 管理员 | Notes CRUD |
