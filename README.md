@@ -20,13 +20,17 @@ AA_Blog/
 ├── AA_个人博客/              # Obsidian 设计文档
 ├── AA_Blog_backEnd/          # Spring Boot 后端
 │   └── src/main/java/com/javaee/blog/
-│       ├── common/           # Result、ResultCode、GlobalExceptionHandler
-│       ├── config/           # JwtInterceptor、WebMvcConfig、DataInitializer、AppConfig、PasswordConfig
+│       ├── common/           # Result、ResultCode、GlobalExceptionHandler、AppConstants
+│       ├── config/           # WebMvcConfig、DataInitializer、AppConfig、PasswordConfig
+│       ├── interceptor/      # JwtInterceptor（Cookie 认证）
 │       ├── controller/       # 12 个控制器
-│       ├── entity/           # 10 个实体（10 张表）
+│       ├── entity/           # 实体类
+│       │   ├── base/         # BaseEntity（id、createdAt、updatedAt）
+│       │   └── association/  # 多对多关联（BlogTags、NotesTags、ProjectsTags）
+│       ├── dto/              # request / VO
 │       ├── mapper/           # MyBatis-Plus Mapper
-│       ├── service/          # 服务接口（11 个）
-│       └── service/impl/     # 服务实现（11 个）
+│       ├── util/             # JwtUtil、SlugUtil
+│       └── service/          # 服务接口 + 实现
 ├── AA_Blog_frontEnd/         # Vue 3 前端
 │   └── src/
 │       ├── api/client.ts     # Axios 泛型封装
@@ -69,11 +73,9 @@ cd AA_Blog_frontEnd && npm install && npm run dev
 
 ## 默认管理员
 
-| 用户名 | 密码 |
-|---|---|
-| AA_ | 123456 |
+首次启动自动创建。用户名默认 `AA_`，密码通过环境变量 `ADMIN_INIT_PASSWORD` 设置。
 
-首次启动自动创建。登录后侧边栏 Logo 可点击进入首页管理。
+**未设置时**：自动生成随机密码，启动日志输出（首次登录后请立即修改）。
 
 ## 部署（Nginx 反向代理）
 
@@ -110,10 +112,12 @@ nginx
 
 ## 环境变量
 
-| 变量 | 说明 |
-|---|---|
-| DB_PASSWORD | MySQL 密码 |
-| JWT_SECRET | JWT 签名密钥（≥ 32 字节） |
-| GITHUB_CLIENT_ID | GitHub OAuth Client ID |
-| GITHUB_CLIENT_SECRET | GitHub OAuth Client Secret |
-| GITHUB_REDIRECT_URI | GitHub OAuth 回调地址 |
+| 变量 | 说明 | 必填 |
+|---|---|---|
+| DB_PASSWORD | MySQL 密码 | ✅ |
+| JWT_SECRET | JWT 签名密钥（≥ 32 字节） | ✅ |
+| ADMIN_INIT_USERNAME | 初始管理员用户名（默认 AA_） | |
+| ADMIN_INIT_PASSWORD | 初始管理员密码（不设则随机生成） | |
+| GITHUB_CLIENT_ID | GitHub OAuth Client ID | |
+| GITHUB_CLIENT_SECRET | GitHub OAuth Client Secret | |
+| GITHUB_REDIRECT_URI | GitHub OAuth 回调地址 | |
