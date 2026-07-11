@@ -35,8 +35,13 @@ public class DataInitializer implements CommandLineRunner {
             log.info("========================================");
         }
 
+        String username = System.getenv("ADMIN_INIT_USERNAME");
+        if (username == null || username.isBlank()) {
+            username = "AA_";
+        }
+
         Admin admin = new Admin();
-        admin.setUsername("AA_");
+        admin.setUsername(username);
         admin.setPassword(passwordEncoder.encode(password));
         adminMapper.insert(admin);
     }

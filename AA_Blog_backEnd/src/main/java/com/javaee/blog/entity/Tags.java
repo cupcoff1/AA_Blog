@@ -1,19 +1,15 @@
 package com.javaee.blog.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.javaee.blog.entity.base.BaseEntity;
 import lombok.Data;
-
-import java.time.LocalDateTime;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("tags")
-public class Tags {
+public class Tags extends BaseEntity {
 
-    @TableId(type = IdType.AUTO)
-    private Long id;
     private String name;
     private String slug;
-    private LocalDateTime createdAt;
 }

@@ -23,7 +23,6 @@ const login = async () => {
 }
 const logout = async () => {
   await api.post('/auth/logout')
-  localStorage.removeItem('commenter')
   commenter.value = null
 }
 
@@ -56,7 +55,10 @@ const del = async (id: number) => {
     if (isAdmin.value) await api.delete(`/admin/sticky-notes/${id}`)
     else await api.delete(`/sticky-notes/${id}`)
     notes.value = notes.value.filter(n => n.id !== id)
-  } catch { alert('无权删除此便签') }
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : ''
+    alert(msg.includes('无权') ? msg : '删除失败，请重试')
+  }
 }
 
 const fetchAuth = async () => {

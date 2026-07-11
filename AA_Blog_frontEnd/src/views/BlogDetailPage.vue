@@ -34,7 +34,7 @@ const headings = ref<{ id: string; text: string; level: number; open: boolean; c
 const activeId = ref('')
 let headingTimer: ReturnType<typeof setTimeout>
 
-marked.setOptions({ gfm: true, breaks: true })
+marked.use({ gfm: true, breaks: true })
 marked.use(markedHighlight({
   langPrefix: 'hljs language-',
   highlight(code: string, lang: string) {

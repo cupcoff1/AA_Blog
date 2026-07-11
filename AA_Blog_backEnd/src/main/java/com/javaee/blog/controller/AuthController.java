@@ -1,5 +1,6 @@
 package com.javaee.blog.controller;
 
+import com.javaee.blog.common.AppConstants;
 import com.javaee.blog.common.Result;
 import com.javaee.blog.service.GitHubAuthService;
 import com.javaee.blog.util.JwtUtil;
@@ -22,7 +23,7 @@ public class AuthController {
 
     /** 设置 httpOnly Cookie */
     private void setTokenCookie(HttpServletResponse response, String token, int maxAge) {
-        Cookie cookie = new Cookie("commenter_token", token);
+        Cookie cookie = new Cookie(AppConstants.COMMENTER_COOKIE, token);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
@@ -33,7 +34,7 @@ public class AuthController {
     private String extractToken(HttpServletRequest request) {
         if (request.getCookies() == null) return null;
         for (Cookie cookie : request.getCookies()) {
-            if ("commenter_token".equals(cookie.getName())) return cookie.getValue();
+            if (AppConstants.COMMENTER_COOKIE.equals(cookie.getName())) return cookie.getValue();
         }
         return null;
     }

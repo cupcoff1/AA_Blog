@@ -1,5 +1,6 @@
 package com.javaee.blog.controller;
 
+import com.javaee.blog.common.AppConstants;
 import com.javaee.blog.common.Result;
 import com.javaee.blog.common.ResultCode;
 import com.javaee.blog.dto.request.ChangePasswordRequest;
@@ -26,7 +27,7 @@ public class LoginController {
 
     /** 设置 httpOnly Cookie */
     private void setTokenCookie(HttpServletResponse response, String token, int maxAge) {
-        Cookie cookie = new Cookie("admin_token", token);
+        Cookie cookie = new Cookie(AppConstants.ADMIN_COOKIE, token);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
@@ -66,7 +67,7 @@ public class LoginController {
     private String extractToken(HttpServletRequest request) {
         if (request.getCookies() == null) return null;
         for (Cookie cookie : request.getCookies()) {
-            if ("admin_token".equals(cookie.getName())) return cookie.getValue();
+            if (AppConstants.ADMIN_COOKIE.equals(cookie.getName())) return cookie.getValue();
         }
         return null;
     }
@@ -88,7 +89,10 @@ public class LoginController {
     @PutMapping("/password")
     public Result<?> changePassword(@Valid @RequestBody ChangePasswordRequest request,
                                      HttpServletRequest req) {
-        String username = (String) req.getAttribute("username");
+        String username = (String) req.getAttribute(AppConstants.USERNAME_ATTR);
+        if (username == null) {
+            return Result.fail(ResultCode.UNAUTHORIZED);
+        }
         authService.changePassword(username, request.getOldPassword(), request.getNewPassword());
         return Result.ok();
     }

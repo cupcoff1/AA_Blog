@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/aa_blog?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
-    password: ${DB_PASSWORD:}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   servlet:
     multipart:
@@ -17,13 +17,18 @@ upload:
   max-size: 2097152  # 2MB
 
 jwt:
-  secret: ${JWT_SECRET:}
+  secret: ${JWT_SECRET}
   ttl: 604800  # 7天 (秒)
 
 github:
   client-id: ${GITHUB_CLIENT_ID:}
   client-secret: ${GITHUB_CLIENT_SECRET:}
   redirect-uri: ${GITHUB_REDIRECT_URI:http://localhost:5173/auth/callback}
+
+home:
+  latest-blogs: 5
+  latest-notes: 5
+  latest-projects: 6
 
 mybatis-plus:
   configuration:

@@ -1,23 +1,20 @@
 package com.javaee.blog.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.javaee.blog.entity.base.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("projects")
-public class Projects {
+public class Projects extends BaseEntity {
 
-    @TableId(type = IdType.AUTO)
-    private Long id;
     private String name;
     private String slug;
     private String description;
     private String demoUrl;
     private String githubUrl;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

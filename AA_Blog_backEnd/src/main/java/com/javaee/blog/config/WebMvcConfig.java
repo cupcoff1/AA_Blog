@@ -1,5 +1,6 @@
 package com.javaee.blog.config;
 
+import com.javaee.blog.interceptor.JwtInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -29,4 +30,5 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + baseDir);
     }
+
 }

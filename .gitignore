@@ -34,6 +34,8 @@ build/
 
 ### Secrets ###
 .env
+.env.dev
+.env.prod
 
 ### Frontend static (built artifacts) ###
 AA_Blog_backEnd/src/main/resources/static/

@@ -21,7 +21,7 @@ AA_Blog/
 ├── AA_Blog_backEnd/          # Spring Boot 后端
 │   └── src/main/java/com/javaee/blog/
 │       ├── common/           # Result、ResultCode、GlobalExceptionHandler
-│       ├── config/           # JwtInterceptor、WebMvcConfig、DataInitializer
+│       ├── config/           # JwtInterceptor、WebMvcConfig、DataInitializer、AppConfig、PasswordConfig
 │       ├── controller/       # 12 个控制器
 │       ├── entity/           # 10 个实体（10 张表）
 │       ├── mapper/           # MyBatis-Plus Mapper
@@ -75,26 +75,27 @@ cd AA_Blog_frontEnd && npm install && npm run dev
 
 首次启动自动创建。登录后侧边栏 Logo 可点击进入首页管理。
 
-## 打包部署
+## 部署（Nginx 反向代理）
 
 ```bash
-# 1. 构建前端
+# 1. 构建前端（产物在 dist/）
 cd AA_Blog_frontEnd && npm run build
 
-# 2. 复制到后端静态目录
-cp -r dist/* ../AA_Blog_backEnd/src/main/resources/static/
+# 2. 启动后端
+cd AA_Blog_backEnd && mvn spring-boot:run
 
-# 3. 打包 JAR
-cd ../AA_Blog_backEnd && mvn package -DskipTests
+# 3. 修改 nginx.conf 中的 root/alias 路径指向实际位置
 
-# 4. 复制 .env 到 target/
-cp .env target/
-
-# 5. 运行
-cd target && java -jar AA_Blog_backEnd-1.0-SNAPSHOT.jar
+# 4. 启动 Nginx
+nginx
 ```
 
-前端 SPA 路由刷新问题由 `SpaForwardFilter` 解决——非 API、非静态资源请求自动转发到 `index.html`。
+```
+浏览器 → Nginx :80
+           ├── /            → 前端 dist/index.html（try_files 处理 SPA 路由）
+           ├── /api/*       → proxy_pass :8080（后端 API）
+           └── /uploads/*   → alias 上传目录
+```
 
 公网暴露推荐 ngrok（开发测试）或 Nginx 反代 + 域名（生产）。
 

@@ -43,6 +43,7 @@ public class HeroQuoteServiceImpl implements HeroQuoteService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         mapper.deleteById(id);
     }

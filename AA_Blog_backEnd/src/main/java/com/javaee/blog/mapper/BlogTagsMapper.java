@@ -1,7 +1,7 @@
 package com.javaee.blog.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.javaee.blog.entity.BlogTags;
+import com.javaee.blog.entity.association.BlogTags;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

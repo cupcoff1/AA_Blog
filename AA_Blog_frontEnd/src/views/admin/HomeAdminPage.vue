@@ -7,6 +7,8 @@ import type { HeroQuoteVO, HeroConfigVO } from '@/models/types'
 const quotes = ref<HeroQuoteVO[]>([])
 const loading = ref(true)
 const error = ref(false)
+const quoteError = ref('')
+const uploadError = ref('')
 const newContent = ref('')
 const newAuthor = ref('')
 const newSource = ref('')
@@ -31,9 +33,10 @@ const addQuote = async () => {
     newContent.value = ''
     newAuthor.value = ''
     newSource.value = ''
+    quoteError.value = ''
     fetchQuotes()
   } catch {
-    alert('添加引语失败')
+    quoteError.value = '添加引语失败'
   }
 }
 
@@ -43,7 +46,7 @@ const delQuote = async (id: number) => {
     await api.delete(`/admin/hero-quotes/${id}`)
     quotes.value = quotes.value.filter(q => q.id !== id)
   } catch {
-    alert('删除引语失败')
+    quoteError.value = '删除引语失败'
   }
 }
 
@@ -55,8 +58,9 @@ const uploadHero = async (type: 'light' | 'dark', e: Event) => {
     form.append('file', input.files[0])
     const { url } = await api.post<{ url: string }>('/admin/hero-image?type=' + type, form)
     heroConfig.value[type === 'light' ? 'heroLight' : 'heroDark'] = url + '?t=' + Date.now()
+    uploadError.value = ''
   } catch {
-    alert('上传失败')
+    uploadError.value = '上传失败'
   }
 }
 
@@ -124,6 +128,7 @@ onMounted(() => {
           <input v-model="newSource" placeholder="作品名" />
         </div>
         <button class="btn" @click="addQuote"><Plus :size="16" /> 添加</button>
+        <div v-if="quoteError" class="msg-err" style="margin-top:0.5rem">{{ quoteError }}</div>
       </div>
     </section>
 
@@ -141,6 +146,7 @@ onMounted(() => {
     <!-- Hero 图管理 -->
     <section class="section">
       <h2>Hero 图片</h2>
+      <div v-if="uploadError" class="msg-err" style="margin-bottom:0.5rem">{{ uploadError }}</div>
       <div class="hero-grid">
         <div class="hero-card">
           <label>亮色主题</label>

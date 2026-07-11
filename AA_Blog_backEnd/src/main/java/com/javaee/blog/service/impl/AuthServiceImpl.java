@@ -1,6 +1,7 @@
 package com.javaee.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.javaee.blog.common.ResultCode;
 import com.javaee.blog.dto.request.LoginRequest;
 import com.javaee.blog.entity.Admin;
 import com.javaee.blog.mapper.AdminMapper;
@@ -38,10 +39,13 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void changePassword(String username, String oldPwd, String newPwd) {
+        if (oldPwd.equals(newPwd)) {
+            throw new IllegalArgumentException(ResultCode.MSG_PASSWORD_SAME);
+        }
         Admin admin = adminMapper.selectOne(
                 new LambdaQueryWrapper<Admin>().eq(Admin::getUsername, username));
         if (admin == null || !passwordEncoder.matches(oldPwd, admin.getPassword())) {
-            throw new IllegalArgumentException("旧密码错误");
+            throw new IllegalArgumentException(ResultCode.MSG_WRONG_PASSWORD);
         }
         admin.setPassword(passwordEncoder.encode(newPwd));
         adminMapper.updateById(admin);

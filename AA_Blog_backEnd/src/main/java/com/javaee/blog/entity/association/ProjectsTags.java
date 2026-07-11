@@ -1,4 +1,4 @@
-package com.javaee.blog.entity;
+package com.javaee.blog.entity.association;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;

@@ -1,5 +1,6 @@
 package com.javaee.blog.controller;
 
+import com.javaee.blog.common.AppConstants;
 import com.javaee.blog.common.Result;
 import com.javaee.blog.common.ResultCode;
 import com.javaee.blog.dto.request.StickyNoteCreateRequest;
@@ -58,8 +59,8 @@ public class StickyNoteController {
     }
 
     private Claims getClaims(HttpServletRequest req) {
-        String token = extractToken(req, "commenter_token");
-        if (token == null) token = extractToken(req, "admin_token");
+        String token = extractToken(req, AppConstants.COMMENTER_COOKIE);
+        if (token == null) token = extractToken(req, AppConstants.ADMIN_COOKIE);
         if (token == null) return null;
         try { return jwtUtil.parseToken(token); }
         catch (JwtException e) { return null; }
