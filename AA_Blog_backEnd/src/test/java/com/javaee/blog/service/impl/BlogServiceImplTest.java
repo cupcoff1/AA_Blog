@@ -6,7 +6,6 @@ import com.javaee.blog.dto.vo.BlogListVO;
 import com.javaee.blog.dto.vo.BlogVO;
 import com.javaee.blog.entity.Blog;
 import com.javaee.blog.entity.association.BlogTags;
-import com.javaee.blog.entity.Tag;
 import com.javaee.blog.mapper.BlogMapper;
 import com.javaee.blog.mapper.BlogTagsMapper;
 import com.javaee.blog.mapper.TagMapper;
