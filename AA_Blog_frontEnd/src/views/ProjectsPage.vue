@@ -65,7 +65,7 @@ onMounted(async () => {
 .section-title { font-size: 2.8rem; margin-bottom: 0.2em; display: flex; align-items: center; gap: 10px; }
 .section-desc { color: var(--text-secondary); font-size: 0.95em; margin: 0; }
 .state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
-.state.error { color: #e53e3e; }
+.state.error { color: var(--color-error); }
 .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
 .project-card { padding: 1rem 1.2rem; background: var(--bg-card); backdrop-filter: blur(10px); border: 2px solid var(--border); border-radius: var(--radius); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
 .project-name { font-weight: 600; display: block; margin-bottom: 0.2em; font-size: 1.1em; }
@@ -73,6 +73,6 @@ onMounted(async () => {
 .project-card p { color: var(--text-secondary); font-size: 0.92em; margin-bottom: 0.5em; }
 .card-actions { display: flex; gap: 4px; margin-top: 0.5rem; justify-content: flex-end; }
 .icon-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; color: var(--text-secondary); background: none; border: none; cursor: pointer; }
-.icon-btn:hover { background: rgba(147, 197, 253, 0.25); color: rgba(147, 197, 253, 1); }
-.icon-del:hover { background: rgba(229, 62, 62, 0.15); color: #e53e3e; }
+.icon-btn:hover { background: var(--color-edit-hover); color: rgba(147, 197, 253, 1); }
+.icon-del:hover { background: var(--color-delete-hover); color: var(--color-error); }
 </style>

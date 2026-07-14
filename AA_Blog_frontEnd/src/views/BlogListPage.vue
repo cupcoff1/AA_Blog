@@ -98,7 +98,7 @@ watch(() => route.query.q, (val) => { keyword.value = String(val || '') })
 }
 .search-bar:focus-within { border-color: var(--link); background: var(--bg); }
 .state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
-.state.error { color: #e53e3e; }
+.state.error { color: var(--color-error); }
 .post-list { display: flex; flex-direction: column; }
 .post-item {
   display: flex; flex-direction: column; gap: 0.2rem;
@@ -122,6 +122,6 @@ watch(() => route.query.q, (val) => { keyword.value = String(val || '') })
 .post-row .post-item { flex: 1; }
 .post-actions { display: flex; gap: 4px; flex-shrink: 0; }
 .icon-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; color: var(--text-secondary); background: none; border: none; cursor: pointer; }
-.icon-btn:hover { background: rgba(147, 197, 253, 0.25); color: rgba(147, 197, 253, 1); }
-.icon-del:hover { background: rgba(229, 62, 62, 0.15); color: #e53e3e; }
+.icon-btn:hover { background: var(--color-edit-hover); color: rgba(147, 197, 253, 1); }
+.icon-del:hover { background: var(--color-delete-hover); color: var(--color-error); }
 </style>

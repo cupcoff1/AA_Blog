@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Sidebar from '@/components/Sidebar.vue'
+import Toast from '@/components/Toast.vue'
 
 const route = useRoute()
 const isLogin = computed(() => route.path === '/admin/login')
@@ -14,9 +15,14 @@ const isLogin = computed(() => route.path === '/admin/login')
   <div v-else class="layout">
     <Sidebar />
     <main class="main-content">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <keep-alive :include="['BlogListPage', 'NotesPage', 'ProjectsPage']">
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
     </main>
   </div>
+  <Toast />
 </template>
 
 <style scoped>

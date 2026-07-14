@@ -147,12 +147,12 @@ onMounted(() => {
       <div class="hero-grid">
         <div class="hero-card">
           <label>亮色主题</label>
-          <img :src="heroConfig.heroLight" alt="亮色 Hero" />
+          <img loading="lazy" :src="heroConfig.heroLight" alt="亮色 Hero" />
           <input type="file" accept="image/*" @change="uploadHero('light', $event)" />
         </div>
         <div class="hero-card">
           <label>暗色主题</label>
-          <img :src="heroConfig.heroDark" alt="暗色 Hero" />
+          <img loading="lazy" :src="heroConfig.heroDark" alt="暗色 Hero" />
           <input type="file" accept="image/*" @change="uploadHero('dark', $event)" />
         </div>
       </div>
@@ -168,14 +168,14 @@ onMounted(() => {
 .section { margin-top: 2rem; }
 h2 { font-size: 1.2em; margin-bottom: 0.8rem; }
 .state { color: var(--text-secondary); padding: 1rem 0; }
-.state.error { color: #e53e3e; }
+.state.error { color: var(--color-error); }
 
 .quote-list { list-style: none; padding: 0; margin: 0 0 1rem; }
 .quote-list li { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
 .quote-text { line-height: 1.4; }
 .quote-meta { font-size: 0.85em; color: var(--text-secondary); margin-top: 2px; }
 .del { display: flex; align-items: center; border: none; background: none; color: var(--text-secondary); cursor: pointer; padding: 4px; border-radius: 4px; flex-shrink: 0; }
-.del:hover { color: #e53e3e; background: rgba(229,62,62,0.1); }
+.del:hover { color: var(--color-error); background: rgba(229,62,62,0.1); }
 
 .add-form { display: flex; flex-direction: column; gap: 0.4rem; }
 .add-form input { border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.6rem; background: var(--bg); color: var(--text); font-size: 0.95em; }
@@ -186,8 +186,8 @@ h2 { font-size: 1.2em; margin-bottom: 0.8rem; }
 
 .pwd-form { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
 .pwd-form input { border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.6rem; background: var(--bg); color: var(--text); font-size: 0.95em; max-width: 200px; }
-.msg-ok { color: #276749; font-size: 0.9em; }
-.msg-err { color: #e53e3e; font-size: 0.9em; }
+.msg-ok { color: var(--color-success); font-size: 0.9em; }
+.msg-err { color: var(--color-error); font-size: 0.9em; }
 .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .hero-card { display: flex; flex-direction: column; gap: 0.5rem; }
 .hero-card label { font-weight: 600; font-size: 0.95em; }

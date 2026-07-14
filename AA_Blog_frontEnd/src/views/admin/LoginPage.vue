@@ -75,7 +75,7 @@ const handleLogin = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Ma Shan Zheng', cursive; font-size: 1.1em; line-height: 1.4; color: rgba(0,0,0,0.6);
+  font-family: var(--font-sticky); font-size: 1.1em; line-height: 1.4; color: rgba(0,0,0,0.6);
   opacity: 0.7;
   box-shadow: 2px 3px 8px rgba(0,0,0,0.1);
   background-size: 100% 28px;
@@ -121,8 +121,8 @@ const handleLogin = async () => {
   margin-bottom: 1.5rem;
 }
 .error {
-  background: #fed7d7;
-  color: #c53030;
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
   padding: 0.6rem 1rem;
   border-radius: 6px;
   margin-bottom: 1rem;

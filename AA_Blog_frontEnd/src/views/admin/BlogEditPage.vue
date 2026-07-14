@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import TagEditor from '@/components/TagEditor.vue'
 import { getAdminBlog, createBlog, updateBlog, updateBlogTags } from '@/api/blog'
 import { uploadImage } from '@/api/upload'
+import '@/assets/editor.css'
 import type { BlogCreateRequest, TagVO } from '@/models/types'
 
 const route = useRoute()
@@ -77,20 +78,20 @@ onMounted(async () => {
     <div class="error" v-if="error">{{ error }}</div>
 
     <form @submit.prevent="submit">
-      <label>标题</label>
-      <input v-model="title" type="text" placeholder="文章标题" />
+      <label for="blog-title">标题</label>
+      <input id="blog-title" v-model="title" type="text" placeholder="文章标题" />
 
-      <label>摘要</label>
-      <input v-model="summary" type="text" placeholder="简短描述" />
+      <label for="blog-summary">摘要</label>
+      <input id="blog-summary" v-model="summary" type="text" placeholder="简短描述" />
 
       <div class="label-row">
-        <label>正文（Markdown）</label>
+        <label for="blog-content">正文（Markdown）</label>
         <label class="upload-label">
           <input type="file" accept="image/*" @change="handleUploadImage" hidden />
           {{ uploading ? '上传中...' : '📷 插入图片' }}
         </label>
       </div>
-      <textarea ref="textareaRef" v-model="content" rows="16" placeholder="Markdown 内容" />
+      <textarea ref="textareaRef" id="blog-content" v-model="content" rows="16" placeholder="Markdown 内容" />
 
       <label>新标签</label>
       <TagEditor v-model="newTags" />
@@ -102,21 +103,4 @@ onMounted(async () => {
   </div>
 </template>
 
-<style scoped>
-.edit-page { max-width: 800px; padding: 2rem 0; }
-.page-title { font-size: 2rem; margin-bottom: 1.5rem; }
-.error { background: #fed7d7; color: #c53030; padding: 0.6rem 1rem; border-radius: var(--radius); margin-bottom: 1rem; font-size: 0.9em; }
-form { display: flex; flex-direction: column; gap: 0.8rem; }
-.label-row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.3rem; }
-.upload-label { font-weight: 500; font-size: 0.85em; color: var(--link); cursor: pointer; }
-.upload-label:hover { color: var(--link-hover); }
-label { font-weight: 600; font-size: 0.9em; color: var(--text-secondary); }
-input, textarea {
-  padding: 0.65rem 0.8rem; border: 1px solid var(--border); border-radius: var(--radius);
-  font-size: 0.95em; font-family: inherit; background: var(--bg); color: var(--text); outline: none;
-}
-input:focus, textarea:focus { border-color: var(--link); box-shadow: 0 0 0 2px rgba(177,45,108,0.08); }
-.submit-btn { margin-top: 1rem; padding: 0.5rem 1.5rem; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius); font-size: 0.9em; font-weight: 500; cursor: pointer; transition: opacity 0.2s; width: fit-content; }
-.submit-btn:hover { opacity: 0.85; }
-.submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-</style>
+

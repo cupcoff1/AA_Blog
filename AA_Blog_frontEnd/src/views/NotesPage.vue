@@ -102,7 +102,7 @@ watch(() => route.query.q, (val) => { keyword.value = String(val || '') })
 .search-bar input { width: 100%; padding: 8px 0; border: none; font-size: 0.9em; background: transparent; color: var(--text); outline: none; }
 .search-bar:focus-within { border-color: var(--link); }
 .state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
-.state.error { color: #e53e3e; }
+.state.error { color: var(--color-error); }
 .note-list { display: flex; flex-direction: column; gap: 1rem; }
 .note-item { padding-bottom: 0; }
 .note-header { display: flex; align-items: baseline; gap: 1rem; }
@@ -112,6 +112,6 @@ watch(() => route.query.q, (val) => { keyword.value = String(val || '') })
 .note-body :deep(a) { text-decoration: underline; text-decoration-thickness: 2px; text-decoration-style: dotted; text-underline-offset: 6px; }
 .note-actions { display: flex; gap: 4px; margin-top: 0.5rem; justify-content: flex-end; }
 .icon-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; color: var(--text-secondary); background: none; border: none; cursor: pointer; }
-.icon-btn:hover { background: rgba(147, 197, 253, 0.25); color: rgba(147, 197, 253, 1); }
-.icon-del:hover { background: rgba(229, 62, 62, 0.15); color: #e53e3e; }
+.icon-btn:hover { background: var(--color-edit-hover); color: rgba(147, 197, 253, 1); }
+.icon-del:hover { background: var(--color-delete-hover); color: var(--color-error); }
 </style>

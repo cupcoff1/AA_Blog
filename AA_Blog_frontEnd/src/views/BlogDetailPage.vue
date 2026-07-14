@@ -10,6 +10,8 @@ import hljs from 'highlight.js'
 import DOMPurify from 'dompurify'
 import 'highlight.js/styles/github-dark.min.css'
 
+const UTTERANCES_REPO = 'cupcoff1/AA_Blog'
+
 const route = useRoute()
 const blog = ref<BlogVO | null>(null)
 const loading = ref(true)
@@ -22,7 +24,7 @@ const renderedContent = computed(() =>
 const loadUtterances = () => {
   const script = document.createElement('script')
   script.src = 'https://utteranc.es/client.js'
-  script.setAttribute('repo', 'cupcoff1/AA_Blog')
+  script.setAttribute('repo', UTTERANCES_REPO)
   script.setAttribute('issue-term', 'pathname')
   script.setAttribute('theme', document.body.classList.contains('dark') ? 'github-dark' : 'github-light')
   script.setAttribute('crossorigin', 'anonymous')
@@ -65,14 +67,20 @@ const extractHeadings = () => {
 const scrollTo = (id: string) => {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
+let ticking = false
 const onScroll = () => {
-  const hs = document.querySelectorAll('.blog-content h2, .blog-content h3')
-  let current = ''
-  hs.forEach(h => {
-    const top = (h as HTMLElement).getBoundingClientRect().top
-    if (top < 100) current = h.id
+  if (ticking) return
+  ticking = true
+  requestAnimationFrame(() => {
+    const hs = document.querySelectorAll('.blog-content h2, .blog-content h3')
+    let current = ''
+    hs.forEach(h => {
+      const top = (h as HTMLElement).getBoundingClientRect().top
+      if (top < 100) current = h.id
+    })
+    activeId.value = current
+    ticking = false
   })
-  activeId.value = current
 }
 
 onMounted(async () => {
@@ -126,11 +134,14 @@ onUnmounted(() => {
         </p>
         <nav v-show="showToc" class="toc-nav">
           <div v-for="h in headings" :key="h.id">
-            <a :href="`#${h.id}`" class="toc-h2"
-              :class="{ active: h.id === activeId }"
-              @click.prevent="h.open = !h.open; scrollTo(h.id)">
-              {{ h.open ? '▾' : '▸' }} {{ h.text }}
-            </a>
+            <div class="toc-h2-row" :class="{ active: h.id === activeId }">
+              <span class="toc-toggle" @click.stop="h.open = !h.open">
+                {{ h.open ? '▾' : '▸' }}
+              </span>
+              <a :href="`#${h.id}`" @click.prevent="scrollTo(h.id)" class="toc-h2-link">
+                {{ h.text }}
+              </a>
+            </div>
             <template v-if="h.open">
               <a v-for="c in h.children" :key="c.id"
                 :href="`#${c.id}`" class="toc-h3"
@@ -176,7 +187,10 @@ onUnmounted(() => {
 .toc-nav { display: flex; flex-direction: column; gap: 2px; }
 .toc-nav a { color: var(--text-secondary); font-size: 0.85em; line-height: 1.4; display: block; padding: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .toc-nav a:hover, .toc-nav a.active { color: var(--link); }
-.toc-h2 { cursor: pointer; }
+.toc-h2-row { display: flex; align-items: baseline; gap: 2px; }
+.toc-h2-row.active .toc-h2-link { color: var(--link); }
+.toc-toggle { cursor: pointer; user-select: none; color: var(--text-secondary); font-size: 0.8em; }
+.toc-h2-link { cursor: pointer; color: var(--text-secondary); font-size: 0.85em; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .toc-h3 { padding-left: 16px; font-size: 0.8em; }
 
 /* Header */
@@ -200,5 +214,5 @@ onUnmounted(() => {
 .comments h2 { font-size: 1.5em; margin-bottom: 1rem; font-weight: 600; color: var(--text); }
 
 .state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
-.state.error { color: #e53e3e; }
+.state.error { color: var(--color-error); }
 </style>

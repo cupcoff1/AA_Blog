@@ -7,7 +7,7 @@ import { logout as logoutApi } from '@/api/auth'
 import LogoIcon from './LogoIcon.vue'
 
 const router = useRouter()
-const dark = ref(localStorage.getItem('theme') === 'dark')
+const dark = ref((() => { try { return localStorage.getItem('theme') === 'dark' } catch { return false } })())
 const menuOpen = ref(false)
 
 onMounted(() => { if (isAdmin.value === null) refreshAuth() })
@@ -15,7 +15,7 @@ onMounted(() => { if (isAdmin.value === null) refreshAuth() })
 const toggleTheme = () => {
   dark.value = !dark.value
   document.body.classList.toggle('dark', dark.value)
-  localStorage.setItem('theme', dark.value ? 'dark' : 'light')
+  try { localStorage.setItem('theme', dark.value ? 'dark' : 'light') } catch { /* 无痕模式等 */ }
 }
 const logout = async () => {
   if (!confirm('(╥﹏╥) 真的要走了吗？')) return
@@ -130,7 +130,7 @@ if (dark.value) document.body.classList.add('dark')
 .mobile-menu { width: 240px; height: 100%; background: var(--bg); padding: 5rem 1.5rem 2rem; display: flex; flex-direction: column; gap: 4px; box-shadow: -4px 0 16px rgba(0,0,0,0.08); }
 .mobile-menu a { display: block; padding: 0.6rem 0.5rem; color: var(--text-secondary); font-size: 1.05em; border-radius: 6px; }
 .mobile-menu a:hover { background: var(--bg-secondary); color: var(--link); }
-.mobile-menu .logout-link { color: #e53e3e; margin-top: 1rem; }
+.mobile-menu .logout-link { color: var(--color-error); margin-top: 1rem; }
 .mobile-gh { display: block; padding: 0.6rem 0.5rem; color: var(--text-secondary); font-size: 1.05em; border-radius: 6px; }
 .mobile-gh:hover { background: var(--bg-secondary); color: var(--link); }
 .mobile-divider { height: 1px; background: rgba(128,128,128,0.1); margin: 0.5rem 0; }
@@ -181,7 +181,7 @@ if (dark.value) document.body.classList.add('dark')
 .sidebar-links a { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.93em; padding: 5px 8px; border-radius: var(--radius); }
 .sidebar-links a:hover { color: var(--link); background: var(--bg-secondary); }
 .sidebar-footer { padding-top: 0.5rem !important; }
-.logout-link { display: flex; align-items: center; gap: 8px; color: #e53e3e; font-size: 0.93em; padding: 5px 8px; border-radius: var(--radius); }
+.logout-link { display: flex; align-items: center; gap: 8px; color: var(--color-error); font-size: 0.93em; padding: 5px 8px; border-radius: var(--radius); }
 .logout-link:hover { background: var(--bg-secondary); }
 .secret-link { color: inherit; text-decoration: none !important; opacity: 0.6; }
 .secret-link:hover { opacity: 1; }

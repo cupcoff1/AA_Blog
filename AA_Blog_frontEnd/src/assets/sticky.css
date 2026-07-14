@@ -1,0 +1,26 @@
+/* 便签墙共享样式（AboutPage + GuestWall） */
+
+.sticky-wall {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 1rem; padding: 1rem 0;
+}
+.sticky { margin: 0.5rem; }
+.sticky:nth-child(odd) { margin-top: 1.5rem; }
+.sticky:nth-child(3n) { margin-left: -0.5rem; margin-right: 1rem; }
+.sticky:nth-child(4n+1) { margin-top: -0.3rem; }
+.sticky {
+  background: var(--bg); position: relative;
+  padding: 1.2rem 1.4rem 2rem; width: 200px; max-height: 200px;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  display: flex; flex-direction: column;
+}
+.sticky:hover { transform: scale(1.05) !important; z-index: 10; }
+.sticky::after {
+  content: ''; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(transparent 0, transparent 26px, rgba(0,0,0,0.04) 26px, rgba(0,0,0,0.04) 28px),
+    repeating-linear-gradient(transparent 0, transparent 23px, rgba(0,0,0,0.02) 23px, rgba(0,0,0,0.02) 24px);
+  pointer-events: none;
+}
+.sticky-body { font-family: var(--font-sticky); font-size: 1.05em; color: var(--color-sticky-text); line-height: 1.6; overflow-y: auto; flex: 1; scrollbar-width: none; }

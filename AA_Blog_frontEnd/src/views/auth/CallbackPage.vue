@@ -11,8 +11,7 @@ onMounted(async () => {
   const code = route.query.code as string
   if (!code) { error.value = '缺少授权码'; return }
   try {
-    const data = await githubCallback(code)
-    localStorage.setItem('commenter', JSON.stringify(data))
+    await githubCallback(code)
     router.replace('/guest')
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : '授权失败'
@@ -29,5 +28,5 @@ onMounted(async () => {
 
 <style scoped>
 .callback-page { display: flex; justify-content: center; align-items: center; min-height: 60vh; }
-.err { color: #e53e3e; }
+.err { color: var(--color-error); }
 </style>

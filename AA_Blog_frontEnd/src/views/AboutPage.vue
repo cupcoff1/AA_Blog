@@ -4,15 +4,16 @@ import { ref, onMounted } from 'vue'
 import { Plus, X, Check } from '@lucide/vue'
 import { isAdmin } from '@/router/auth'
 import { listStickyNotes, createAdminNote, deleteAdminNote } from '@/api/sticky-note'
+import '@/assets/sticky.css'
 import type { StickyNoteVO } from '@/models/types'
+import { STICKY_COLORS, randomStickyRotation } from '@/models/constants'
 
 const customNotes = ref<StickyNoteVO[]>([])
 const loading = ref(true)
 const error = ref(false)
 const showForm = ref(false)
 const newContent = ref('')
-const newColor = ref('#fff3cd')
-const colors = ['#fff3cd', '#d4edda', '#cce5ff', '#f8d7da', '#e8daef', '#d1ecf1']
+const newColor = ref(STICKY_COLORS[0])
 
 const addNote = async () => {
   if (!newContent.value.trim()) return
@@ -20,12 +21,12 @@ const addNote = async () => {
     await createAdminNote({
       content: newContent.value.trim(),
       color: newColor.value,
-      rotate: Math.floor(Math.random() * 7) - 3
+      rotate: randomStickyRotation()
     })
     newContent.value = ''
     showForm.value = false
     customNotes.value = await listStickyNotes('admin')
-  } catch {}
+  } catch { console.error('添加便签失败') }
 }
 
 const delNote = async (id: number) => {
@@ -71,7 +72,7 @@ onMounted(async () => {
       <div v-if="showForm" class="sticky form-sticky" :style="{ '--bg': newColor, transform: 'rotate(-1deg)' }">
         <textarea v-model="newContent" rows="3" placeholder="写点什么..." class="form-input" />
         <div class="color-pick">
-          <button v-for="c in colors" :key="c" class="color-dot"
+          <button v-for="c in STICKY_COLORS" :key="c" class="color-dot"
             :class="{ active: newColor === c }"
             :style="{ background: c }"
             @click="newColor = c" />
@@ -88,41 +89,17 @@ onMounted(async () => {
 <style scoped>
 .about-page { padding: 3rem 0; }
 .state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
-.state.error { color: #e53e3e; }
+.state.error { color: var(--color-error); }
 
-.sticky-wall {
-  display: flex; flex-wrap: wrap; justify-content: center;
-  gap: 1rem; padding: 1rem 0;
-}
-.sticky { margin: 0.5rem; }
-.sticky:nth-child(odd) { margin-top: 1.5rem; }
-.sticky:nth-child(3n) { margin-left: -0.5rem; margin-right: 1rem; }
-.sticky:nth-child(4n+1) { margin-top: -0.3rem; }
-.sticky {
-  background: var(--bg); position: relative;
-  padding: 1.2rem 1.4rem; width: 200px; max-height: 200px;
-  box-shadow: 2px 3px 8px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
-  display: flex; flex-direction: column;
-}
-.sticky:hover { transform: scale(1.05) !important; z-index: 10; }
-.sticky::after {
-  content: ''; position: absolute; inset: 0;
-  background:
-    repeating-linear-gradient(transparent 0, transparent 26px, rgba(0,0,0,0.04) 26px, rgba(0,0,0,0.04) 28px),
-    repeating-linear-gradient(transparent 0, transparent 23px, rgba(0,0,0,0.02) 23px, rgba(0,0,0,0.02) 24px);
-  pointer-events: none;
-}
-.sticky-body { font-family: 'Ma Shan Zheng', cursive; font-size: 1.05em; color: rgba(0,0,0,0.65); line-height: 1.6; overflow-y: auto; flex: 1; scrollbar-width: none; }
 .del-note { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(0,0,0,0.08); color: rgba(0,0,0,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; }
-.del-note:hover { background: rgba(229,62,62,0.2); color: #e53e3e; }
+.del-note:hover { background: var(--color-delete-hover); color: var(--color-error); }
 
 .add-sticky { display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px dashed var(--border); background: transparent; color: var(--text-secondary); min-height: 120px; }
 .add-sticky:hover { border-color: var(--link); color: var(--link); background: rgba(177,45,108,0.05); }
-body.dark .add-sticky:hover { background: rgba(200,146,231,0.08); }
+body.dark .add-sticky:hover { background: var(--color-edit-hover); }
 
 .form-sticky { min-height: 180px; }
-.form-input { width: 100%; border: none; background: transparent; font-family: 'Ma Shan Zheng', cursive; font-size: 1em; resize: none; outline: none; color: rgba(0,0,0,0.65); }
+.form-input { width: 100%; border: none; background: transparent; font-family: var(--font-sticky); font-size: 1em; resize: none; outline: none; color: var(--color-sticky-text); }
 .color-pick { display: flex; gap: 6px; margin: 0.5rem 0; }
 .color-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
 .color-dot.active { border-color: rgba(0,0,0,0.3); }
@@ -131,5 +108,5 @@ body.dark .add-sticky:hover { background: rgba(200,146,231,0.08); }
 .form-btn { background: rgba(0,0,0,0.1); color: rgba(0,0,0,0.5); }
 .form-btn:hover { background: rgba(147,197,253,0.3); color: rgba(59,130,246,0.9); }
 .form-cancel { background: none; color: rgba(0,0,0,0.3); }
-.form-cancel:hover { background: rgba(229,62,62,0.15); color: #e53e3e; }
+.form-cancel:hover { background: var(--color-delete-hover); color: var(--color-error); }
 </style>

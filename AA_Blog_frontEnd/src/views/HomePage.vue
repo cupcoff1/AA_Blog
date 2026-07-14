@@ -23,12 +23,12 @@ onMounted(async () => {
   try {
     const qs = await listQuotes()
     if (qs && qs.length) quotes.value = qs
-  } catch {}
+  } catch { console.error('加载引语失败') }
 
   try {
     const cfg = await getHeroConfig()
     if (cfg) { heroLight.value = cfg.heroLight; heroDark.value = cfg.heroDark }
-  } catch {}
+  } catch { console.error('加载Hero配置失败') }
 
   intervalTimer = setInterval(() => {
     quoteVisible.value = false
@@ -57,8 +57,8 @@ onUnmounted(() => {
 
       </div>
       <div class="hero-image">
-        <img :src="heroLight" alt="Hero" class="hero-light" />
-        <img :src="heroDark" alt="Hero" class="hero-dark" />
+        <img loading="lazy" :src="heroLight" alt="Hero" class="hero-light" />
+        <img loading="lazy" :src="heroDark" alt="Hero" class="hero-dark" />
       </div>
     </section>
 
@@ -163,6 +163,6 @@ a.post-title:hover { text-decoration-color: var(--link); }
 .project-name:hover { text-decoration: underline; text-decoration-thickness: 2px; }
 .project-card p { color: var(--text-secondary); font-size: 0.9em; margin-bottom: 0.4em; }
 .state { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
-.error { color: #e53e3e; }
+.error { color: var(--color-error); }
 .empty { color: var(--text-secondary); font-size: 0.95em; }
 </style>

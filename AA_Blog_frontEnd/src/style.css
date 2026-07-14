@@ -13,7 +13,16 @@
   --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, -apple-system, sans-serif;
   --mono: 'Space Mono', Consolas, monospace;
+  --font-sticky: 'Ma Shan Zheng', cursive;
   --radius: 6px;
+  --color-error: #e53e3e;
+  --color-error-bg: #fed7d7;
+  --color-error-text: #c53030;
+  --color-success: #276749;
+  --color-edit-hover: rgba(147, 197, 253, 0.25);
+  --color-delete-hover: rgba(229, 62, 62, 0.15);
+  --color-focus-ring: rgba(177, 45, 108, 0.08);
+  --color-sticky-text: rgba(0, 0, 0, 0.65);
   --h1: 2.8rem;
   --h2: 2.3rem;
   --h3: 1.9rem;
@@ -28,6 +37,8 @@ body.dark {
   --link-hover: #e1a6f2;
   --border: #4e4e55;
   --code-bg: #323239;
+  --color-edit-hover: rgba(200, 146, 231, 0.08);
+  --color-delete-hover: rgba(229, 62, 62, 0.2);
 }
 html { scroll-behavior: smooth; }
 * { margin: 0; padding: 0; box-sizing: border-box; }

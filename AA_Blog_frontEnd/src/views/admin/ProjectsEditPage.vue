@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TagEditor from '@/components/TagEditor.vue'
 import { getAdminProject, createProject, updateProject, updateProjectTags } from '@/api/project'
+import '@/assets/editor.css'
 import type { ProjectCreateRequest, TagVO } from '@/models/types'
 
 const route = useRoute(); const router = useRouter()
@@ -55,15 +56,3 @@ onMounted(async () => {
     </form>
   </div>
 </template>
-<style scoped>
-.edit-page { max-width: 800px; padding: 2rem 0; }
-.page-title { font-size: 2rem; margin-bottom: 1.5rem; }
-.error { background: #fed7d7; color: #c53030; padding: 0.6rem 1rem; border-radius: var(--radius); margin-bottom: 1rem; font-size: 0.9em; }
-form { display: flex; flex-direction: column; gap: 0.8rem; }
-label { font-weight: 600; font-size: 0.9em; margin-top: 0.3rem; color: var(--text-secondary); }
-input { padding: 0.65rem 0.8rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.95em; background: var(--bg); color: var(--text); outline: none; }
-input:focus { border-color: var(--link); box-shadow: 0 0 0 2px rgba(177,45,108,0.08); }
-.submit-btn { margin-top: 1rem; padding: 0.5rem 1.5rem; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius); font-size: 0.9em; font-weight: 500; cursor: pointer; transition: opacity 0.2s; width: fit-content; }
-.submit-btn:hover { opacity: 0.85; }
-.submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-</style>
