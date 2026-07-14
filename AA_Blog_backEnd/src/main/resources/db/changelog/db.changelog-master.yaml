@@ -154,7 +154,7 @@ databaseChangeLog:
       comment: projects 表删除未使用的 content 列
       changes:
         - sql:
-            sql: ALTER TABLE projects DROP COLUMN IF EXISTS content;
+            sql: ALTER TABLE projects DROP COLUMN content;
       rollback:
         - sql:
             sql: ALTER TABLE projects ADD COLUMN content LONGTEXT NULL;

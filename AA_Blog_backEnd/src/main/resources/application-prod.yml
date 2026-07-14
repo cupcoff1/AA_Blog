@@ -1,0 +1,8 @@
+# ==================== 生产环境 ====================
+
+upload:
+  base-dir: /var/www/uploads/
+
+logging:
+  level:
+    root: warn

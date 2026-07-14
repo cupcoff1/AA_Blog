@@ -16,7 +16,6 @@ spring:
       max-request-size: 2MB
 
 upload:
-  base-dir: ./uploads/blog/
   max-size: 2097152  # 2MB
 
 jwt:
@@ -39,3 +38,6 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+
+# 默认使用 dev profile
+spring.profiles.active: dev
