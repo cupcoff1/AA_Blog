@@ -218,8 +218,6 @@ public class BlogServiceImpl implements BlogService {
         blog.setSummary(request.getSummary());
         blog.setContent(request.getContent());
         blogMapper.updateById(blog);
-        blogTagsMapper.delete(new LambdaQueryWrapper<BlogTags>().eq(BlogTags::getBlogId, id));
-        handleTags(id, request.getTagIds(), request.getNewTags());
     }
 
     /**
@@ -228,13 +226,22 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public BlogVO getById(Long id) {
         Blog blog = blogMapper.selectById(id);
-        if (blog == null) return null;
+        if (blog == null) throw new NoSuchElementException("文章不存在");
         return toVO(blog);
     }
 
     /**
      * 后台删除博客。先删标签关联，再删博客本体。
      */
+    /** 后台更新博客标签。清空旧关联后重建。 */
+    @Override
+    @Transactional
+    public void updateTags(Long id, List<Long> tagIds, List<String> newTags) {
+        if (blogMapper.selectById(id) == null) throw new NoSuchElementException("文章不存在");
+        blogTagsMapper.delete(new LambdaQueryWrapper<BlogTags>().eq(BlogTags::getBlogId, id));
+        handleTags(id, tagIds, newTags);
+    }
+
     @Override
     @Transactional
     public void delete(Long id) {

@@ -17,6 +17,10 @@ export const createNote = (data: NoteCreateRequest) =>
 export const updateNote = (id: number, data: NoteCreateRequest) =>
   api.put(`/admin/notes/${id}`, data)
 
+/** 更新标签 */
+export const updateNoteTags = (id: number, tagIds: number[], newTags: string[]) =>
+  api.patch(`/admin/notes/${id}/tags`, { tagIds, newTags })
+
 /** 删除 */
 export const deleteNote = (id: number) =>
   api.delete(`/admin/notes/${id}`)

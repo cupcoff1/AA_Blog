@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TagEditor from '@/components/TagEditor.vue'
-import { getAdminBlog, createBlog, updateBlog } from '@/api/blog'
+import { getAdminBlog, createBlog, updateBlog, updateBlogTags } from '@/api/blog'
 import { uploadImage } from '@/api/upload'
 import type { BlogVO, BlogCreateRequest, TagVO } from '@/models/types'
 
@@ -44,8 +44,12 @@ const submit = async () => {
   loading.value = true; error.value = ''
   try {
     const body: BlogCreateRequest = { title: title.value, summary: summary.value, content: content.value, tagIds: tagIds.value, newTags: newTags.value }
-    if (editId) await updateBlog(editId, body)
-    else await createBlog(body)
+    if (editId) {
+      await updateBlog(editId, body)
+      await updateBlogTags(editId, tagIds.value, newTags.value)
+    } else {
+      await createBlog(body)
+    }
     router.push('/blog')
   } catch (e: unknown) { error.value = e instanceof Error ? e.message : '保存失败' }
   finally { loading.value = false }

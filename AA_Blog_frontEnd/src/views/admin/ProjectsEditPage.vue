@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TagEditor from '@/components/TagEditor.vue'
-import { getAdminProject, createProject, updateProject } from '@/api/project'
+import { getAdminProject, createProject, updateProject, updateProjectTags } from '@/api/project'
 import type { ProjectVO, ProjectCreateRequest, TagVO } from '@/models/types'
 
 const route = useRoute(); const router = useRouter()
@@ -16,7 +16,12 @@ const submit = async () => {
   loading.value = true; error.value = ''
   try {
     const body: ProjectCreateRequest = { name: name.value, description: description.value, demoUrl: demoUrl.value, githubUrl: githubUrl.value, tagIds: tagIds.value, newTags: newTags.value }
-    editId ? await updateProject(editId, body) : await createProject(body)
+    if (editId) {
+      await updateProject(editId, body)
+      await updateProjectTags(editId, tagIds.value, newTags.value)
+    } else {
+      await createProject(body)
+    }
     router.push('/projects')
   } catch (e: unknown) { error.value = e instanceof Error ? e.message : '保存失败' } finally { loading.value = false }
 }

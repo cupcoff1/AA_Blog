@@ -167,16 +167,23 @@ public class NoteServiceImpl implements NoteService {
         note.setTitle(request.getTitle());
         note.setContent(request.getContent());
         noteMapper.updateById(note);
-        noteTagsMapper.delete(new LambdaQueryWrapper<NoteTags>().eq(NoteTags::getNotesId, id));
-        handleTags(id, request.getTagIds(), request.getNewTags());
     }
 
     /** 后台获取笔记详情（供编辑页加载）。null = 不存在 */
     @Override
     public NoteVO getById(Long id) {
         Note note = noteMapper.selectById(id);
-        if (note == null) return null;
+        if (note == null) throw new NoSuchElementException("笔记不存在");
         return toVO(note, getTagsByNoteId(note.getId()));
+    }
+
+    /** 后台更新笔记标签。清空旧关联后重建。 */
+    @Override
+    @Transactional
+    public void updateTags(Long id, List<Long> tagIds, List<String> newTags) {
+        if (noteMapper.selectById(id) == null) throw new NoSuchElementException("笔记不存在");
+        noteTagsMapper.delete(new LambdaQueryWrapper<NoteTags>().eq(NoteTags::getNotesId, id));
+        handleTags(id, tagIds, newTags);
     }
 
     /** 后台删除笔记 */

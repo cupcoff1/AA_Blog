@@ -1,8 +1,8 @@
 package com.javaee.blog.controller;
 
 import com.javaee.blog.common.Result;
-import com.javaee.blog.common.ResultCode;
 import com.javaee.blog.dto.request.BlogCreateRequest;
+import com.javaee.blog.dto.request.TagUpdateRequest;
 import com.javaee.blog.dto.vo.BlogListVO;
 import com.javaee.blog.dto.vo.BlogVO;
 import com.javaee.blog.service.BlogService;
@@ -27,11 +27,7 @@ public class AdminBlogController {
 
     @GetMapping("/blog/{id}")
     public Result<BlogVO> getById(@PathVariable Long id) {
-        BlogVO vo = blogService.getById(id);
-        if (vo == null) {
-            return Result.fail(ResultCode.NOT_FOUND);
-        }
-        return Result.ok(vo);
+        return Result.ok(blogService.getById(id));
     }
 
     @PostMapping("/blog")
@@ -43,6 +39,12 @@ public class AdminBlogController {
     @PutMapping("/blog/{id}")
     public Result<?> update(@PathVariable Long id, @Valid @RequestBody BlogCreateRequest request) {
         blogService.update(id, request);
+        return Result.ok();
+    }
+
+    @PatchMapping("/blog/{id}/tags")
+    public Result<?> updateTags(@PathVariable Long id, @Valid @RequestBody TagUpdateRequest request) {
+        blogService.updateTags(id, request.getTagIds(), request.getNewTags());
         return Result.ok();
     }
 

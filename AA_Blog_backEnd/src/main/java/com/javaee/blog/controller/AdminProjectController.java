@@ -1,8 +1,8 @@
 package com.javaee.blog.controller;
 
 import com.javaee.blog.common.Result;
-import com.javaee.blog.common.ResultCode;
 import com.javaee.blog.dto.request.ProjectCreateRequest;
+import com.javaee.blog.dto.request.TagUpdateRequest;
 import com.javaee.blog.dto.vo.ProjectVO;
 import com.javaee.blog.service.ProjectService;
 import jakarta.validation.Valid;
@@ -26,11 +26,7 @@ public class AdminProjectController {
 
     @GetMapping("/projects/{id}")
     public Result<ProjectVO> getById(@PathVariable Long id) {
-        ProjectVO vo = projectService.getById(id);
-        if (vo == null) {
-            return Result.fail(ResultCode.NOT_FOUND);
-        }
-        return Result.ok(vo);
+        return Result.ok(projectService.getById(id));
     }
 
     @PostMapping("/projects")
@@ -42,6 +38,12 @@ public class AdminProjectController {
     @PutMapping("/projects/{id}")
     public Result<?> update(@PathVariable Long id, @Valid @RequestBody ProjectCreateRequest request) {
         projectService.update(id, request);
+        return Result.ok();
+    }
+
+    @PatchMapping("/projects/{id}/tags")
+    public Result<?> updateTags(@PathVariable Long id, @Valid @RequestBody TagUpdateRequest request) {
+        projectService.updateTags(id, request.getTagIds(), request.getNewTags());
         return Result.ok();
     }
 

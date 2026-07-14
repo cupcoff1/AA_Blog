@@ -17,6 +17,10 @@ export const createProject = (data: ProjectCreateRequest) =>
 export const updateProject = (id: number, data: ProjectCreateRequest) =>
   api.put(`/admin/projects/${id}`, data)
 
+/** 更新标签 */
+export const updateProjectTags = (id: number, tagIds: number[], newTags: string[]) =>
+  api.patch(`/admin/projects/${id}/tags`, { tagIds, newTags })
+
 /** 删除 */
 export const deleteProject = (id: number) =>
   api.delete(`/admin/projects/${id}`)

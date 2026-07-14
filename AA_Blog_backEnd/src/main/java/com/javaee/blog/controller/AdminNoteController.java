@@ -1,8 +1,8 @@
 package com.javaee.blog.controller;
 
 import com.javaee.blog.common.Result;
-import com.javaee.blog.common.ResultCode;
 import com.javaee.blog.dto.request.NoteCreateRequest;
+import com.javaee.blog.dto.request.TagUpdateRequest;
 import com.javaee.blog.dto.vo.NoteVO;
 import com.javaee.blog.service.NoteService;
 import jakarta.validation.Valid;
@@ -26,11 +26,7 @@ public class AdminNoteController {
 
     @GetMapping("/notes/{id}")
     public Result<NoteVO> getById(@PathVariable Long id) {
-        NoteVO vo = noteService.getById(id);
-        if (vo == null) {
-            return Result.fail(ResultCode.NOT_FOUND);
-        }
-        return Result.ok(vo);
+        return Result.ok(noteService.getById(id));
     }
 
     @PostMapping("/notes")
@@ -42,6 +38,12 @@ public class AdminNoteController {
     @PutMapping("/notes/{id}")
     public Result<?> update(@PathVariable Long id, @Valid @RequestBody NoteCreateRequest request) {
         noteService.update(id, request);
+        return Result.ok();
+    }
+
+    @PatchMapping("/notes/{id}/tags")
+    public Result<?> updateTags(@PathVariable Long id, @Valid @RequestBody TagUpdateRequest request) {
+        noteService.updateTags(id, request.getTagIds(), request.getNewTags());
         return Result.ok();
     }
 

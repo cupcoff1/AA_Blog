@@ -16,8 +16,11 @@ public interface NoteService {
     /** 后台：创建笔记 */
     void create(NoteCreateRequest request);
 
-    /** 后台：编辑笔记 */
+    /** 后台：编辑笔记（只改标题/正文，不动标签） */
     void update(Long id, NoteCreateRequest request);
+
+    /** 后台：编辑笔记标签 */
+    void updateTags(Long id, List<Long> tagIds, List<String> newTags);
 
     /** 后台：获取笔记（供编辑页使用） */
     NoteVO getById(Long id);

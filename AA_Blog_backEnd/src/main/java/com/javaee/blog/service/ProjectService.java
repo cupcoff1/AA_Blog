@@ -16,8 +16,11 @@ public interface ProjectService {
     /** 后台：创建项目 */
     void create(ProjectCreateRequest request);
 
-    /** 后台：编辑项目 */
+    /** 后台：编辑项目（只改基本信息，不动标签） */
     void update(Long id, ProjectCreateRequest request);
+
+    /** 后台：编辑项目标签 */
+    void updateTags(Long id, List<Long> tagIds, List<String> newTags);
 
     /** 后台：获取项目（供编辑页使用） */
     ProjectVO getById(Long id);

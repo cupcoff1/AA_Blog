@@ -1,5 +1,6 @@
 package com.javaee.blog.config;
 
+import com.javaee.blog.interceptor.CommenterInterceptor;
 import com.javaee.blog.interceptor.JwtInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final JwtInterceptor jwtInterceptor;
+    private final CommenterInterceptor commenterInterceptor;
 
     @Value("${upload.base-dir}")
     private String baseDir;
@@ -23,6 +25,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/admin/**")
                 .excludePathPatterns("/api/admin/login", "/api/admin/refresh",
                         "/api/admin/status", "/api/admin/logout");
+
+        registry.addInterceptor(commenterInterceptor)
+                .addPathPatterns("/api/sticky-notes", "/api/sticky-notes/**");
     }
 
     @Override

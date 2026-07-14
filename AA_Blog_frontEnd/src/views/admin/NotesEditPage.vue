@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TagEditor from '@/components/TagEditor.vue'
-import { getAdminNote, createNote, updateNote } from '@/api/note'
+import { getAdminNote, createNote, updateNote, updateNoteTags } from '@/api/note'
 import type { NoteVO, NoteCreateRequest, TagVO } from '@/models/types'
 
 const route = useRoute(); const router = useRouter()
@@ -16,7 +16,12 @@ const submit = async () => {
   loading.value = true; error.value = ''
   try {
     const body: NoteCreateRequest = { title: title.value, content: content.value, tagIds: tagIds.value, newTags: newTags.value }
-    editId ? await updateNote(editId, body) : await createNote(body)
+    if (editId) {
+      await updateNote(editId, body)
+      await updateNoteTags(editId, tagIds.value, newTags.value)
+    } else {
+      await createNote(body)
+    }
     router.push('/notes')
   } catch (e: unknown) { error.value = e instanceof Error ? e.message : '保存失败' } finally { loading.value = false }
 }

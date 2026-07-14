@@ -151,15 +151,22 @@ public class ProjectServiceImpl implements ProjectService {
         project.setDemoUrl(request.getDemoUrl());
         project.setGithubUrl(request.getGithubUrl());
         projectMapper.updateById(project);
+    }
+
+    /** 后台更新项目标签。清空旧关联后重建。 */
+    @Override
+    @Transactional
+    public void updateTags(Long id, List<Long> tagIds, List<String> newTags) {
+        if (projectMapper.selectById(id) == null) throw new NoSuchElementException("项目不存在");
         projectTagsMapper.delete(new LambdaQueryWrapper<ProjectTags>().eq(ProjectTags::getProjectId, id));
-        handleTags(id, request.getTagIds(), request.getNewTags());
+        handleTags(id, tagIds, newTags);
     }
 
     /** 后台获取项目详情（供编辑页加载） */
     @Override
     public ProjectVO getById(Long id) {
         Project project = projectMapper.selectById(id);
-        if (project == null) return null;
+        if (project == null) throw new NoSuchElementException("项目不存在");
         return toVO(project, getTagsByProjectId(project.getId()));
     }
 

@@ -38,6 +38,9 @@ const api = {
   put<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig) {
     return http.put(url, data, config) as Promise<T>
   },
+  patch<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig) {
+    return http.patch(url, data, config) as Promise<T>
+  },
   delete<T = unknown>(url: string, config?: AxiosRequestConfig) {
     return http.delete(url, config) as Promise<T>
   }

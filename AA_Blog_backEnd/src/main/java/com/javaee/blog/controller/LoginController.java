@@ -25,7 +25,8 @@ public class LoginController {
     private final AuthService authService;
     private final JwtUtil jwtUtil;
 
-    /** 设置 httpOnly Cookie */
+    // ==================== 私有方法 ====================
+
     private void setTokenCookie(HttpServletResponse response, String token, int maxAge) {
         Cookie cookie = new Cookie(AppConstants.ADMIN_COOKIE, token);
         cookie.setHttpOnly(true);
@@ -34,6 +35,16 @@ public class LoginController {
         cookie.setAttribute("SameSite", "Lax");
         response.addCookie(cookie);
     }
+
+    private String extractToken(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+        for (Cookie cookie : request.getCookies()) {
+            if (AppConstants.ADMIN_COOKIE.equals(cookie.getName())) return cookie.getValue();
+        }
+        return null;
+    }
+
+    // ==================== 公开方法 ====================
 
     @PostMapping("/login")
     public Result<?> login(@Valid @RequestBody LoginRequest request,
@@ -62,14 +73,6 @@ public class LoginController {
     public Result<?> logout(HttpServletResponse response) {
         setTokenCookie(response, "", 0); // maxAge=0 立即删除
         return Result.ok();
-    }
-
-    private String extractToken(HttpServletRequest request) {
-        if (request.getCookies() == null) return null;
-        for (Cookie cookie : request.getCookies()) {
-            if (AppConstants.ADMIN_COOKIE.equals(cookie.getName())) return cookie.getValue();
-        }
-        return null;
     }
 
     @PostMapping("/refresh")

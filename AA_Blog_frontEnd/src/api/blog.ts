@@ -25,6 +25,10 @@ export const createBlog = (data: BlogCreateRequest) =>
 export const updateBlog = (id: number, data: BlogCreateRequest) =>
   api.put(`/admin/blog/${id}`, data)
 
+/** 更新标签 */
+export const updateBlogTags = (id: number, tagIds: number[], newTags: string[]) =>
+  api.patch(`/admin/blog/${id}/tags`, { tagIds, newTags })
+
 /** 删除 */
 export const deleteBlog = (id: number) =>
   api.delete(`/admin/blog/${id}`)

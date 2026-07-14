@@ -20,8 +20,11 @@ public interface BlogService {
     /** 后台：创建文章 */
     void create(BlogCreateRequest request);
 
-    /** 后台：编辑文章 */
+    /** 后台：编辑文章（只改标题/摘要/正文，不动标签） */
     void update(Long id, BlogCreateRequest request);
+
+    /** 后台：编辑文章标签（清空旧关联后重建） */
+    void updateTags(Long id, List<Long> tagIds, List<String> newTags);
 
     /** 后台：获取文章详情（供编辑页使用） */
     BlogVO getById(Long id);
