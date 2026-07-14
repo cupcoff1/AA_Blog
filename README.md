@@ -9,9 +9,11 @@
 | 前端 | Vue 3 + TypeScript + Vue Router + Axios + Vite |
 | 后端 | Spring Boot 3.2.5 + MyBatis-Plus 3.5.6 |
 | 数据库 | MySQL 8.0 |
+| 数据库迁移 | Liquibase |
 | 认证 | JWT（管理员）+ GitHub OAuth（游客） |
 | 评论 | Utterances（GitHub Issues 评论 iframe） |
 | Markdown | marked + marked-highlight + highlight.js |
+| CI | GitHub Actions |
 
 ## 项目结构
 
@@ -22,23 +24,24 @@ AA_Blog/
 │   └── src/main/java/com/javaee/blog/
 │       ├── common/           # Result、ResultCode、GlobalExceptionHandler、AppConstants
 │       ├── config/           # WebMvcConfig、DataInitializer、AppConfig、PasswordConfig
-│       ├── interceptor/      # JwtInterceptor（Cookie 认证）
-│       ├── controller/       # 12 个控制器
+│       ├── interceptor/      # JwtInterceptor、CommenterInterceptor
+│       ├── controller/       # 13 个控制器
 │       ├── entity/           # 实体类
 │       │   ├── base/         # BaseEntity（id、createdAt、updatedAt）
-│       │   └── association/  # 多对多关联（BlogTags、NotesTags、ProjectsTags）
+│       │   └── association/  # 多对多关联（BlogTags、NoteTags、ProjectTags）
 │       ├── dto/              # request / VO
 │       ├── mapper/           # MyBatis-Plus Mapper
 │       ├── util/             # JwtUtil、SlugUtil
 │       └── service/          # 服务接口 + 实现
 ├── AA_Blog_frontEnd/         # Vue 3 前端
 │   └── src/
-│       ├── api/client.ts     # Axios 泛型封装
+│       ├── api/              # API 模块（blog、note、project、auth 等 9 个）
 │       ├── models/types.ts   # TypeScript 类型
 │       ├── router/routes.ts  # 路由配置
 │       ├── components/       # 共享组件（Sidebar、LogoIcon、TagEditor）
 │       ├── views/            # 前台页面（8 个）
 │       └── views/admin/      # 后台页面（5 个）
+├── .github/workflows/ci.yml  # CI 配置
 └── .gitignore
 ```
 
@@ -58,8 +61,8 @@ AA_Blog/
 ## 本地运行
 
 ```bash
-# 1. 创建数据库
-mysql -u root -p < AA_Blog_backEnd/src/main/resources/db/schema.sql
+# 1. 创建数据库（Liquibase 启动时自动建表）
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS aa_blog"
 
 # 2. 配置 .env
 cp AA_Blog_backEnd/.env.example AA_Blog_backEnd/.env

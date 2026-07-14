@@ -1,0 +1,160 @@
+databaseChangeLog:
+  # ==================== 初始建表 ====================
+  - changeSet:
+      id: 1
+      author: AA_
+      comment: 全部 10 张表初始建表
+      changes:
+        - sql:
+            dbms: mysql
+            splitStatements: true
+            sql: |
+              -- 1. blog
+              CREATE TABLE IF NOT EXISTS blog (
+                  id BIGINT NOT NULL AUTO_INCREMENT,
+                  title VARCHAR(255) NOT NULL,
+                  slug VARCHAR(255) NOT NULL,
+                  summary TEXT NOT NULL,
+                  content LONGTEXT NOT NULL,
+                  published_at DATETIME NOT NULL,
+                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  PRIMARY KEY (id),
+                  UNIQUE KEY uk_slug (slug),
+                  INDEX idx_published_at (published_at)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+              -- 2. notes
+              CREATE TABLE IF NOT EXISTS notes (
+                  id BIGINT NOT NULL AUTO_INCREMENT,
+                  title VARCHAR(255) NOT NULL,
+                  slug VARCHAR(255) NOT NULL,
+                  content LONGTEXT NOT NULL,
+                  published_at DATETIME NOT NULL,
+                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  PRIMARY KEY (id),
+                  UNIQUE KEY uk_slug (slug),
+                  INDEX idx_published_at (published_at)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+              -- 3. projects
+              CREATE TABLE IF NOT EXISTS projects (
+                  id BIGINT NOT NULL AUTO_INCREMENT,
+                  name VARCHAR(255) NOT NULL,
+                  slug VARCHAR(255) NOT NULL,
+                  description VARCHAR(500) NOT NULL,
+                  content LONGTEXT NULL,
+                  demo_url VARCHAR(500),
+                  github_url VARCHAR(500),
+                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  PRIMARY KEY (id),
+                  UNIQUE KEY uk_slug (slug)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+              -- 4. tags
+              CREATE TABLE IF NOT EXISTS tags (
+                  id BIGINT NOT NULL AUTO_INCREMENT,
+                  name VARCHAR(100) NOT NULL,
+                  slug VARCHAR(100) NOT NULL,
+                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  PRIMARY KEY (id),
+                  UNIQUE KEY uk_name (name),
+                  UNIQUE KEY uk_slug (slug)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+              -- 5. blog_tags
+              CREATE TABLE IF NOT EXISTS blog_tags (
+                  blog_id BIGINT NOT NULL,
+                  tag_id BIGINT NOT NULL,
+                  PRIMARY KEY (blog_id, tag_id),
+                  INDEX idx_tag_id (tag_id),
+                  FOREIGN KEY (blog_id) REFERENCES blog(id) ON DELETE CASCADE,
+                  FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+              -- 6. notes_tags
+              CREATE TABLE IF NOT EXISTS notes_tags (
+                  notes_id BIGINT NOT NULL,
+                  tag_id BIGINT NOT NULL,
+                  PRIMARY KEY (notes_id, tag_id),
+                  INDEX idx_tag_id (tag_id),
+                  FOREIGN KEY (notes_id) REFERENCES notes(id) ON DELETE CASCADE,
+                  FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+              -- 7. projects_tags
+              CREATE TABLE IF NOT EXISTS projects_tags (
+                  project_id BIGINT NOT NULL,
+                  tag_id BIGINT NOT NULL,
+                  PRIMARY KEY (project_id, tag_id),
+                  INDEX idx_tag_id (tag_id),
+                  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+                  FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+              -- 8. admin
+              CREATE TABLE IF NOT EXISTS admin (
+                  id BIGINT NOT NULL AUTO_INCREMENT,
+                  username VARCHAR(100) NOT NULL,
+                  password VARCHAR(255) NOT NULL,
+                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  PRIMARY KEY (id),
+                  UNIQUE KEY uk_username (username)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+              -- 9. sticky_notes
+              CREATE TABLE IF NOT EXISTS sticky_notes (
+                  id BIGINT NOT NULL AUTO_INCREMENT,
+                  content VARCHAR(500) NOT NULL,
+                  color VARCHAR(20) NOT NULL,
+                  rotate INT DEFAULT 0,
+                  category VARCHAR(20) DEFAULT 'to_aa',
+                  author_name VARCHAR(100) DEFAULT '',
+                  author_avatar VARCHAR(500) DEFAULT '',
+                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  PRIMARY KEY (id),
+                  INDEX idx_category (category)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+              -- 10. hero_quotes
+              CREATE TABLE IF NOT EXISTS hero_quotes (
+                  id BIGINT NOT NULL AUTO_INCREMENT,
+                  content VARCHAR(500) NOT NULL,
+                  author VARCHAR(100) DEFAULT '',
+                  source VARCHAR(200) DEFAULT '',
+                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  PRIMARY KEY (id)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+      rollback:
+        - sql:
+            splitStatements: true
+            sql: |
+              DROP TABLE IF EXISTS hero_quotes;
+              DROP TABLE IF EXISTS sticky_notes;
+              DROP TABLE IF EXISTS admin;
+              DROP TABLE IF EXISTS projects_tags;
+              DROP TABLE IF EXISTS notes_tags;
+              DROP TABLE IF EXISTS blog_tags;
+              DROP TABLE IF EXISTS tags;
+              DROP TABLE IF EXISTS projects;
+              DROP TABLE IF EXISTS notes;
+              DROP TABLE IF EXISTS blog;
+
+  # ==================== 清理 projects 表无用字段 ====================
+  - changeSet:
+      id: 2
+      author: AA_
+      comment: projects 表删除未使用的 content 列
+      changes:
+        - sql:
+            sql: ALTER TABLE projects DROP COLUMN IF EXISTS content;
+      rollback:
+        - sql:
+            sql: ALTER TABLE projects ADD COLUMN content LONGTEXT NULL;
