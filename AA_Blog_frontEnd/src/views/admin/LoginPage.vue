@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/api/client'
 import { refreshAuth } from '@/router/auth'
+import { login as loginApi } from '@/api/auth'
+import type { LoginRequest } from '@/models/types'
 import LogoIcon from '@/components/LogoIcon.vue'
 
 const router = useRouter()
@@ -11,7 +12,7 @@ const password = ref('')
 const loading = ref(false)
 const error = ref('')
 
-const login = async () => {
+const handleLogin = async () => {
   if (!username.value || !password.value) {
     error.value = '请填写用户名和密码'
     return
@@ -19,10 +20,8 @@ const login = async () => {
   error.value = ''
   loading.value = true
   try {
-    await api.post('/admin/login', {
-      username: username.value,
-      password: password.value
-    })
+    const body: LoginRequest = { username: username.value, password: password.value }
+    await loginApi(body)
     await refreshAuth()
     router.push('/')
   } catch (e: unknown) {
@@ -48,7 +47,7 @@ const login = async () => {
       </RouterLink>
       <p class="login-sub">管理员登录</p>
       <div class="error" v-if="error">{{ error }}</div>
-      <form @submit.prevent="login">
+      <form @submit.prevent="handleLogin">
         <input v-model="username" type="text" placeholder="用户名" autocomplete="username" />
         <input v-model="password" type="password" placeholder="密码" autocomplete="current-password" />
         <button type="submit" :disabled="loading">

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import api from '@/api/client'
+import { githubCallback } from '@/api/auth'
 
 const route = useRoute()
 const router = useRouter()
@@ -11,7 +11,7 @@ onMounted(async () => {
   const code = route.query.code as string
   if (!code) { error.value = '缺少授权码'; return }
   try {
-    const data = await api.get<{ name: string; avatar: string }>(`/auth/github/callback?code=${encodeURIComponent(code)}`)
+    const data = await githubCallback(code)
     localStorage.setItem('commenter', JSON.stringify(data))
     router.replace('/guest')
   } catch (e: unknown) {

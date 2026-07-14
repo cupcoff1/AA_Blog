@@ -7,10 +7,10 @@ import com.javaee.blog.dto.vo.BlogVO;
 import com.javaee.blog.dto.vo.TagVO;
 import com.javaee.blog.entity.Blog;
 import com.javaee.blog.entity.association.BlogTags;
-import com.javaee.blog.entity.Tags;
+import com.javaee.blog.entity.Tag;
 import com.javaee.blog.mapper.BlogMapper;
 import com.javaee.blog.mapper.BlogTagsMapper;
-import com.javaee.blog.mapper.TagsMapper;
+import com.javaee.blog.mapper.TagMapper;
 import com.javaee.blog.service.BlogService;
 import com.javaee.blog.util.SlugUtil;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class BlogServiceImpl implements BlogService {
 
     private final BlogMapper blogMapper;
-    private final TagsMapper tagsMapper;
+    private final TagMapper tagMapper;
     private final BlogTagsMapper blogTagsMapper;
 
     // ==================== 私有方法 ====================
@@ -43,7 +43,7 @@ public class BlogServiceImpl implements BlogService {
             wrapper.and(w -> w.like(Blog::getTitle, keyword).or().like(Blog::getContent, keyword));
         }
         if (tagSlug != null && !tagSlug.isBlank()) {
-            Tags tag = tagsMapper.selectOne(new LambdaQueryWrapper<Tags>().eq(Tags::getSlug, tagSlug));
+            Tag tag = tagMapper.selectOne(new LambdaQueryWrapper<Tag>().eq(Tag::getSlug, tagSlug));
             if (tag == null) return Collections.emptyList();
             List<BlogTags> links = blogTagsMapper.selectList(
                     new LambdaQueryWrapper<BlogTags>().eq(BlogTags::getTagId, tag.getId()));
@@ -68,8 +68,8 @@ public class BlogServiceImpl implements BlogService {
                 new LambdaQueryWrapper<BlogTags>().in(BlogTags::getBlogId, blogIds));
         if (links.isEmpty()) return Collections.emptyMap();
         List<Long> tagIds = links.stream().map(BlogTags::getTagId).distinct().collect(Collectors.toList());
-        List<Tags> tags = tagsMapper.selectBatchIds(tagIds);
-        Map<Long, TagVO> tagVoMap = tags.stream().collect(Collectors.toMap(Tags::getId, TagVO::from));
+        List<Tag> tags = tagMapper.selectBatchIds(tagIds);
+        Map<Long, TagVO> tagVoMap = tags.stream().collect(Collectors.toMap(Tag::getId, TagVO::from));
         Map<Long, List<TagVO>> result = new HashMap<>();
         for (BlogTags link : links) {
             TagVO vo = tagVoMap.get(link.getTagId());
@@ -108,7 +108,7 @@ public class BlogServiceImpl implements BlogService {
                 new LambdaQueryWrapper<BlogTags>().eq(BlogTags::getBlogId, blogId));
         if (links.isEmpty()) return Collections.emptyList();
         List<Long> tagIds = links.stream().map(BlogTags::getTagId).collect(Collectors.toList());
-        return tagsMapper.selectBatchIds(tagIds).stream().map(TagVO::from).collect(Collectors.toList());
+        return tagMapper.selectBatchIds(tagIds).stream().map(TagVO::from).collect(Collectors.toList());
     }
 
     /**
@@ -124,19 +124,19 @@ public class BlogServiceImpl implements BlogService {
             }
         }
         if (newTags != null && !newTags.isEmpty()) {
-            List<Tags> existing = tagsMapper.selectList(
-                    new LambdaQueryWrapper<Tags>().in(Tags::getName, newTags));
-            Set<String> existingNames = existing.stream().map(Tags::getName).collect(Collectors.toSet());
+            List<Tag> existing = tagMapper.selectList(
+                    new LambdaQueryWrapper<Tag>().in(Tag::getName, newTags));
+            Set<String> existingNames = existing.stream().map(Tag::getName).collect(Collectors.toSet());
             for (String name : newTags) {
-                Tags tag;
+                Tag tag;
                 if (existingNames.contains(name)) {
                     tag = existing.stream().filter(t -> t.getName().equals(name)).findFirst()
                                     .orElseThrow(() -> new IllegalStateException("标签数据异常"));
                 } else {
-                    tag = new Tags();
+                    tag = new Tag();
                     tag.setName(name);
                     tag.setSlug(SlugUtil.toSlug(name));
-                    tagsMapper.insert(tag);
+                    tagMapper.insert(tag);
                     existingNames.add(name);
                 }
                 BlogTags link = new BlogTags();

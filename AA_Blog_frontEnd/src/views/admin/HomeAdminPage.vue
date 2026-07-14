@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { Home, Plus, X, Key } from '@lucide/vue'
-import api from '@/api/client'
-import type { HeroQuoteVO, HeroConfigVO } from '@/models/types'
+import { listQuotes, createQuote, deleteQuote, uploadHeroImage, getHeroConfig } from '@/api/hero'
+import { changePassword as changePasswordApi } from '@/api/auth'
+import type { HeroQuoteVO, HeroConfigVO, ChangePasswordRequest } from '@/models/types'
 
 const quotes = ref<HeroQuoteVO[]>([])
 const loading = ref(true)
@@ -17,7 +18,7 @@ const heroConfig = ref<HeroConfigVO>({ heroLight: '/hero-light.png', heroDark: '
 
 const fetchQuotes = async () => {
   loading.value = true; error.value = false
-  try { quotes.value = await api.get<HeroQuoteVO[]>('/hero-quotes') || [] }
+  try { quotes.value = await listQuotes() || [] }
   catch { error.value = true }
   finally { loading.value = false }
 }
@@ -25,7 +26,7 @@ const fetchQuotes = async () => {
 const addQuote = async () => {
   if (!newContent.value.trim()) return
   try {
-    await api.post('/admin/hero-quotes', {
+    await createQuote({
       content: newContent.value.trim(),
       author: newAuthor.value.trim(),
       source: newSource.value.trim()
@@ -43,7 +44,7 @@ const addQuote = async () => {
 const delQuote = async (id: number) => {
   if (!confirm('删除这条引语？')) return
   try {
-    await api.delete(`/admin/hero-quotes/${id}`)
+    await deleteQuote(id)
     quotes.value = quotes.value.filter(q => q.id !== id)
   } catch {
     quoteError.value = '删除引语失败'
@@ -54,9 +55,7 @@ const uploadHero = async (type: 'light' | 'dark', e: Event) => {
   const input = e.target as HTMLInputElement
   if (!input.files?.length) return
   try {
-    const form = new FormData()
-    form.append('file', input.files[0])
-    const { url } = await api.post<{ url: string }>('/admin/hero-image?type=' + type, form)
+    const { url } = await uploadHeroImage(type, input.files[0])
     heroConfig.value[type === 'light' ? 'heroLight' : 'heroDark'] = url + '?t=' + Date.now()
     uploadError.value = ''
   } catch {
@@ -74,10 +73,8 @@ const changePassword = async () => {
     pwdMsg.value = '请填写新旧密码'; pwdOk.value = false; return
   }
   try {
-    await api.put('/admin/password', {
-      oldPassword: oldPassword.value,
-      newPassword: newPassword.value
-    })
+    const body: ChangePasswordRequest = { oldPassword: oldPassword.value, newPassword: newPassword.value }
+    await changePasswordApi(body)
     pwdMsg.value = '密码修改成功'
     pwdOk.value = true
     oldPassword.value = ''
@@ -89,7 +86,7 @@ const changePassword = async () => {
 }
 
 const fetchHeroConfig = async () => {
-  try { heroConfig.value = await api.get<HeroConfigVO>('/hero-config') }
+  try { heroConfig.value = await getHeroConfig() }
   catch { /* use defaults */ }
 }
 

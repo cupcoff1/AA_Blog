@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ChevronDown, ChevronRight } from '@lucide/vue'
-import api from '@/api/client'
+import { getBlogBySlug } from '@/api/blog'
 import type { BlogVO } from '@/models/types'
 import { marked } from 'marked'
 import { markedHighlight } from 'marked-highlight'
@@ -77,7 +77,7 @@ const onScroll = () => {
 
 onMounted(async () => {
   try {
-    blog.value = await api.get<BlogVO>(`/blog/${String(route.params.slug)}`)
+    blog.value = await getBlogBySlug(String(route.params.slug))
     headingTimer = setTimeout(extractHeadings, 100)
     setTimeout(loadUtterances, 300)
   } catch {

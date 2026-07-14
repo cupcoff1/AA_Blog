@@ -17,15 +17,22 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StickyNoteServiceImpl implements StickyNoteService {
 
+    private static final String SOURCE_ADMIN = "admin";
+    private static final String SOURCE_GUEST = "guest";
+    private static final String DEFAULT_CATEGORY = "to_aa";
+    private static final String EMPTY_STR = "";
+    private static final int ROTATE_MIN = -3;
+    private static final int ROTATE_RANGE = 7;
+
     private final StickyNoteMapper mapper;
 
     @Override
     public List<StickyNoteVO> list(String currentUser, String source) {
         LambdaQueryWrapper<StickyNote> wrapper = new LambdaQueryWrapper<StickyNote>().orderByDesc(StickyNote::getCreatedAt);
-        if ("admin".equals(source)) {
-            wrapper.and(w -> w.isNull(StickyNote::getAuthorName).or().eq(StickyNote::getAuthorName, ""));
-        } else if ("guest".equals(source)) {
-            wrapper.isNotNull(StickyNote::getAuthorName).ne(StickyNote::getAuthorName, "");
+        if (SOURCE_ADMIN.equals(source)) {
+            wrapper.and(w -> w.isNull(StickyNote::getAuthorName).or().eq(StickyNote::getAuthorName, EMPTY_STR));
+        } else if (SOURCE_GUEST.equals(source)) {
+            wrapper.isNotNull(StickyNote::getAuthorName).ne(StickyNote::getAuthorName, EMPTY_STR);
         }
         return mapper.selectList(wrapper)
                 .stream().map(n -> {
@@ -34,9 +41,9 @@ public class StickyNoteServiceImpl implements StickyNoteService {
                     vo.setContent(n.getContent());
                     vo.setColor(n.getColor());
                     vo.setRotate(n.getRotate() != null ? n.getRotate() : 0);
-                    vo.setCategory(n.getCategory() != null ? n.getCategory() : "to_aa");
-                    vo.setAuthorName(n.getAuthorName() != null ? n.getAuthorName() : "");
-                    vo.setAuthorAvatar(n.getAuthorAvatar() != null ? n.getAuthorAvatar() : "");
+                    vo.setCategory(n.getCategory() != null ? n.getCategory() : DEFAULT_CATEGORY);
+                    vo.setAuthorName(n.getAuthorName() != null ? n.getAuthorName() : EMPTY_STR);
+                    vo.setAuthorAvatar(n.getAuthorAvatar() != null ? n.getAuthorAvatar() : EMPTY_STR);
                     vo.setOwn(n.getAuthorName() != null && n.getAuthorName().equals(currentUser));
                     return vo;
                 }).collect(Collectors.toList());
@@ -47,8 +54,8 @@ public class StickyNoteServiceImpl implements StickyNoteService {
         StickyNote note = new StickyNote();
         note.setContent(req.getContent());
         note.setColor(req.getColor());
-        note.setRotate(req.getRotate() != null ? req.getRotate() : ThreadLocalRandom.current().nextInt(7) - 3);
-        note.setCategory(req.getCategory() != null ? req.getCategory() : "to_aa");
+        note.setRotate(req.getRotate() != null ? req.getRotate() : ThreadLocalRandom.current().nextInt(ROTATE_RANGE) + ROTATE_MIN);
+        note.setCategory(req.getCategory() != null ? req.getCategory() : DEFAULT_CATEGORY);
         note.setAuthorName(authorName);
         note.setAuthorAvatar(authorAvatar);
         mapper.insert(note);

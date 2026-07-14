@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import api from '@/api/client'
 import TagEditor from '@/components/TagEditor.vue'
+import { getAdminBlog, createBlog, updateBlog } from '@/api/blog'
+import { uploadImage } from '@/api/upload'
 import type { BlogVO, BlogCreateRequest, TagVO } from '@/models/types'
 
 const route = useRoute()
@@ -20,14 +21,12 @@ const error = ref('')
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const uploading = ref(false)
 
-const uploadImage = async (e: Event) => {
+const handleUploadImage = async (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
   uploading.value = true
   try {
-    const form = new FormData()
-    form.append('file', file)
-    const { url } = await api.post<{ url: string }>('/admin/upload?type=image', form)
+    const { url } = await uploadImage(file)
     const ta = textareaRef.value
     if (ta) {
       const pos = ta.selectionStart
@@ -45,8 +44,8 @@ const submit = async () => {
   loading.value = true; error.value = ''
   try {
     const body: BlogCreateRequest = { title: title.value, summary: summary.value, content: content.value, tagIds: tagIds.value, newTags: newTags.value }
-    if (editId) await api.put(`/admin/blog/${editId}`, body)
-    else await api.post('/admin/blog', body)
+    if (editId) await updateBlog(editId, body)
+    else await createBlog(body)
     router.push('/blog')
   } catch (e: unknown) { error.value = e instanceof Error ? e.message : '保存失败' }
   finally { loading.value = false }
@@ -56,7 +55,7 @@ onMounted(async () => {
   if (!editId) return
   loading.value = true
   try {
-    const blog = await api.get<BlogVO>(`/admin/blog/${editId}`)
+    const blog = await getAdminBlog(editId)
     title.value = blog.title; summary.value = blog.summary; content.value = blog.content
     tagIds.value = blog.tags?.map((t: TagVO) => t.id) || []
   } catch {
@@ -83,7 +82,7 @@ onMounted(async () => {
       <div class="label-row">
         <label>正文（Markdown）</label>
         <label class="upload-label">
-          <input type="file" accept="image/*" @change="uploadImage" hidden />
+          <input type="file" accept="image/*" @change="handleUploadImage" hidden />
           {{ uploading ? '上传中...' : '📷 插入图片' }}
         </label>
       </div>

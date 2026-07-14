@@ -2,8 +2,8 @@
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { BookOpen, Search, Pencil, Trash2 } from '@lucide/vue'
-import api from '@/api/client'
 import { isAdmin } from '@/router/auth'
+import { listBlogs, deleteBlog } from '@/api/blog'
 import type { BlogListVO } from '@/models/types'
 
 const route = useRoute()
@@ -12,10 +12,10 @@ const blogs = ref<BlogListVO[]>([])
 const loading = ref(true)
 const error = ref(false)
 
-const deleteBlog = async (id: number, title: string) => {
+const handleDelete = async (id: number, title: string) => {
   if (!confirm(`删除「${title}」？`)) return
   try {
-    await api.delete(`/admin/blog/${id}`)
+    await deleteBlog(id)
     blogs.value = blogs.value.filter(b => b.id !== id)
   } catch {
     alert('删除失败，请重试')
@@ -29,7 +29,7 @@ const fetchBlogs = async () => {
   try {
     const q = String(route.query.q || '')
     const tag = String(route.query.tag || '')
-    blogs.value = await api.get<BlogListVO[]>('/blog', { params: { q, tag } })
+    blogs.value = await listBlogs({ q, tag })
   } catch {
     error.value = true
   } finally {
@@ -76,7 +76,7 @@ watch(() => route.query.q, (val) => { keyword.value = String(val || '') })
           <RouterLink :to="`/blog/${blog.id}/edit`" class="icon-btn" title="编辑">
             <Pencil :size="14" />
           </RouterLink>
-          <button @click="deleteBlog(blog.id, blog.title)" class="icon-btn icon-del" title="删除">
+          <button @click="handleDelete(blog.id, blog.title)" class="icon-btn icon-del" title="删除">
             <Trash2 :size="14" />
           </button>
         </div>

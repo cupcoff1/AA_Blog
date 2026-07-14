@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { FolderOpen, Pencil, Trash2 } from '@lucide/vue'
-import api from '@/api/client'
 import { isAdmin } from '@/router/auth'
-import type { ProjectsVO } from '@/models/types'
+import { listProjects, deleteProject } from '@/api/project'
+import type { ProjectVO } from '@/models/types'
 
-const projects = ref<ProjectsVO[]>([])
+const projects = ref<ProjectVO[]>([])
 const loading = ref(true)
 const error = ref(false)
 
-const deleteProject = async (id: number, name: string) => {
+const handleDelete = async (id: number, name: string) => {
   if (!confirm(`删除「${name}」？`)) return
   try {
-    await api.delete(`/admin/projects/${id}`)
+    await deleteProject(id)
     projects.value = projects.value.filter(p => p.id !== id)
   } catch {
     alert('删除失败，请重试')
@@ -21,7 +21,7 @@ const deleteProject = async (id: number, name: string) => {
 
 onMounted(async () => {
   try {
-    projects.value = await api.get<ProjectsVO[]>('/projects')
+    projects.value = await listProjects()
   } catch {
     error.value = true
   } finally {
@@ -50,7 +50,7 @@ onMounted(async () => {
           <RouterLink :to="`/projects/${proj.id}/edit`" class="icon-btn" title="编辑">
             <Pencil :size="14" />
           </RouterLink>
-          <button @click="deleteProject(proj.id, proj.name)" class="icon-btn icon-del" title="删除">
+          <button @click="handleDelete(proj.id, proj.name)" class="icon-btn icon-del" title="删除">
             <Trash2 :size="14" />
           </button>
         </div>

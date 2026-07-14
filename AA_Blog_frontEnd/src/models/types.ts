@@ -30,7 +30,7 @@ export interface BlogCreateRequest {
 }
 
 // ==================== Notes ====================
-export interface NotesVO {
+export interface NoteVO {
   id: number
   title: string
   slug: string
@@ -39,7 +39,7 @@ export interface NotesVO {
   tags: TagVO[]
 }
 
-export interface NotesCreateRequest {
+export interface NoteCreateRequest {
   title: string
   content: string
   tagIds?: number[]
@@ -47,7 +47,7 @@ export interface NotesCreateRequest {
 }
 
 // ==================== Projects ====================
-export interface ProjectsVO {
+export interface ProjectVO {
   id: number
   name: string
   slug: string
@@ -57,7 +57,7 @@ export interface ProjectsVO {
   tags: TagVO[]
 }
 
-export interface ProjectsCreateRequest {
+export interface ProjectCreateRequest {
   name: string
   description: string
   demoUrl?: string
@@ -99,6 +99,16 @@ export interface HeroConfigVO {
 }
 
 // ==================== Auth ====================
+export interface LoginRequest {
+  username: string
+  password: string
+}
+
+export interface ChangePasswordRequest {
+  oldPassword: string
+  newPassword: string
+}
+
 export interface GitHubUser {
   name: string
   avatar: string
@@ -107,8 +117,8 @@ export interface GitHubUser {
 // ==================== Home ====================
 export interface HomeVO {
   latestBlogs: BlogListVO[]
-  latestNotes: NotesVO[]
-  latestProjects: ProjectsVO[]
+  latestNotes: NoteVO[]
+  latestProjects: ProjectVO[]
 }
 
 

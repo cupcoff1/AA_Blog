@@ -6,7 +6,8 @@
       "Bash(npm install *)",
       "Read(//tmp/**)",
       "Bash(npx vite *)",
-      "Bash(mysql *)"
+      "Bash(mysql *)",
+      "Bash(git mv *)"
     ]
   }
 }

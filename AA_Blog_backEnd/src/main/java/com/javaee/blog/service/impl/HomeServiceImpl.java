@@ -3,8 +3,8 @@ package com.javaee.blog.service.impl;
 import com.javaee.blog.dto.vo.HomeVO;
 import com.javaee.blog.service.BlogService;
 import com.javaee.blog.service.HomeService;
-import com.javaee.blog.service.NotesService;
-import com.javaee.blog.service.ProjectsService;
+import com.javaee.blog.service.NoteService;
+import com.javaee.blog.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 public class HomeServiceImpl implements HomeService {
 
     private final BlogService blogService;
-    private final NotesService notesService;
-    private final ProjectsService projectsService;
+    private final NoteService noteService;
+    private final ProjectService projectService;
 
     @Value("${home.latest-blogs}")
     private int latestBlogs;
@@ -30,8 +30,8 @@ public class HomeServiceImpl implements HomeService {
     public HomeVO getHome() {
         HomeVO vo = new HomeVO();
         vo.setLatestBlogs(blogService.list(null, null, latestBlogs));
-        vo.setLatestNotes(notesService.list(null, null, latestNotes));
-        vo.setLatestProjects(projectsService.list(latestProjects));
+        vo.setLatestNotes(noteService.list(null, null, latestNotes));
+        vo.setLatestProjects(projectService.list(latestProjects));
         return vo;
     }
 }

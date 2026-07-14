@@ -2,15 +2,15 @@
 import { ref, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Pencil, Search, Trash2 } from '@lucide/vue'
-import api from '@/api/client'
+import { listNotes, deleteNote as deleteNoteApi } from '@/api/note'
 import { isAdmin } from '@/router/auth'
-import type { NotesVO } from '@/models/types'
+import type { NoteVO } from '@/models/types'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 
 const route = useRoute()
 const router = useRouter()
-const notes = ref<NotesVO[]>([])
+const notes = ref<NoteVO[]>([])
 const loading = ref(true)
 const error = ref(false)
 const keyword = ref(String(route.query.q || ''))
@@ -19,10 +19,10 @@ const renderedContents = computed(() => new Map(
   notes.value.map(n => [n.id, DOMPurify.sanitize(marked(n.content || '') as string)] as const)
 ))
 
-const deleteNote = async (id: number, title: string) => {
+const handleDelete = async (id: number, title: string) => {
   if (!confirm(`删除「${title}」？`)) return
   try {
-    await api.delete(`/admin/notes/${id}`)
+    await deleteNoteApi(id)
     notes.value = notes.value.filter(n => n.id !== id)
   } catch {
     alert('删除失败，请重试')
@@ -35,7 +35,7 @@ const fetchNotes = async () => {
   try {
     const q = String(route.query.q || '')
     const tag = String(route.query.tag || '')
-    notes.value = await api.get<NotesVO[]>('/notes', { params: { q, tag } })
+    notes.value = await listNotes({ q, tag })
   } catch {
     error.value = true
   } finally {
@@ -83,7 +83,7 @@ watch(() => route.query.q, (val) => { keyword.value = String(val || '') })
           <RouterLink :to="`/notes/${note.id}/edit`" class="icon-btn" title="编辑">
             <Pencil :size="14" />
           </RouterLink>
-          <button @click="deleteNote(note.id, note.title)" class="icon-btn icon-del" title="删除">
+          <button @click="handleDelete(note.id, note.title)" class="icon-btn icon-del" title="删除">
             <Trash2 :size="14" />
           </button>
         </div>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { BookOpen, Pencil, FolderOpen } from '@lucide/vue'
-import api from '@/api/client'
+import { getHome } from '@/api/home'
+import { listQuotes, getHeroConfig } from '@/api/hero'
 import type { HomeVO, HeroQuoteVO, HeroConfigVO } from '@/models/types'
 
 const quotes = ref<HeroQuoteVO[]>([{ id: 0, content: '真正重要的东西，眼睛是看不见的', author: '', source: '' }])
@@ -16,16 +17,16 @@ const heroLight = ref('/hero-light.png')
 const heroDark = ref('/hero.jpg')
 
 onMounted(async () => {
-  try { data.value = await api.get<HomeVO>('/home') }
+  try { data.value = await getHome() }
   catch { error.value = true }
 
   try {
-    const qs = await api.get<HeroQuoteVO[]>('/hero-quotes')
+    const qs = await listQuotes()
     if (qs && qs.length) quotes.value = qs
   } catch {}
 
   try {
-    const cfg = await api.get<HeroConfigVO>('/hero-config')
+    const cfg = await getHeroConfig()
     if (cfg) { heroLight.value = cfg.heroLight; heroDark.value = cfg.heroDark }
   } catch {}
 

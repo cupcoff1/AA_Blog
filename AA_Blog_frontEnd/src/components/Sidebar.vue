@@ -2,8 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { BookOpen, Pencil, FolderOpen, User, Sun, Moon, GitFork, LogOut, Plus, MessageSquare, Menu } from '@lucide/vue'
-import api from '@/api/client'
 import { isAdmin, refreshAuth } from '@/router/auth'
+import { logout as logoutApi } from '@/api/auth'
 import LogoIcon from './LogoIcon.vue'
 
 const router = useRouter()
@@ -19,7 +19,7 @@ const toggleTheme = () => {
 }
 const logout = async () => {
   if (!confirm('(╥﹏╥) 真的要走了吗？')) return
-  await api.post('/admin/logout')
+  await logoutApi()
   await refreshAuth()
   router.push('/')
 }

@@ -2,8 +2,8 @@
 import { ref, onMounted } from 'vue'
 
 import { Plus, X, Check } from '@lucide/vue'
-import api from '@/api/client'
 import { isAdmin } from '@/router/auth'
+import { listStickyNotes, createAdminNote, deleteAdminNote } from '@/api/sticky-note'
 import type { StickyNoteVO } from '@/models/types'
 
 const customNotes = ref<StickyNoteVO[]>([])
@@ -17,22 +17,21 @@ const colors = ['#fff3cd', '#d4edda', '#cce5ff', '#f8d7da', '#e8daef', '#d1ecf1'
 const addNote = async () => {
   if (!newContent.value.trim()) return
   try {
-    await api.post('/admin/sticky-notes', {
+    await createAdminNote({
       content: newContent.value.trim(),
       color: newColor.value,
       rotate: Math.floor(Math.random() * 7) - 3
     })
     newContent.value = ''
     showForm.value = false
-    // 刷新自定义便签
-    customNotes.value = await api.get<StickyNoteVO[]>('/sticky-notes?source=admin')
+    customNotes.value = await listStickyNotes('admin')
   } catch {}
 }
 
 const delNote = async (id: number) => {
   if (!confirm('删除这张便签？')) return
   try {
-    await api.delete(`/admin/sticky-notes/${id}`)
+    await deleteAdminNote(id)
     customNotes.value = customNotes.value.filter(n => n.id !== id)
   } catch {
     alert('删除失败，请重试')
@@ -41,7 +40,7 @@ const delNote = async (id: number) => {
 
 onMounted(async () => {
   try {
-    customNotes.value = await api.get<StickyNoteVO[]>('/sticky-notes?source=admin') || []
+    customNotes.value = await listStickyNotes('admin') || []
   } catch { error.value = true }
   finally { loading.value = false }
 })
@@ -101,9 +100,10 @@ onMounted(async () => {
 .sticky:nth-child(4n+1) { margin-top: -0.3rem; }
 .sticky {
   background: var(--bg); position: relative;
-  padding: 1.2rem 1.4rem; width: 200px; min-height: 120px;
+  padding: 1.2rem 1.4rem; width: 200px; max-height: 200px;
   box-shadow: 2px 3px 8px rgba(0,0,0,0.1);
   transition: transform 0.2s;
+  display: flex; flex-direction: column;
 }
 .sticky:hover { transform: scale(1.05) !important; z-index: 10; }
 .sticky::after {
@@ -113,7 +113,7 @@ onMounted(async () => {
     repeating-linear-gradient(transparent 0, transparent 23px, rgba(0,0,0,0.02) 23px, rgba(0,0,0,0.02) 24px);
   pointer-events: none;
 }
-.sticky-body { font-family: 'Ma Shan Zheng', cursive; font-size: 1.05em; color: rgba(0,0,0,0.65); line-height: 1.6; }
+.sticky-body { font-family: 'Ma Shan Zheng', cursive; font-size: 1.05em; color: rgba(0,0,0,0.65); line-height: 1.6; overflow-y: auto; flex: 1; scrollbar-width: none; }
 .del-note { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(0,0,0,0.08); color: rgba(0,0,0,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; }
 .del-note:hover { background: rgba(229,62,62,0.2); color: #e53e3e; }
 

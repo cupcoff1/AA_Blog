@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import api from '@/api/client'
 import TagEditor from '@/components/TagEditor.vue'
-import type { NotesVO, NotesCreateRequest, TagVO } from '@/models/types'
+import { getAdminNote, createNote, updateNote } from '@/api/note'
+import type { NoteVO, NoteCreateRequest, TagVO } from '@/models/types'
 
 const route = useRoute(); const router = useRouter()
 const editId = route.params.id ? Number(route.params.id) : null
@@ -15,8 +15,8 @@ const submit = async () => {
   if (!title.value || !content.value) { error.value = '标题和正文不能为空'; return }
   loading.value = true; error.value = ''
   try {
-    const body: NotesCreateRequest = { title: title.value, content: content.value, tagIds: tagIds.value, newTags: newTags.value }
-    editId ? await api.put(`/admin/notes/${editId}`, body) : await api.post('/admin/notes', body)
+    const body: NoteCreateRequest = { title: title.value, content: content.value, tagIds: tagIds.value, newTags: newTags.value }
+    editId ? await updateNote(editId, body) : await createNote(body)
     router.push('/notes')
   } catch (e: unknown) { error.value = e instanceof Error ? e.message : '保存失败' } finally { loading.value = false }
 }
@@ -24,7 +24,7 @@ onMounted(async () => {
   if (!editId) return
   loading.value = true
   try {
-    const n = await api.get<NotesVO>(`/admin/notes/${editId}`)
+    const n = await getAdminNote(editId)
     title.value = n.title; content.value = n.content
     tagIds.value = n.tags?.map((t: TagVO) => t.id) || []
   } catch {

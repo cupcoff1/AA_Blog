@@ -21,6 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StickyNoteController {
 
+    /** 管理员用户名，首次启动由 DataInitializer 创建 */
+    private static final String ADMIN_USERNAME = "AA_";
+
     private final StickyNoteService service;
     private final JwtUtil jwtUtil;
 
@@ -75,13 +78,13 @@ public class StickyNoteController {
     }
 
     private String getUsername(HttpServletRequest req, boolean isAdmin) {
-        if (isAdmin) return "AA_";
+        if (isAdmin) return ADMIN_USERNAME;
         Claims claims = getClaims(req);
         return claims != null ? claims.getSubject() : null;
     }
 
     private boolean isAdmin(HttpServletRequest req) {
         Claims claims = getClaims(req);
-        return claims != null && "AA_".equals(claims.getSubject());
+        return claims != null && ADMIN_USERNAME.equals(claims.getSubject());
     }
 }

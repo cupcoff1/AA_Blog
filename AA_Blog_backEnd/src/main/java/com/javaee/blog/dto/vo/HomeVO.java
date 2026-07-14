@@ -8,6 +8,6 @@ import java.util.List;
 public class HomeVO {
 
     private List<BlogListVO> latestBlogs;
-    private List<NotesVO> latestNotes;
-    private List<ProjectsVO> latestProjects;
+    private List<NoteVO> latestNotes;
+    private List<ProjectVO> latestProjects;
 }

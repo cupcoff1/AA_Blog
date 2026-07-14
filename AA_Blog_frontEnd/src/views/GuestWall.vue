@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { GitFork, Send, X, MessageSquare, LogOut } from '@lucide/vue'
-import api from '@/api/client'
 import { isAdmin } from '@/router/auth'
+import { getGitHubAuthUrl, commenterLogout, checkCommenterStatus } from '@/api/auth'
+import { listStickyNotes, createGuestNote, deleteGuestNote, deleteAdminNote } from '@/api/sticky-note'
 import type { StickyNoteVO } from '@/models/types'
 
 const notes = ref<StickyNoteVO[]>([])
@@ -18,16 +19,16 @@ const submitting = ref(false)
 const colors = ['#fff3cd', '#d4edda', '#cce5ff', '#f8d7da', '#e8daef', '#d1ecf1']
 
 const login = async () => {
-  const { url } = await api.get<{ url: string }>('/auth/github/url')
+  const { url } = await getGitHubAuthUrl()
   window.location.href = url
 }
 const logout = async () => {
-  await api.post('/auth/logout')
+  await commenterLogout()
   commenter.value = null
 }
 
 const fetchNotes = async () => {
-  try { notes.value = await api.get<StickyNoteVO[]>('/sticky-notes?source=guest') || [] }
+  try { notes.value = await listStickyNotes('guest') || [] }
   catch { error.value = true }
   finally { loading.value = false }
 }
@@ -37,7 +38,7 @@ const submit = async () => {
   submitting.value = true
   try {
     const color = colors[Math.floor(Math.random() * colors.length)]
-    await api.post('/sticky-notes', {
+    await createGuestNote({
       content: newContent.value.trim(),
       color,
       rotate: Math.floor(Math.random() * 7) - 3,
@@ -52,8 +53,8 @@ const submit = async () => {
 const del = async (id: number) => {
   if (!confirm('删除这张便签？')) return
   try {
-    if (isAdmin.value) await api.delete(`/admin/sticky-notes/${id}`)
-    else await api.delete(`/sticky-notes/${id}`)
+    if (isAdmin.value) await deleteAdminNote(id)
+    else await deleteGuestNote(id)
     notes.value = notes.value.filter(n => n.id !== id)
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : ''
@@ -63,7 +64,7 @@ const del = async (id: number) => {
 
 const fetchAuth = async () => {
   try {
-    const data = await api.get<{ authenticated: boolean; name?: string; avatar?: string }>('/auth/status')
+    const data = await checkCommenterStatus()
     if (data.authenticated && data.name) {
       commenter.value = { name: data.name, avatar: data.avatar || '' }
     }
@@ -124,6 +125,7 @@ onMounted(async () => {
             {{ note.category === 'to_website' ? 'To Website' : 'To AA_' }}
           </span>
           <div class="sticky-foot" v-if="note.authorName">
+            <img v-if="note.authorAvatar" :src="note.authorAvatar" class="sticky-avatar" alt="" />
             <span class="sticky-author">{{ note.authorName }}</span>
           </div>
           <button v-if="note.own || isAdmin"
@@ -207,9 +209,10 @@ body.dark .write-row textarea { background: #33332c; border-color: #4a4a3f; }
 .sticky:nth-child(4n+1) { margin-top: -0.3rem; }
 .sticky {
   background: var(--bg); position: relative;
-  padding: 1.2rem 1.4rem; width: 200px; min-height: 120px;
+  padding: 1.2rem 1.4rem 2rem; width: 200px; max-height: 200px;
   box-shadow: 2px 3px 8px rgba(0,0,0,0.1);
   transition: transform 0.2s;
+  display: flex; flex-direction: column;
 }
 .sticky:hover { transform: scale(1.05) !important; z-index: 10; }
 .sticky::after {
@@ -219,11 +222,12 @@ body.dark .write-row textarea { background: #33332c; border-color: #4a4a3f; }
     repeating-linear-gradient(transparent 0, transparent 23px, rgba(0,0,0,0.02) 23px, rgba(0,0,0,0.02) 24px);
   pointer-events: none;
 }
-.sticky-body { font-family: 'Ma Shan Zheng', cursive; font-size: 1.05em; color: rgba(0,0,0,0.65); line-height: 1.6; }
+.sticky-body { font-family: 'Ma Shan Zheng', cursive; font-size: 1.05em; color: rgba(0,0,0,0.65); line-height: 1.6; overflow-y: auto; flex: 1; scrollbar-width: none; }
 .sticky-tag { position: absolute; bottom: 8px; right: 10px; padding: 1px 6px; border-radius: 8px; font-size: 0.65em; font-weight: 600; }
 .tag-aa { background: rgba(177,45,108,0.15); color: #b12d6c; }
 .tag-website { background: rgba(37,99,235,0.12); color: #2563eb; }
-.sticky-foot { margin-top: 0.3rem; }
+.sticky-foot { position: absolute; bottom: 8px; left: 10px; display: flex; align-items: center; gap: 4px; }
+.sticky-avatar { width: 16px; height: 16px; border-radius: 50%; }
 .sticky-author { font-size: 0.75em; color: rgba(0,0,0,0.35); }
 .del-btn { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(0,0,0,0.08); color: rgba(0,0,0,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; }
 .del-btn:hover { background: rgba(229,62,62,0.2); color: #e53e3e; }

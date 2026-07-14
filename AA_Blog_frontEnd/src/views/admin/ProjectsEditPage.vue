@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import api from '@/api/client'
 import TagEditor from '@/components/TagEditor.vue'
-import type { ProjectsVO, ProjectsCreateRequest, TagVO } from '@/models/types'
+import { getAdminProject, createProject, updateProject } from '@/api/project'
+import type { ProjectVO, ProjectCreateRequest, TagVO } from '@/models/types'
 
 const route = useRoute(); const router = useRouter()
 const editId = route.params.id ? Number(route.params.id) : null
@@ -15,8 +15,8 @@ const submit = async () => {
   if (!name.value || !description.value) { error.value = '名称和描述不能为空'; return }
   loading.value = true; error.value = ''
   try {
-    const body: ProjectsCreateRequest = { name: name.value, description: description.value, demoUrl: demoUrl.value, githubUrl: githubUrl.value, tagIds: tagIds.value, newTags: newTags.value }
-    editId ? await api.put(`/admin/projects/${editId}`, body) : await api.post('/admin/projects', body)
+    const body: ProjectCreateRequest = { name: name.value, description: description.value, demoUrl: demoUrl.value, githubUrl: githubUrl.value, tagIds: tagIds.value, newTags: newTags.value }
+    editId ? await updateProject(editId, body) : await createProject(body)
     router.push('/projects')
   } catch (e: unknown) { error.value = e instanceof Error ? e.message : '保存失败' } finally { loading.value = false }
 }
@@ -24,7 +24,7 @@ onMounted(async () => {
   if (!editId) return
   loading.value = true
   try {
-    const p = await api.get<ProjectsVO>(`/admin/projects/${editId}`)
+    const p = await getAdminProject(editId)
     name.value = p.name; description.value = p.description
     demoUrl.value = p.demoUrl; githubUrl.value = p.githubUrl
     tagIds.value = p.tags?.map((t: TagVO) => t.id) || []
