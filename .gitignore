@@ -40,6 +40,10 @@ build/
 ### Frontend static (built artifacts) ###
 AA_Blog_backEnd/src/main/resources/static/
 
+### Frontend ###
+AA_Blog_frontEnd/node_modules/
+AA_Blog_frontEnd/dist/
+
 ### Uploads ###
 uploads/
 

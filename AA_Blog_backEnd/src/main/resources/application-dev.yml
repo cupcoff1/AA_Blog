@@ -1,8 +1,5 @@
 # ==================== 开发环境 ====================
 
-upload:
-  base-dir: ./uploads/blog/
-
 logging:
   level:
     com.javaee.blog: debug

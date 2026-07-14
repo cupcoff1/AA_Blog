@@ -16,6 +16,7 @@ spring:
       max-request-size: 2MB
 
 upload:
+  base-dir: ${UPLOAD_BASE_DIR:./uploads/blog/}
   max-size: 2097152  # 2MB
 
 jwt:
