@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import TagEditor from '@/components/TagEditor.vue'
 import { getAdminBlog, createBlog, updateBlog, updateBlogTags } from '@/api/blog'
 import { uploadImage } from '@/api/upload'
-import type { BlogVO, BlogCreateRequest, TagVO } from '@/models/types'
+import type { BlogCreateRequest, TagVO } from '@/models/types'
 
 const route = useRoute()
 const router = useRouter()

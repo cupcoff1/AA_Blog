@@ -93,6 +93,7 @@ class NoteServiceImplTest {
         request.setTitle("New Note");
         request.setContent("Content");
         request.setTagIds(List.of(1L));
+        request.setNewTags(List.of("Vue"));
         when(tagMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(Collections.emptyList());
 
         service.create(request);

@@ -93,6 +93,7 @@ class ProjectServiceImplTest {
         request.setName("New Project");
         request.setDescription("Description");
         request.setTagIds(List.of(1L));
+        request.setNewTags(List.of("Java"));
         when(tagMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(Collections.emptyList());
 
         service.create(request);

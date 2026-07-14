@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TagEditor from '@/components/TagEditor.vue'
 import { getAdminNote, createNote, updateNote, updateNoteTags } from '@/api/note'
-import type { NoteVO, NoteCreateRequest, TagVO } from '@/models/types'
+import type { NoteCreateRequest, TagVO } from '@/models/types'
 
 const route = useRoute(); const router = useRouter()
 const editId = route.params.id ? Number(route.params.id) : null

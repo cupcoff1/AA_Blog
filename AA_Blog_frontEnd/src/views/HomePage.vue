@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { BookOpen, Pencil, FolderOpen } from '@lucide/vue'
 import { getHome } from '@/api/home'
 import { listQuotes, getHeroConfig } from '@/api/hero'
-import type { HomeVO, HeroQuoteVO, HeroConfigVO } from '@/models/types'
+import type { HomeVO, HeroQuoteVO } from '@/models/types'
 
 const quotes = ref<HeroQuoteVO[]>([{ id: 0, content: '真正重要的东西，眼睛是看不见的', author: '', source: '' }])
 const currentQuote = ref(0)
