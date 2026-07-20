@@ -6,13 +6,37 @@ on:
   pull_request:
     branches: [master]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   backend:
     name: Backend (Java 17 + Maven)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: AA_Blog_backEnd
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test1234
+          MYSQL_DATABASE: aa_blog
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_PASSWORD: test1234
+      JWT_SECRET: ci-integration-test-secret-key-min-32-bytes
+
     steps:
       - uses: actions/checkout@v4
 
@@ -24,11 +48,12 @@ jobs:
           cache: maven
 
       - name: Run tests
-        run: mvn test -B
+        run: mvn verify -B
 
   frontend:
     name: Frontend (Node 20 + Vite)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: AA_Blog_frontEnd
