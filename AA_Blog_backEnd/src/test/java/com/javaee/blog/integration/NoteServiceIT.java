@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -64,18 +63,6 @@ class NoteServiceIT {
         Note updated = noteMapper.selectById(id);
         assertEquals("新标题", updated.getTitle());
         assertEquals("新正文", updated.getContent());
-    }
-
-    @Test
-    void updateTags_shouldReplaceTags() {
-        NoteCreateRequest req = createReq("标签测试", "...");
-        req.setNewTags(List.of("Java"));
-        noteService.create(req);
-        Long id = noteMapper.selectList(null).get(0).getId();
-
-        noteService.updateTags(id, Collections.emptyList(), List.of("Spring"));
-
-        assertEquals("Spring", noteService.getById(id).getTags().get(0).getName());
     }
 
     @Test

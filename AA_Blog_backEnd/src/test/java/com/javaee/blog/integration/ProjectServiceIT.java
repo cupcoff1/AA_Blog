@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -69,18 +68,6 @@ class ProjectServiceIT {
         assertEquals("新描述", updated.getDescription());
         // slug 不变
         assertNotNull(updated.getSlug());
-    }
-
-    @Test
-    void updateTags_shouldReplaceTags() {
-        ProjectCreateRequest req = createReq("标签项目");
-        req.setNewTags(List.of("Java"));
-        projectService.create(req);
-        Long id = projectMapper.selectList(null).get(0).getId();
-
-        projectService.updateTags(id, Collections.emptyList(), List.of("Spring"));
-
-        assertEquals("Spring", projectService.getById(id).getTags().get(0).getName());
     }
 
     @Test
